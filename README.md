@@ -1,2 +1,0 @@
-# jaeOS
-progetto sistemi operativi
