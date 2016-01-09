@@ -27,15 +27,15 @@
  *	Aborts as soon as an error is detected.
  */
 
-#include <uARMconst.h>
-#include <uARMtypes.h>
-#include <libuarm.h>
+#include "include/uARMconst.h"
+#include "include/uARMtypes.h"
+#include "include/libuarm.h"
 
-#include "const.h"
+#include "include/const.h"
 
-#include "clist.h"
-#include "pcb.h"
-#include "asl.h"
+#include "include/clist.h"
+#include "include/pcb.h"
+#include "include/asl.h"
 
 #define	MAXSEM	MAXPROC
 
