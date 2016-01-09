@@ -35,3 +35,15 @@ struct pcb_t *allocPcb(){
 		}
 	return pcb;
 }
+
+// Inizializza la lista pcbFree, verrà chiamato solo una volta all'inizio
+
+void initPcbs(){
+	static struct pcb_t pcb_static[MAXPROC];
+    int i;
+	pcbFree = &pcb_static[MAXPROC].p_list;
+	for(i = 0; i < (MAXPROC-1); i++){
+		pcb_static[i].p_list.next = &pcb_static[i+1].p_list;
+	}
+	pcb_static[MAXPROC].p_list.next= &pcb_static[0].p_list;
+}
