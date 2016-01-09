@@ -5,7 +5,7 @@
 
 /* Lista */
 
-EXTERN void freePcb(pcb_t *p);
+ void freePcb(pcb_t *p);
 EXTERN pcb_t *allocPcb(void);
 EXTERN void initPcbs(void);
 
