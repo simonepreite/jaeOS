@@ -17,14 +17,14 @@ HIDDEN struct clist *pcbFree = CLIST_INIT;
 
 void freePcb(struct pcb_t *p){
 	struct clist *t = pcbFree;
-	clist_enqueue(p, t, p_list )
+	clist_enqueue(p, t, p_list );
 }
 
-pcb_t *allocPcb(){
-	pcb_t *pcb = NULL;
+struct pcb_t *allocPcb(){
+	struct pcb_t *pcb = NULL;
 		if(pcbFree != NULL){
 			pcb = container_of((pcbFree)->next, typeof(*pcb), p_list);
-			clist_dequeue(pcb);
+			clist_dequeue(pcbFree);
 			pcb->p_parent=NULL;
 			pcb->p_cursem=NULL;
 			//pcb->p_s=0; da verificare;

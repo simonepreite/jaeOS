@@ -1,6 +1,6 @@
 #ifndef STRUTTURE
 #define STRUTTURE
-#include <uARMtypes.h>
+#include "uARMtypes.h"
 
 struct pcb_t{
 	struct pcb_t *p_parent;

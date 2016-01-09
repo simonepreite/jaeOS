@@ -1,7 +1,7 @@
 #ifndef _CLIST_H
 #define _CLIST_H
 
-//typedef unsigned int    size_t;
+typedef unsigned int size_t;
 
 #define container_of(ptr, type, member) ({      \
 		    const typeof( ((type *)0)->member ) *__mptr = (ptr);  \
