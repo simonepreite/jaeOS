@@ -6,7 +6,7 @@
 
 /* Lista dei pcb inutilizzati */
 
-HIDDEN struct clist *pcbFree_h = CLIST_INIT;
+HIDDEN struct clist *pcbFree = CLIST_INIT;
 
 
 /*#################################################
@@ -16,14 +16,14 @@ HIDDEN struct clist *pcbFree_h = CLIST_INIT;
 //inserisce il pcb passato come parametro in coda alla lista
 
 void freePcb(struct pcb_t *p){
-	struct clist *t = pcbFree_h;
+	struct clist *t = pcbFree;
 	clist_enqueue(p, t, p_list )
 }
 
 pcb_t *allocPcb(){
 	pcb_t *pcb = NULL;
-		if(pcbFree_h != NULL){
-			pcb = container_of((pcbFree_h)->next, typeof(*pcb), p_list);
+		if(pcbFree != NULL){
+			pcb = container_of((pcbFree)->next, typeof(*pcb), p_list);
 			clist_dequeue(pcb);
 			pcb->p_parent=NULL;
 			pcb->p_cursem=NULL;
