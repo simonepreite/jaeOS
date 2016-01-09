@@ -27,9 +27,9 @@
  *	Aborts as soon as an error is detected.
  */
 
-#include "include/uARMconst.h"
-#include "include/uARMtypes.h"
-#include "include/libuarm.h"
+#include "/usr/include/uarm/uARMconst.h"
+#include "/usr/include/uarm/uARMtypes.h"
+#include "/usr/include/uarm/libuarm.h"
 
 #include "include/const.h"
 

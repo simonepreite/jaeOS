@@ -1,3 +1,5 @@
+#include "/usr/include/uarm/uARMconst.h"
+#include "/usr/include/uarm/uARMtypes.h"
 #include "include/const.h"
 #include "include/clist.h"
 #include "include/pcb.h"
@@ -6,7 +8,7 @@
 
 /* Lista dei pcb inutilizzati */
 
-HIDDEN struct clist *pcbFree = CLIST_INIT;
+HIDDEN struct clist *pcbFree = NULL;
 
 
 /*#################################################
@@ -28,9 +30,9 @@ struct pcb_t *allocPcb(){
 			pcb->p_parent=NULL;
 			pcb->p_cursem=NULL;
 			//pcb->p_s=0; da verificare;
-			pcb->p_list=NULL;
-			pcb->p_children=NULL;
-			pcb->p_siblings=NULL;
+			pcb->p_list.next=NULL;
+			pcb->p_children.next=NULL;
+			pcb->p_siblings.next=NULL;
 		}
 	return pcb;
 }
