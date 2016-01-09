@@ -7,6 +7,10 @@
 
 struct clist *pcbFree;
 
+/*#################################################
+  ###           GESTIONE LISTE PROCESSI         ###
+  #################################################*/
+
 void freePcb(struct pcb_t *p){
 	
 
