@@ -2,6 +2,8 @@
 #include "include/clist.h"
 #include "include/pcb.h"
 #include "include/asl.h"
+#include "include/struct.h"
+
 /* Lista dei pcb inutilizzati */
 
 HIDDEN struct clist *pcbFree_h;
