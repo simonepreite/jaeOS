@@ -6,7 +6,8 @@
 
 /* Lista dei pcb inutilizzati */
 
-HIDDEN struct clist *pcbFree_h;
+HIDDEN struct clist *pcbFree_h = CLIST_INIT;
+
 
 /*#################################################
   ###           GESTIONE LISTE PROCESSI         ###
@@ -16,7 +17,20 @@ HIDDEN struct clist *pcbFree_h;
 
 void freePcb(struct pcb_t *p){
 	struct clist *t = pcbFree_h;
-	clist_enqueue(p, &t, p_list )
+	clist_enqueue(p, t, p_list )
 }
 
-
+pcb_t *allocPcb(){
+	pcb_t *pcb = NULL;
+		if(pcbFree_h != NULL){
+			pcb = container_of((pcbFree_h)->next, typeof(*pcb), p_list);
+			clist_dequeue(pcb);
+			pcb->p_parent=NULL;
+			pcb->p_cursem=NULL;
+			//pcb->p_s=0; da verificare;
+			pcb->p_list=NULL;
+			pcb->p_children=NULL;
+			pcb->p_siblings=NULL;
+		}
+	return pcb;
+}
