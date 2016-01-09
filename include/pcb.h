@@ -6,19 +6,19 @@
 /* Lista */
 
 void freePcb(pcb_t *p);
-pcb_t *allocPcb(void);
-void initPcbs(void);
+struct pcb_t *allocPcb();
+void initPcbs();
 
-void insertProcQ(pcb_t *q, pcb_t *p);
-pcb_t *removeProcQ(pcb_t *q);
-pcb_t *outProcQ(pcb_t *q, pcb_t *p);
-pcb_t *headProcQ(struct clist *q);
+void insertProcQ(struct clist *q, struct pcb_t *p);
+struct pcb_t *removeProcQ(struct clist *q);
+struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p);
+struct pcb_t *headProcQ(struct clist *q);
 
 /* Alberi */
 
-int emptyChild(pcb_t *p);
-void insertChild(pcb_t *parent, pcb_t *p);
-pcb_t *removeChild(pcb_t *p);
-pcb_t *outChild(pcb_t *p);
+int emptyChild(struct pcb_t *p);
+void insertChild(struct pcb_t *parent, struct pcb_t *p);
+struct pcb_t *removeChild(struct pcb_t *p);
+struct pcb_t *outChild(struct pcb_t *p);
 
 #endif
