@@ -18,6 +18,12 @@ void freePcb(struct pcb_t *p){
 	clist_enqueue(p, t, p_list );
 }
 
+/*
+  toglie dalla lista dei processi liberi il primo e lo alloca
+  inizializza la struttura in modo che non vi siano residui della
+  vecchia allocazione                                           
+*/
+
 struct pcb_t *allocPcb(){
 	struct pcb_t *pcb = NULL;
 		if(pcbFree->next != NULL){
@@ -60,5 +66,27 @@ void insertProcQ(struct clist *q, struct pcb_t *p){
 
 struct pcb_t *headProcQ(struct clist *q){
 	struct clist temp = *q;
-	struct pcb_t *pcb_temp = clist_head(pcb_temp, temp, p_list);
+	struct pcb_t *pcb_temp; 
+	pcb_temp = clist_head(pcb_temp, temp, p_list);
+	return pcb_temp;
 }
+
+struct pcb_t *removeProcQ(struct clist *q){
+	struct pcb_t *pcb_temp = NULL; 
+		if(q->next != NULL){
+			pcb_temp = container_of((q)->next->next, typeof(*pcb_temp), p_list);
+			clist_dequeue(q);
+		}
+	return pcb_temp;
+}
+
+struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
+	if (clist_delete(p, q, p_list) == 0) return p;
+	else return NULL;
+}
+
+/***************************************************************
+*                   PROCESS TREE MAINTENANCE                   *
+***************************************************************/
+
+

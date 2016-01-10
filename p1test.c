@@ -110,5 +110,45 @@ int main() {
 	if (headProcQ(&qa) != firstproc)
 		adderrbuf("headProcQ(qa) failed   ");
 
+	q = outProcQ(&qa, firstproc);
+	if ((q == NULL) || (q != firstproc))
+		adderrbuf("outProcQ(&qa, firstproc) failed on first entry   ");		
+	freePcb(q);
+
+	q = outProcQ(&qa, midproc);
+	if (q == NULL || q != midproc)
+		adderrbuf("outProcQ(&qa, midproc) failed on middle entry   ");
+	freePcb(q);
+
+	if (outProcQ(&qa, procp[0]) != NULL)
+		adderrbuf("outProcQ(&qa, procp[0]) failed on nonexistent entry   ");
+	addokbuf("outProcQ() ok   \n");
+
+	/* Check if removeProc and insertProc remove in the correct order */
+	addokbuf("Removing...   \n");
+	for (i = 0; i < 8; i++) {
+		char *a="ciao\n";
+		char *b="GAY\n";
+		tprint(a);
+		if ((q = removeProcQ(&qa)) == NULL)
+			adderrbuf("removeProcQ(&qa): unexpected NULL   ");
+		freePcb(q);
+		tprint(b);
+	}
+
+	if (q != lastproc)
+		adderrbuf("removeProcQ(): failed on last entry   ");
+
+	if (removeProcQ(&qa) != NULL)
+		adderrbuf("removeProcQ(&qa): removes too many entries   ");
+
+	if (!clist_empty(qa))
+		adderrbuf("clist_empty(qa): unexpected FALSE   ");
+
+	addokbuf("insertProcQ(), removeProcQ() and clist_empty() ok   \n");
+	addokbuf("process queues module ok      \n");
+
+	addokbuf("checking process trees...\n");
+
 	return 0;
 }
