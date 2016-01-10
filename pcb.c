@@ -7,9 +7,9 @@
 
 HIDDEN struct clist *pcbFree = NULL;
 
-/*#################################################
-  ###           GESTIONE LISTE PROCESSI         ###
-  #################################################*/
+/***************************************************************
+*           ALLOCATION AND DEALLOCATION PROCKBLKS'S            *
+***************************************************************/
 
 //inserisce il pcb passato come parametro in coda alla lista
 
@@ -45,7 +45,16 @@ void initPcbs(){
     int i;
 	pcbFree->next = &pcb_static[MAXPROC-1].p_list;
 	pcb_static[MAXPROC-1].p_list.next = &pcb_static[0].p_list;
-	for(i = 0; i < (MAXPROC-2); i++){
+	for(i = 0; i < (MAXPROC-1); i++){
 		pcb_static[i].p_list.next = &pcb_static[i+1].p_list;
 	}
+}
+
+/***************************************************************
+*                   PROCESS QUEUE MAINTENANCE                  *
+***************************************************************/
+
+void insertProcQ(struct clist *q, struct pcb_t *p){
+	
+	
 }

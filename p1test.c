@@ -67,20 +67,43 @@ int main() {
 
 	/* Check allocPcb */
 	for (i = 0; i < MAXPROC; i++) {
-		char *a="ciao!\n";
-		tprint(a);
 		if ((procp[i] = allocPcb()) == NULL){
 			adderrbuf("allocPcb(): unexpected NULL   ");
-			char *b="if\n";
-			tprint(b);
 		}
 	}
-	char *b="if\n";
-	tprint(b);
 	if (allocPcb() != NULL) {
 		adderrbuf("allocPcb(): allocated more than MAXPROC entries   ");
 	}
 	addokbuf("allocPcb ok   \n");
+
+	/* return the last 10 entries back to free list */
+	for (i = 10; i < MAXPROC; i++)
+		freePcb(procp[i]);
+	addokbuf("freed 10 entries   \n");
+	
+	/* create a 10-element process queue */
+	qa=empty;
+	if (!clist_empty(qa)) adderrbuf("clist_empty(qa): unexpected FALSE   ");
+	addokbuf("Inserting...   \n");
+	for (i = 0; i < 10; i++) {
+		if ((q = allocPcb()) == NULL)
+			adderrbuf("allocPcb(): unexpected NULL while insert   ");
+		switch (i) {
+			case 0:
+				firstproc = q;
+				break;
+			case 5:
+				midproc = q;
+				break;
+			case 9:
+				lastproc = q;
+				break;
+			default:
+				break;
+		}
+		insertProcQ(&qa, q);
+	}
+	addokbuf("inserted 10 elements   \n");
 
 	return 0;
 }
