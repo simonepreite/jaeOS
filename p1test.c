@@ -127,13 +127,8 @@ int main() {
 	/* Check if removeProc and insertProc remove in the correct order */
 	addokbuf("Removing...   \n");
 	for (i = 0; i < 8; i++) {
-		char *a="ciao\n";
-		char *b="GAY\n";
-		tprint(a);
 		if ((q = removeProcQ(&qa)) == NULL)
 			adderrbuf("removeProcQ(&qa): unexpected NULL   ");
-		freePcb(q);
-		tprint(b);
 	}
 
 	if (q != lastproc)
