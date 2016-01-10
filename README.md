@@ -18,7 +18,6 @@
                                                     
 ############################################################################
                                                    
-
 #####                     DECOMPRIMERE IL PROGETTO                     #####
 
 	- eseguire il seguente comando nella directory dove è contenuto
