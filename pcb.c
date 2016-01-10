@@ -7,7 +7,6 @@
 
 HIDDEN struct clist *pcbFree = NULL;
 
-
 /*#################################################
   ###           GESTIONE LISTE PROCESSI         ###
   #################################################*/
@@ -26,7 +25,12 @@ struct pcb_t *allocPcb(){
 			clist_dequeue(pcbFree);
 			pcb->p_parent = NULL;
 			pcb->p_cursem = NULL;
-			//pcb->p_s=0; da verificare;
+			{
+				pcb->p_s.a1 = pcb->p_s.a2 = pcb->p_s.a3 = pcb->p_s.a4 = 0; //da verificare la struttura state_p sta nella libreria uARMtypes.h;
+				pcb->p_s.v1 = pcb->p_s.v2 = pcb->p_s.v3 = pcb->p_s.v4 = pcb->p_s.v5 = pcb->p_s.v6 = 0;
+				pcb->p_s.sl = pcb->p_s.fp = pcb->p_s.ip = pcb->p_s.sp = pcb->p_s.lr = pcb->p_s.pc = pcb->p_s.cpsr = 0;
+				pcb->p_s.CP15_Control = pcb->p_s.CP15_EntryHi = pcb->p_s.CP15_Cause = pcb->p_s.TOD_Hi = pcb->p_s.TOD_Low = 0;     
+			}
 			pcb->p_list.next = NULL;
 			pcb->p_children.next = NULL;
 			pcb->p_siblings.next = NULL;
