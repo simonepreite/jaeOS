@@ -80,7 +80,7 @@ int main() {
 	for (i = 10; i < MAXPROC; i++)
 		freePcb(procp[i]);
 	addokbuf("freed 10 entries   \n");
-	
+
 	/* create a 10-element process queue */
 	qa=empty;
 	if (!clist_empty(qa)) adderrbuf("clist_empty(qa): unexpected FALSE   ");
@@ -104,6 +104,11 @@ int main() {
 		insertProcQ(&qa, q);
 	}
 	addokbuf("inserted 10 elements   \n");
+
+	if (clist_empty(qa)) adderrbuf("clist_empty(qa): unexpected TRUE"   );
+	
+	if (headProcQ(&qa) != firstproc)
+		adderrbuf("headProcQ(qa) failed   ");
 
 	return 0;
 }

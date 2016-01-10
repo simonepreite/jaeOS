@@ -35,10 +35,10 @@ struct clist {
 		&scan->member != (tmp); scan = container_of(scan->member.next, typeof(*scan), member), tmp=(clistp)->next->next)
 
 #define clist_tail(elem, clistx, member)	\
-	(clistx.next == NULL) ? NULL : container_of(clistx.next, typeof(*scan), member);
+	(clistx.next == NULL) ? NULL : container_of(clistx.next, typeof(*elem), member);
 
 #define clist_head(elem, clistx, member)	\
-	(clistx.next == NULL) ? NULL : container_of(clistx.next->next, typeof(*scan), member);
+	(clistx.next == NULL) ? NULL : container_of(clistx.next->next, typeof(*elem), member);
 
 #define clist_push(elem, clistp, member) ({\
 	if((clistp)->next == NULL) {\

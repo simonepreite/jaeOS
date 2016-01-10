@@ -55,6 +55,10 @@ void initPcbs(){
 ***************************************************************/
 
 void insertProcQ(struct clist *q, struct pcb_t *p){
-	
-	
+	clist_enqueue(p, q, p_list);
+}
+
+struct pcb_t *headProcQ(struct clist *q){
+	struct clist temp = *q;
+	struct pcb_t *pcb_temp = clist_head(pcb_temp, temp, p_list);
 }
