@@ -1,9 +1,7 @@
-#include "/usr/include/uarm/uARMconst.h"
-#include "/usr/include/uarm/uARMtypes.h"
 #include "include/const.h"
 #include "include/clist.h"
 #include "include/pcb.h"
-#include "include/asl.h"
+//#include "include/asl.h"
 
 /* Lista dei pcb inutilizzati */
 
