@@ -42,8 +42,8 @@ struct clist {
 
 #define clist_push(elem, clistp, member) ({\
 	if((clistp)->next == NULL) {\
-		(clistp)->next=&elem->member;\
-		elem->member.next=&elem->member;\
+		(clistp)->next = &elem->member;\
+		elem->member.next = &elem->member;\
 	} else { \
 		elem->member.next = (clistp)->next->next;	\
 		(clistp)->next->next = &elem->member;	\
@@ -65,9 +65,9 @@ struct clist {
 #define clist_delete(elem, clistp, member)({\
 int ret=1;\
 struct clist *tmp1, *tmp2, *scan;\
-if((clistp)->next!=NULL){\
-	if(container_of((clistp)->next, typeof(*elem),member)==elem && (clistp)->next->next==(clistp)->next){\
-		(clistp)->next=NULL;\
+if((clistp)->next != NULL){\
+	if(container_of((clistp)->next, typeof(*elem),member) == elem && (clistp)->next->next == (clistp)->next){\
+		(clistp)->next = NULL;\
 		ret=0;\
 }\
 else{\
