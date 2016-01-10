@@ -23,7 +23,7 @@ struct pcb_t *allocPcb(){
 	struct pcb_t *pcb = NULL;
 		if(pcbFree != NULL){
 			pcb = container_of((pcbFree)->next, typeof(*pcb), p_list);
-			clist_dequeue(pcbFree);
+			clist_enqueue(pcb, pcbFree, p_list);
 			pcb->p_parent=NULL;
 			pcb->p_cursem=NULL;
 			//pcb->p_s=0; da verificare;
