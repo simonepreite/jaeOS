@@ -19,4 +19,4 @@ clean:
 	rm -rf *o jaeOS
 
 cleanall:
-	rm -rf *o jaeOS jaeOS.core.uarm jaeOS.stab.uarm
+	rm -rf *o jaeOS jaeOS.core.uarm jaeOS.stab.uarm *.o
