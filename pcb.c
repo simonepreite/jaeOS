@@ -1,7 +1,6 @@
 #include "include/const.h"
 #include "include/clist.h"
 #include "include/pcb.h"
-#include "include/asl.h"
 
 /* Lista dei pcb inutilizzati */
 
@@ -60,9 +59,16 @@ void initPcbs(){
 *                   PROCESS QUEUE MAINTENANCE                  *
 ***************************************************************/
 
+//inserisce il processo puntato da p nella lista puntata in coda da q
+
 void insertProcQ(struct clist *q, struct pcb_t *p){
 	clist_enqueue(p, q, p_list);
 }
+
+/*
+ritorna il puntatore alla testa della lista puntata in coda da q, se 
+la lista risulta vuota ritorna NULL, non elimina alcun elemento
+*/
 
 struct pcb_t *headProcQ(struct clist *q){
 	struct clist temp = *q;
@@ -70,6 +76,8 @@ struct pcb_t *headProcQ(struct clist *q){
 	pcb_temp = clist_head(pcb_temp, temp, p_list);
 	return pcb_temp;
 }
+
+//rimuove l'elemento in testa alla lista puntata in coda da q
 
 struct pcb_t *removeProcQ(struct clist *q){
 	struct pcb_t *pcb_temp = NULL; 
@@ -80,6 +88,8 @@ struct pcb_t *removeProcQ(struct clist *q){
 	return pcb_temp;
 }
 
+//rimuove il processo puntato da p nella lista puntata in coda da q
+
 struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
 	if (clist_delete(p, q, p_list) == 0) return p;
 	else return NULL;
@@ -89,10 +99,20 @@ struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
 *                   PROCESS TREE MAINTENANCE                   *
 ***************************************************************/
 
+/*
+ritorna TRUE se il processo puntato da p ha figli altrimenti 
+FALSE
+*/
+
 int emptyChild(struct pcb_t *p){
 	if(p->p_children.next == NULL) return TRUE;
 	else return FALSE;
 }
+
+/*
+inserisce il processo puntato da p in coda alla lista dei 
+processi figli del processo puntato da parent
+*/
 
 void insertChild(struct pcb_t *parent, struct pcb_t *p){
 	struct clist *q = &parent->p_children;
@@ -100,6 +120,7 @@ void insertChild(struct pcb_t *parent, struct pcb_t *p){
 	p->p_parent = parent;
 }
 
+//decrementa la lista dei processi figli del processo puntato da p
 
 struct pcb_t *removeChild(struct pcb_t *p){
 	struct pcb_t *pcb_temp = NULL; 
@@ -110,6 +131,12 @@ struct pcb_t *removeChild(struct pcb_t *p){
 		}
 	return pcb_temp;
 }
+
+/*
+toglie il processo puntato da p dalla lista dei processi del suo 
+parent e ritorna il puntatore del processo eliminato, 
+se il processo p non ha un parent torna NULL
+*/
 
 struct pcb_t *outChild(struct pcb_t *p){
 	struct clist *q = &p->p_children;
