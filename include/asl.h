@@ -12,7 +12,7 @@ struct semd_t{
 
 /* prototipi funzioni semafori */
 
-EXTERN void initASL(void);
+EXTERN void initASL();
 EXTERN int insertBlocked(int *semAdd, struct pcb_t *p); /*Inserisce il ProcBlk puntato da p*/
 EXTERN struct pcb_t *removeBlocked(int *semAdd); /* rimuove il primo ProcBlk, se trovato */
 EXTERN struct pcb_t *outBlocked(struct pcb_t *p); /* Rimuove il ProcBlk puntato da p */
