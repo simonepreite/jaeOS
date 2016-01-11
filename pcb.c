@@ -15,7 +15,7 @@ HIDDEN struct clist *pcbFree = NULL;
 
 void freePcb(struct pcb_t *p){
 	struct clist *t = pcbFree;
-	clist_enqueue(p, t, p_list );
+	clist_enqueue(p, t, p_list);
 }
 
 /*
@@ -89,4 +89,33 @@ struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
 *                   PROCESS TREE MAINTENANCE                   *
 ***************************************************************/
 
+int emptyChild(struct pcb_t *p){
+	if(p->p_children.next == NULL) return TRUE;
+	else return FALSE;
+}
 
+void insertChild(struct pcb_t *parent, struct pcb_t *p){
+	struct clist *q = &parent->p_children;
+	clist_enqueue(p, q, p_children);
+	p->p_parent = parent;
+}
+
+
+struct pcb_t *removeChild(struct pcb_t *p){
+	struct pcb_t *pcb_temp = NULL; 
+	struct clist *q = &p->p_children;
+		if(p->p_children.next != NULL){
+			pcb_temp = p;
+			clist_dequeue(q);
+		}
+	return pcb_temp;
+}
+
+struct pcb_t *outChild(struct pcb_t *p){
+	struct clist *q = &p->p_children;
+	if(p->p_parent != NULL){
+		clist_delete(p, q, p_children);
+		return p;
+	}
+	else return NULL;
+}

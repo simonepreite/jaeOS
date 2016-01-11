@@ -146,5 +146,48 @@ int main() {
 
 	addokbuf("checking process trees...\n");
 
+	if (!emptyChild(procp[2]))
+		adderrbuf("emptyChild: unexpected FALSE   ");
+
+	/* make procp[1] through procp[9] children of procp[0] */
+	addokbuf("Inserting...   \n");
+	for (i = 1; i < 10; i++) {
+		insertChild(procp[0], procp[i]);
+	}
+	addokbuf("Inserted 9 children   \n");
+
+	if (emptyChild(procp[0]))
+		adderrbuf("emptyChild(procp[0]): unexpected TRUE   ");
+
+	/* Check outChild */
+	q = outChild(procp[1]);
+	if (q == NULL || q != procp[1])
+		adderrbuf("outChild(procp[1]) failed on first child   ");
+	q = outChild(procp[4]);
+	if (q == NULL || q != procp[4])
+		adderrbuf("outChild(procp[4]) failed on middle child   ");
+	if (outChild(procp[0]) != NULL)
+		adderrbuf("outChild(procp[0]) failed on nonexistent child   ");
+	addokbuf("outChild ok   \n");
+
+	/* Check removeChild */
+	addokbuf("Removing...   \n");
+	for (i = 0; i < 7; i++) {
+		if ((q = removeChild(procp[0])) == NULL)
+			adderrbuf("removeChild(procp[0]): unexpected NULL   ");
+	}
+
+	if (removeChild(procp[0]) != NULL)
+		adderrbuf("removeChild(): removes too many children   ");
+
+	if (!emptyChild(procp[0]))
+		adderrbuf("emptyChild(procp[0]): unexpected FALSE   ");
+
+	addokbuf("insertChild(), removeChild() and emptyChild() ok   \n");
+	addokbuf("process tree module ok      \n");
+
+	for (i = 0; i < 10; i++) 
+		freePcb(procp[i]);
+
 	return 0;
 }
