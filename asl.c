@@ -25,6 +25,16 @@ void initASL(){
 
 
 int insertBlocked(int *semAdd, struct pcb_t *p);
+	/* 
+	1° caso: 
+		cerca il semaforo nella lista aslh e nel momento in cui lo trova
+		inserisce il processo puntato da p nella lista dei processi
+		bloccati in quel semaforo e setta il puntatore al semaforo
+		a semAdd
+	2° caso:
+		se il semaforo non c'è e la lista semdFree è vuota ritorna TRUE
+	3° caso:
+		se il semaforo non c'è lo alloca prendendono dalla lista semdfree
 
 
 
