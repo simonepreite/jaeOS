@@ -1,5 +1,5 @@
-//#ifndef ASL_H
-//#define ASL_H
+#ifndef ASL_H
+#define ASL_H
 
 /* struttura semafori */
 
@@ -12,11 +12,11 @@ struct semd_t{
 
 /* prototipi funzioni semafori */
 
-void initASL(void);
-int insertBlocked(int *semAdd, struct pcb_t *p); /*Inserisce il ProcBlk puntato da p*/
-struct pcb_t *removeBlocked(int *semAdd); /* rimuove il primo ProcBlk, se trovato */
-struct pcb_t *outBlocked(struct pcb_t *p); /* Rimuove il ProcBlk puntato da p */
-struct pcb_t *headBlocked(int *semAdd); /*ritorna un puntatore al ProcBlk */
+EXTERN void initASL(void);
+EXTERN int insertBlocked(int *semAdd, struct pcb_t *p); /*Inserisce il ProcBlk puntato da p*/
+EXTERN struct pcb_t *removeBlocked(int *semAdd); /* rimuove il primo ProcBlk, se trovato */
+EXTERN struct pcb_t *outBlocked(struct pcb_t *p); /* Rimuove il ProcBlk puntato da p */
+EXTERN struct pcb_t *headBlocked(int *semAdd); /*ritorna un puntatore al ProcBlk */
 
-//#endif
+#endif
 

@@ -3,5 +3,6 @@
 
 #define MAXPROC 20
 #define HIDDEN static
+#define EXTERN extern
 
 #endif

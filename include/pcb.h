@@ -1,5 +1,5 @@
-//#ifndef PCB_H
-//#define PCB_H
+#ifndef PCB_H
+#define PCB_H
 #include "/usr/include/uarm/uARMtypes.h"
 #include "clist.h" 
 /* struttura processi */
@@ -17,20 +17,20 @@ struct pcb_t{
 
 /* Lista */
 
-void freePcb(struct pcb_t *p);
-struct pcb_t *allocPcb();
-void initPcbs();
+EXTERN void freePcb(struct pcb_t *p);
+EXTERN struct pcb_t *allocPcb();
+EXTERN void initPcbs();
 
-void insertProcQ(struct clist *q, struct pcb_t *p);
-struct pcb_t *removeProcQ(struct clist *q);
-struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p);
-struct pcb_t *headProcQ(struct clist *q);
+EXTERN void insertProcQ(struct clist *q, struct pcb_t *p);
+EXTERN struct pcb_t *removeProcQ(struct clist *q);
+EXTERN struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p);
+EXTERN struct pcb_t *headProcQ(struct clist *q);
 
 /* Alberi */
 
-int emptyChild(struct pcb_t *p);
-void insertChild(struct pcb_t *parent, struct pcb_t *p);
-struct pcb_t *removeChild(struct pcb_t *p);
-struct pcb_t *outChild(struct pcb_t *p);
+EXTERN int emptyChild(struct pcb_t *p);
+EXTERN void insertChild(struct pcb_t *parent, struct pcb_t *p);
+EXTERN struct pcb_t *removeChild(struct pcb_t *p);
+EXTERN struct pcb_t *outChild(struct pcb_t *p);
 
-//#endif
+#endif
