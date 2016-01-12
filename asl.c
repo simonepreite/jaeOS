@@ -37,7 +37,7 @@ void initASL(){
 	come ragionamento da ripensare totalmente.
 */
 
-int insertBlocked(int *semAdd, struct pcb_t *p){
+/*int insertBlocked(int *semAdd, struct pcb_t *p){
 	struct semd_t *scan, *addr;
 	void *tmp;
 	int trovato = 0;
@@ -67,7 +67,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 	}
 	else return TRUE;
 }
-
+*/
 struct pcb_t *removeBlocked(int *semAdd);
 
 
