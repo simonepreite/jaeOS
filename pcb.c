@@ -101,11 +101,10 @@ struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
 
 /*
 
-			ATTENZIONE TROVATI DIVERSI ERRORI CONCETTUALI
-			TRA LE LISTE DI PROCESSI FIGLI VANNO RIVISITATE
-			TUTTE LE FUNZIONI PERCHÈ DAL P1TEST SEMBRANO 
-			FUNZIONARE MA NON FANNO LE AZIONI RICHIESTE 
-			NELLE SPECIFICHE.
+			PROBABILMENTE SONO STATI CORRETTI GLI ERRORI
+			CONCETTUALI DEL PRECEDENTE FILE DI CUI È 
+			PRESENTE UNA COPIA NELLA MEDESIMA CARTELLA
+			CON LA DICITURA pcb_funzionante_sbagliato.c
 
 /*
 ritorna TRUE se il processo puntato da p ha figli altrimenti 
@@ -124,7 +123,7 @@ processi figli del processo puntato da parent
 
 void insertChild(struct pcb_t *parent, struct pcb_t *p){
 	struct clist *q = &parent->p_children;
-	clist_enqueue(p, q, p_children); //forse bisogna sostituire p_children con p_siblings
+	clist_enqueue(p, q, p_siblings); //forse bisogna sostituire p_children con p_siblings
 	p->p_parent = parent;
 }
 
@@ -147,9 +146,10 @@ se il processo p non ha un parent torna NULL
 */
 
 struct pcb_t *outChild(struct pcb_t *p){
-	struct clist *q = &p->p_children;
+	struct pcb_t *padre = p->p_parent;
+	struct clist *figli = &padre->p_children;
 	if(p->p_parent != NULL){
-		clist_delete(p, q, p_children);
+		clist_delete(p, figli, p_siblings);
 		return p;
 	}
 	else return NULL;
