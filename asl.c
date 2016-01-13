@@ -23,6 +23,7 @@ void initASL(){
 }
 
 /* 
+
 1° caso: 
 	cerca il semaforo nella lista aslh e nel momento in cui lo trova
 	inserisce il processo puntato da p nella lista dei processi
@@ -52,7 +53,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 	char *c = "sono nel secondo if\n";
 	char *b = "non ho fatto nulla\n";
 	if(aslh.next != NULL){
-		tprint(a);
+		//tprint(a);
 		scan = container_of(aslh.next, typeof(*scan), s_link);
 		clist_foreach(scan, &aslh, s_link, tmp){
 			if(scan->s_semAdd == semAdd){
@@ -63,20 +64,20 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 		if(trovato == 1){
 			clist_enqueue(p, &scan->s_proc, p_list);
 			p->p_cursem = scan;
-			tprint(d);
+			//tprint(d);
 			return FALSE;
 		}
 		else if (trovato == 0 && semdFree.next != NULL){
-			tprint(e);
-			scan = container_of(aslh.next, typeof(*scan), s_link);
+			//tprint(e);
+			//scan = container_of(aslh.next, typeof(*scan), s_link); inutile fa l'assegnamento nella foreach
 			p->p_cursem = scan;
+			new_sem = container_of(semdFree.next, typeof(*new_sem), s_link);
 			clist_foreach(scan, &aslh, s_link, tmp){
 				if(semAdd < scan->s_semAdd){
-					new_sem = container_of(semdFree.next, typeof(*new_sem), s_link);
 					clist_enqueue(p, &new_sem->s_proc, p_list);
 					clist_dequeue(&semdFree);
 					clist_foreach_add(new_sem, scan, &aslh, s_link, tmp);
-					tprint(g);
+					//tprint(g);
 					break;
 				}
 			}
@@ -85,7 +86,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 		}
 	}
 	else if(aslh.next == NULL && semdFree.next != NULL){
-		tprint(c);
+		//tprint(c);
 		scan = container_of(semdFree.next, typeof(*scan), s_link);
 			clist_dequeue(&semdFree);
 			clist_enqueue(p, &scan->s_proc, p_list);
@@ -98,23 +99,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 		return TRUE;
 	}	
 }
-		/*clist_foreach(scan, &aslh, s_link, tmp) {
-			if (semAdd < scan->s_semAdd) {
-				dequeue(semdFree);
-				clist_foreach_add(semAdd, scan, &aslh, s_link, tmp);
-				}
-		}
-			if (clist_foreach_all(scan, &aslh, s_link,tmp)) 
-				clist_enqueue(semAdd, &myclist, s_link);
-		scan->s_semAdd = semAdd;
-		clist_enqueue(p, &aslh, s_proc);
-		addr = container_of((semAdd), typeof(*addr), s_proc);
-		p->p_cursem = addr; 
-		return FALSE;
-	}
-	else return TRUE;
-}
-*/
+
 struct pcb_t *removeBlocked(int *semAdd){
 	struct pcb_t *p;
 	struct semd_t *scan;
@@ -128,7 +113,6 @@ struct pcb_t *removeBlocked(int *semAdd){
 		return NULL;
 	}
 	else{
-		scan = container_of(aslh.next, typeof(*scan), s_link);
 		clist_foreach(scan, &aslh, s_link, tmp){
 			tprint(b);
 			if(scan->s_semAdd == semAdd){
