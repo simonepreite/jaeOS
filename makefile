@@ -12,6 +12,7 @@ HEAD_UARM = $(INCL_UARM)uARMconst.h $(INCL_UARM)uARMtypes.h $(INCL_UARM)libuarm.
 all: jaeOS
 
 jaeOS: $(OBJECTS)
+	mkdir -p $(EXEC_DIR)
 	$(ARCH_UARM)ld -T $(LIB_UARM) $(OBJECTS)
 	elf2uarm -k $(EXEC_DIR)jaeOS
 
@@ -28,4 +29,4 @@ clean:
 	rm -rf *.o $(EXEC_DIR)jaeOS
 
 cleanall:
-	rm -rf *.o $(EXEC_DIR)jaeOS $(EXEC_DIR)jaeOS.core.uarm $(EXEC_DIR)jaeOS.stab.uarm
+	rm -rf *.o $(EXEC_DIR)jaeOS $(EXEC_DIR)jaeOS.core.uarm $(EXEC_DIR)jaeOS.stab.uarm $(EXEC_DIR)
