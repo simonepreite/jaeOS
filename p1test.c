@@ -192,6 +192,20 @@ int main() {
 	/* check ASL */
 	initASL();
 	addokbuf("Initialized active semaphore list   \n");
+	
+	/* check removeBlocked and insertBlocked */
+	addokbuf("insertBlocked() test #1 started  \n");
+	for (i = 10; i < MAXPROC; i++) {
+		procp[i] = allocPcb();
+		if (insertBlocked(&sem[i], procp[i]))
+			adderrbuf("insertBlocked() test#1: unexpected TRUE   ");
+	}
+	addokbuf("insertBlocked() test #2 started  \n");
+	for (i = 0; i < 10; i++) {
+		procp[i] = allocPcb();
+		if (insertBlocked(&sem[i], procp[i]))
+			adderrbuf("insertBlocked() test #2: unexpected TRUE   ");
+	}
 
 	return 0;
 }
