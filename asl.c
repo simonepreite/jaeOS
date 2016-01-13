@@ -69,7 +69,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 		}
 		else if (trovato == 0 && semdFree.next != NULL){
 			//tprint(e);
-			//scan = container_of(aslh.next, typeof(*scan), s_link); inutile fa l'assegnamento nella foreach
+			scan = container_of(aslh.next, typeof(*scan), s_link); //inutile fa l'assegnamento nella foreach
 			p->p_cursem = scan;
 			new_sem = container_of(semdFree.next, typeof(*new_sem), s_link);
 			clist_foreach(scan, &aslh, s_link, tmp){
@@ -119,6 +119,7 @@ struct pcb_t *removeBlocked(int *semAdd){
 				trovato = 1;
 				break;
 			}
+			tprint(c);
 		}
 		if(trovato == 1){
 			p = container_of(scan->s_proc.next, typeof(*p), p_list);
