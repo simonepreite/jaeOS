@@ -1,25 +1,31 @@
-LIB_UARM = /usr/include/uarm/ldscripts/elf32ltsarm.h.uarmcore.x -o jaeOS /usr/include/uarm/crtso.o /usr/include/uarm/libuarm.o
+ARCH_UARM =	arm-none-eabi-
+FLAG_UARM = -mcpu=arm7tdmi -c -o
+INCL_UARM = /usr/include/uarm/
+SRC_DIR = src/
+INCL_DIR = include/
+EXEC_DIR = exec/
+LIB_UARM = $(INCL_UARM)ldscripts/elf32ltsarm.h.uarmcore.x -o $(EXEC_DIR)jaeOS $(INCL_UARM)crtso.o $(INCL_UARM)libuarm.o
 OBJECTS = p1test.o pcb.o asl.o
 HEAD_FILE = include/const.h include/clist.h include/pcb.h include/asl.h 
-HEAD_UARM = /usr/include/uarm/uARMconst.h /usr/include/uarm/uARMtypes.h /usr/include/uarm/libuarm.h
+HEAD_UARM = $(INCL_UARM)uARMconst.h $(INCL_UARM)uARMtypes.h $(INCL_UARM)libuarm.h
 
 all: jaeOS
 
 jaeOS: $(OBJECTS)
-	arm-none-eabi-ld -T $(LIB_UARM) $(OBJECTS)
-	elf2uarm -k jaeOS
+	$(ARCH_UARM)ld -T $(LIB_UARM) $(OBJECTS)
+	elf2uarm -k $(EXEC_DIR)jaeOS
 
 pcb.o: pcb.c $(HEAD_FILE)
-	arm-none-eabi-gcc -mcpu=arm7tdmi -c -o pcb.o pcb.c
+	$(ARCH_UARM)gcc $(FLAG_UARM) pcb.o pcb.c
 
 asl.o: asl.c $(HEAD_FILE)
-	arm-none-eabi-gcc -mcpu=arm7tdmi -c -o asl.o asl.c
+	$(ARCH_UARM)gcc $(FLAG_UARM) asl.o asl.c
 
 p1test.o: p1test.c $(HEAD_UARM) $(HEAD_FILE)
-	arm-none-eabi-gcc -mcpu=arm7tdmi -c -o p1test.o p1test.c
+	$(ARCH_UARM)gcc $(FLAG_UARM) p1test.o p1test.c
 
 clean:
-	rm -rf *o jaeOS
+	rm -rf *.o $(EXEC_DIR)jaeOS
 
 cleanall:
-	rm -rf *o jaeOS jaeOS.core.uarm jaeOS.stab.uarm *.o
+	rm -rf *.o $(EXEC_DIR)jaeOS $(EXEC_DIR)jaeOS.core.uarm $(EXEC_DIR)jaeOS.stab.uarm

@@ -206,6 +206,30 @@ int main() {
 		if (insertBlocked(&sem[i], procp[i]))
 			adderrbuf("insertBlocked() test #2: unexpected TRUE   ");
 	}
+	
+	/* check if semaphore descriptors are returned to free list */
+	p = removeBlocked(&sem[11]);
+	if (p == NULL)
+		adderrbuf("removeBlocked(): no process removed     ");
+	if (insertBlocked(&sem[11],p))
+		adderrbuf("removeBlocked(): fails to return to free list   ");
+
+	if (insertBlocked(&onesem, procp[9]) == FALSE)
+		adderrbuf("insertBlocked(): inserted more than MAXPROC   ");
+
+	addokbuf("removeBlocked() test started   \n");
+	for (i = 10; i< MAXPROC; i++) {
+		q = removeBlocked(&sem[i]);
+		if (q == NULL)
+			adderrbuf("removeBlocked(): wouldn't remove   ");
+		if (q != procp[i])
+			adderrbuf("removeBlocked(): removed wrong element   ");
+		if (insertBlocked(&sem[i-10], q))
+			adderrbuf("insertBlocked(3): unexpected TRUE   ");
+	}
+	if (removeBlocked(&sem[11]) != NULL)
+		adderrbuf("removeBlocked(): removed nonexistent blocked proc   ");
+	addokbuf("insertBlocked() and removeBlocked() ok   \n");
 
 	return 0;
 }

@@ -37,6 +37,7 @@ void initASL(){
 	come ragionamento da ripensare totalmente.
 
 NON È ANCORA DETTO CHE SIA PRIVA DI PROBLEMI!!!!!!!!!!!
+
 */
 
 int insertBlocked(int *semAdd, struct pcb_t *p){
@@ -114,7 +115,36 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 	else return TRUE;
 }
 */
-struct pcb_t *removeBlocked(int *semAdd);
+struct pcb_t *removeBlocked(int *semAdd){
+	struct pcb_t *p;
+	struct semd_t *scan;
+	int trovato = 0;
+	void *tmp;
+	char *a = "aslh vuota\n";
+	char *b = "cerco il semaforo\n";
+	char *c = "semaforo non trovato\n";
+	if(aslh.next == NULL) {
+		tprint(a);
+		return NULL;
+	}
+	else{
+		scan = container_of(aslh.next, typeof(*scan), s_link);
+		clist_foreach(scan, &aslh, s_link, tmp){
+			tprint(b);
+			if(scan->s_semAdd == semAdd){
+				trovato = 1;
+				break;
+			}
+		}
+		if(trovato == 1){
+			p = container_of(scan->s_proc.next, typeof(*p), p_list);
+			clist_dequeue(scan->s_proc.next);
+			return p;
+		}
+		else return NULL;
+	}
+
+}
 
 
 
