@@ -4,7 +4,7 @@ INCL_UARM = /usr/include/uarm/
 SRC_DIR = src/
 INCL_DIR = include/
 EXEC_DIR = exec/
-LIB_UARM = $(INCL_UARM)ldscripts/elf32ltsarm.h.uarmcore.x -o $(EXEC_DIR)jaeOS $(INCL_UARM)crtso.o $(INCL_UARM)libuarm.o
+LIB_UARM = $(INCL_UARM)ldscripts/elf32ltsarm.h.uarmcore.x -o $(EXEC_DIR)jaeOS.elf $(INCL_UARM)crtso.o $(INCL_UARM)libuarm.o
 OBJECTS = p1test.o pcb.o asl.o
 HEAD_FILE = include/const.h include/clist.h include/pcb.h include/asl.h 
 HEAD_UARM = $(INCL_UARM)uARMconst.h $(INCL_UARM)uARMtypes.h $(INCL_UARM)libuarm.h
@@ -14,7 +14,7 @@ all: jaeOS
 jaeOS: $(OBJECTS)
 	mkdir -p $(EXEC_DIR)
 	$(ARCH_UARM)ld -T $(LIB_UARM) $(OBJECTS)
-	elf2uarm -k $(EXEC_DIR)jaeOS
+	elf2uarm -k $(EXEC_DIR)jaeOS.elf
 
 pcb.o: pcb.c $(HEAD_FILE)
 	$(ARCH_UARM)gcc $(FLAG_UARM) pcb.o pcb.c

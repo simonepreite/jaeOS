@@ -37,77 +37,95 @@ void initASL(){
 	ovviamente non funziona ancora probabilmente concettualemte sbagliato
 	come ragionamento da ripensare totalmente.
 
-NON È ANCORA DETTO CHE SIA PRIVA DI PROBLEMI!!!!!!!!!!!
+PROBLEMA NELLA DEQUEUE DI semdFree che scende troppo in fretta
 
 */
 
 int insertBlocked(int *semAdd, struct pcb_t *p){
-	struct semd_t *new_sem, *scan;
-	int trovato = 0;
-	void *tmp;
-	char *d = "trovato sem e inserito proc\n";
+    void *tmp;
+	struct semd_t *scan, *new_sem;
+	int find = FALSE; // semAdd not found: FALSE
+                      // semAdd found:     TRUE
+	char *l = "cerco punto per inserire semaforo\n";
+	char *m = "cerco semaforo\n";
+	char *n = "semdFree vuota\n";
+	char *i = "processo inserito\n";
+	char *h = "trovato sem\n";
+	char *d = "trovato sem e inserito processo\n";
 	char *e = "sem non trovato e semdFree non vuota\n";
 	char *f = "non trovato e semdFree vuota\n";
-	char *g = "semaforo inserito\n";
+	char *g = "semaforo e processo inseriti\n";
 	char *a = "sono nell'if\n";
 	char *c = "sono nel secondo if\n";
 	char *b = "non ho fatto nulla\n";
-	if(aslh.next != NULL){
-		//tprint(a);
-		scan = container_of(aslh.next, typeof(*scan), s_link);
-		clist_foreach(scan, &aslh, s_link, tmp){
-			if(scan->s_semAdd == semAdd){
-				trovato = 1;
-				break;
-			}
+	char *o = "dequeue semdFree\n";
+
+	if (p != NULL) { 
+			tprint(a);
+	    	clist_foreach(scan, &aslh, s_link, tmp) { 
+	    	tprint(m);
+		    if (scan->s_semAdd == semAdd) {
+   		        find = TRUE;
+   		        tprint(h);
+			    p->p_cursem->s_semAdd=semAdd;
+			    break;
+		    }
 		}
-		if(trovato == 1){
-			clist_enqueue(p, &scan->s_proc, p_list);
-			p->p_cursem = scan;
-			//tprint(d);
+		if (find) { // semaforo trovato
+			insertProcQ(&scan->s_proc, p); 
+			tprint(d);
 			return FALSE;
-		}
-		else if (trovato == 0 && semdFree.next != NULL){
-			//tprint(e);
-			scan = container_of(aslh.next, typeof(*scan), s_link); //inutile fa l'assegnamento nella foreach
-			p->p_cursem = scan;
-			new_sem = container_of(semdFree.next, typeof(*new_sem), s_link);
-			clist_foreach(scan, &aslh, s_link, tmp){
-				if(semAdd < scan->s_semAdd){
-					clist_enqueue(p, &new_sem->s_proc, p_list);
-					clist_dequeue(&semdFree);
-					clist_foreach_add(new_sem, scan, &aslh, s_link, tmp);
-					//tprint(g);
-					break;
+		} 
+		else { //semaforo non trovato
+			if (semdFree.next != NULL) { //semdFree non vuota
+				tprint(e);
+				//scan = container_of(aslh.next, typeof(*scan), s_link); //inutile fa l'assegnamento nella foreach
+				new_sem = container_of(semdFree.next, typeof(*new_sem), s_link);
+				p->p_cursem = new_sem;
+				new_sem->s_semAdd = semAdd;
+				new_sem->s_proc.next = NULL;
+				clist_dequeue(&semdFree);
+				tprint(o);
+				insertProcQ(new_sem->s_proc.next, p);
+				tprint(i);
+				if(aslh.next == NULL) {
+					clist_enqueue(new_sem, &aslh, s_link);
+					return FALSE;
 				}
-			}
-			if (clist_foreach_all(scan, &aslh, s_link, tmp)) clist_enqueue(new_sem, &aslh, s_link);
-		return FALSE;
-		}
+					clist_foreach(scan, &aslh, s_link, tmp){
+						tprint(l);
+						if(new_sem->s_semAdd < scan->s_semAdd){
+							clist_foreach_add(new_sem, scan, &aslh, s_link, tmp);
+							tprint(g);
+							break;
+						}
+					}
+						if (clist_foreach_all(scan, &aslh, s_link, tmp)) {
+							clist_enqueue(new_sem, &aslh, s_link); 
+							tprint(g);
+						}
+				return FALSE;
+				}
+			else { // caso lista semdFree vuota
+				tprint(n);
+				return TRUE; 
+				}
+			}	
 	}
-	else if(aslh.next == NULL && semdFree.next != NULL){
-		//tprint(c);
-		scan = container_of(semdFree.next, typeof(*scan), s_link);
-			clist_dequeue(&semdFree);
-			clist_enqueue(p, &scan->s_proc, p_list);
-			clist_enqueue(scan, &aslh, s_link);
-			p->p_cursem = scan;
-	return FALSE;
-	}
-	else {
-		tprint(b);
-		return TRUE;
-	}	
 }
+
+
 
 struct pcb_t *removeBlocked(int *semAdd){
 	struct pcb_t *p;
 	struct semd_t *scan;
 	int trovato = 0;
 	void *tmp;
+	char *d = "sono in removeBlocked\n";
 	char *a = "aslh vuota\n";
 	char *b = "cerco il semaforo\n";
 	char *c = "semaforo non trovato\n";
+	tprint(d);
 	if(aslh.next == NULL) {
 		tprint(a);
 		return NULL;
@@ -122,8 +140,7 @@ struct pcb_t *removeBlocked(int *semAdd){
 			tprint(c);
 		}
 		if(trovato == 1){
-			p = container_of(scan->s_proc.next, typeof(*p), p_list);
-			clist_dequeue(scan->s_proc.next);
+			p = removeProcQ(&scan->s_proc);
 			return p;
 		}
 		else return NULL;

@@ -36,7 +36,6 @@
 #include "include/pcb.h"
 #include "include/asl.h"
 
-
 #define	MAXSEM	MAXPROC
 
 int sem[MAXSEM];
@@ -68,9 +67,8 @@ int main() {
 
 	/* Check allocPcb */
 	for (i = 0; i < MAXPROC; i++) {
-		if ((procp[i] = allocPcb()) == NULL){
+		if ((procp[i] = allocPcb()) == NULL)
 			adderrbuf("allocPcb(): unexpected NULL   ");
-		}
 	}
 	if (allocPcb() != NULL) {
 		adderrbuf("allocPcb(): allocated more than MAXPROC entries   ");
@@ -107,7 +105,8 @@ int main() {
 	addokbuf("inserted 10 elements   \n");
 
 	if (clist_empty(qa)) adderrbuf("clist_empty(qa): unexpected TRUE"   );
-	
+
+	/* Check outProcQ and headProcQ */
 	if (headProcQ(&qa) != firstproc)
 		adderrbuf("headProcQ(qa) failed   ");
 
@@ -130,6 +129,7 @@ int main() {
 	for (i = 0; i < 8; i++) {
 		if ((q = removeProcQ(&qa)) == NULL)
 			adderrbuf("removeProcQ(&qa): unexpected NULL   ");
+		freePcb(q);
 	}
 
 	if (q != lastproc)
@@ -189,10 +189,11 @@ int main() {
 	for (i = 0; i < 10; i++) 
 		freePcb(procp[i]);
 
+
 	/* check ASL */
 	initASL();
 	addokbuf("Initialized active semaphore list   \n");
-	
+
 	/* check removeBlocked and insertBlocked */
 	addokbuf("insertBlocked() test #1 started  \n");
 	for (i = 10; i < MAXPROC; i++) {
@@ -206,7 +207,7 @@ int main() {
 		if (insertBlocked(&sem[i], procp[i]))
 			adderrbuf("insertBlocked() test #2: unexpected TRUE   ");
 	}
-	
+
 	/* check if semaphore descriptors are returned to free list */
 	p = removeBlocked(&sem[11]);
 	if (p == NULL)
