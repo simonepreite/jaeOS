@@ -55,11 +55,11 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 	char *e = "sem non trovato e semdFree non vuota\n";
 	char *f = "non trovato e semdFree vuota\n";
 	char *g = "semaforo e processo inseriti\n";
-	char *a = "sono nell'if\n";
+	char *a = "sono nell'if di insertBlocked\n";
 	char *c = "sono nel secondo if\n";
 	char *b = "non ho fatto nulla\n";
 	char *o = "dequeue semdFree\n";
-
+	char *q = "verifico se semdFree è vuota\n";
 	if (p != NULL) { 
 			tprint(a);
 	    	clist_foreach(scan, &aslh, s_link, tmp) { 
@@ -77,6 +77,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 			return FALSE;
 		} 
 		else { //semaforo non trovato
+			tprint(q);
 			if (semdFree.next != NULL) { //semdFree non vuota
 				tprint(e);
 				//scan = container_of(aslh.next, typeof(*scan), s_link); //inutile fa l'assegnamento nella foreach
