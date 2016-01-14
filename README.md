@@ -45,7 +45,7 @@
 #	  per ottenere la compilazione di tutti gli eseguibili necessari       #
 #	  che saranno:                                                         #
 #                                                                          #
-#	  jaeOS jaeOS.core.uarm jaeOS.stab.uarm                                #
+#	  jaeOS.elf jaeOS.elf.core.uarm jaeOS.elf.stab.uarm                    #
 #                                                                          #
 #	- il make file offre la possibilità di eliminare i file creati         #
 #	  attraverso le opzioni:                                               #
@@ -65,8 +65,10 @@
 #	che avvierà la macchina spenta.                                        #
 #                                                                          #
 #	clicchiamo sul pulsante delle impostazioni e nella sezione "Boot"      #
-#	cerchiamo attraverso browse il file "jaeOS.core.uarm" (che si troverà  #          
-#	nella cartella in cui abbiamo eseguito la compilazione).               #
+#	cerchiamo attraverso browse il file "jaeOS.elf.core.uarm".             #
+#   successivamente nella stessa finestra nella sezione "Symbol Table"     #
+#	cerchiamo attraverso browse il file "jaeOS.elf.core.uarm".             #
+#   (che si troveranno nella directory exec creata in fase di compilazione)#
 #                                                                          #     
 #	accendiamo l'emulatore attraverso il tasto power e apriamo un terminale#
 #	da terminals.                                                          #
