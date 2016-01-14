@@ -18,13 +18,19 @@
 #                                                                          #
 #                                                                          # 
 ############################################################################
-                                                   
+
+#####                           AUTORI                                 #####
+#	Alessio 		Innocenzi		alessio.innocenzi@studio.unibo.it      #
+#	Michelangelo 	Monoriti		michelangel.monoriti@studio.unibo.it   #
+#	Pierluigi 		Ballandi		pierluigi.ballandi@studio.unibo.it     #
+#	Simone 			Preite 			simone.preite@studio.unibo.it          #
+############################################################################                                                    
 #####                     DECOMPRIMERE IL PROGETTO                     #####
 #                                                                          #
 #	- eseguire il seguente comando nella directory dove è contenuto        #
 #	  l'archivio:                                                          #
 #                                                                          #
-#	  $ cd /directory/archivio                                             #
+#	  $ cd /directory/in_cui_si_trova_archivio                             #
 #	  $ tar -xvf jaeOS.tar.gz                                              #
 #                                                                          #
 ############################################################################
@@ -49,7 +55,7 @@
 #                                                                          #
 ############################################################################
 
-#####                            TEST P1TEST                           #####
+#####                          TEST P1TEST                             #####
 #                                                                          #
 #	- per verificare il p1test sulla macchina aprimo un terminale ed       #
 #	  eseguiamo:                                                           #
@@ -69,6 +75,26 @@
 #	l'output.                                                              #
 #                                                                          #
 ############################################################################
+
+#####                        INFO E LINK UTILI                         #####
+#                                                                          #
+#	link per lo sca e informazioni utili su uARM:                          #
+#		http://mellotanica.github.io/uARM/                                 #
+#                                                                          #
+#	Michael Goldweber, Renzo Davoli µMPS2 Principles of Operation.         #
+#	Lulu Books. 2011:                                                      #
+#		http://www.cs.unibo.it/~renzo/so/princOfOperations.pdf             #
+#                                                                          #
+#	Michael Goldweber, Renzo Davoli Student Guide                          # 
+#	to the Kaya Operating System. Lulu Books. 2009:                        #
+#		http://www.cs.unibo.it/~renzo/so/Kaya.pdf                          #
+#                                                                          #
+#	directory contenente le info utili per lo svolgimento del progetto     #
+#	jaeOS per l'anno 2015/2016:                                            #
+#		http://www.cs.unibo.it/~renzo/so/jaeos16/                          #
+#                                                                          #
+############################################################################
+
 
 
                                                                                                   
