@@ -14,7 +14,6 @@ HIDDEN struct clist aslh, semdFree;
 void initASL(){
 	static struct semd_t semdTable[MAXPROC];   
 	int i;
-	
 	aslh.next = NULL;
 	semdFree.next = &semdTable[MAXPROC-1].s_link;
 	semdTable[MAXPROC-1].s_link.next = &semdTable[0].s_link;
@@ -48,7 +47,6 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 	if (p != NULL) { 
 			if(aslh.next != NULL){
 	    		clist_foreach(scan, &aslh, s_link, tmp) { 
-	    	
 		    		if (scan->s_semAdd == semAdd) {
    		        		trovato = TRUE;
 			    		p->p_cursem->s_semAdd=semAdd;
@@ -86,8 +84,8 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 				}
 			else { // caso lista semdFree vuota
 				return TRUE; 
-				}
-			}	
+			}
+		}	
 	}
 }
 

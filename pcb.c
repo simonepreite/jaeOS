@@ -105,13 +105,6 @@ struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
 ***************************************************************/
 
 /*
-
-			PROBABILMENTE SONO STATI CORRETTI GLI ERRORI
-			CONCETTUALI DEL PRECEDENTE FILE DI CUI È 
-			PRESENTE UNA COPIA NELLA MEDESIMA CARTELLA
-			CON LA DICITURA pcb_funzionante_sbagliato.c
-
-/*
 ritorna TRUE se il processo puntato da p ha figli altrimenti 
 FALSE
 */
@@ -129,7 +122,7 @@ processi figli del processo puntato da parent
 void insertChild(struct pcb_t *parent, struct pcb_t *p){
 	struct clist *q = &parent->p_children;
 
-	clist_enqueue(p, q, p_siblings); //forse bisogna sostituire p_children con p_siblings
+	clist_enqueue(p, q, p_siblings);
 	p->p_parent = parent;
 }
 
