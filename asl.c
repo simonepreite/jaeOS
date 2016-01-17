@@ -58,6 +58,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p){
 			}
 		if (trovato) { // semaforo trovato
 			insertProcQ(&scan->s_proc, p); 
+			p->p_cursem = scan;
 			return FALSE;
 		} 
 		else { //semaforo non trovato
