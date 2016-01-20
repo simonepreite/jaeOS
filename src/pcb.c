@@ -1,6 +1,6 @@
-#include "include/const.h"
-#include "include/clist.h"
-#include "include/pcb.h"
+#include "../include/const.h"
+#include "../include/clist.h"
+#include "../include/pcb.h"
 
 /* Lista dei pcb inutilizzati */
 

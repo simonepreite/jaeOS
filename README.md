@@ -80,7 +80,7 @@
 
 #####                        INFO E LINK UTILI                         #####
 #                                                                          #
-#	link dove scaricare il pacchetto e informazioni utili su uARM:         #
+#	link per lo sca e informazioni utili su uARM:                          #
 #		http://mellotanica.github.io/uARM/                                 #
 #                                                                          #
 #	Michael Goldweber, Renzo Davoli µMPS2 Principles of Operation.         #

@@ -30,11 +30,11 @@
 #include "/usr/include/uarm/uARMtypes.h"
 #include "/usr/include/uarm/libuarm.h"
 
-#include "include/const.h"
+#include "../include/const.h"
  
-#include "include/clist.h"
-#include "include/pcb.h"
-#include "include/asl.h"
+#include "../include/clist.h"
+#include "../include/pcb.h"
+#include "../include/asl.h"
 
 #define	MAXSEM	MAXPROC
 
