@@ -32,7 +32,7 @@ void initASL(){
 2° caso:
 	se il semaforo non c'è e la lista semdFree è vuota ritorna TRUE
 3° caso:
-	se il semaforo non c'è lo alloca prendendono dalla lista semdfree
+	se il semaforo non c'è lo alloca prendendolo dalla lista semdfree
 
 	ovviamente non funziona ancora probabilmente concettualemte sbagliato
 	come ragionamento da ripensare totalmente.

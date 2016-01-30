@@ -19,9 +19,11 @@ void freePcb(struct pcb_t *p){
 }
 
 /*
+
   toglie dalla lista dei processi liberi il primo e lo alloca
   inizializza la struttura in modo che non vi siano residui della
-  vecchia allocazione                                           
+  vecchia allocazione    
+                                         
 */
 
 struct pcb_t *allocPcb(){
@@ -69,8 +71,10 @@ void insertProcQ(struct clist *q, struct pcb_t *p){
 }
 
 /*
+
 ritorna il puntatore alla testa della lista puntata in coda da q, se 
 la lista risulta vuota ritorna NULL, non elimina alcun elemento
+
 */
 
 struct pcb_t *headProcQ(struct clist *q){
@@ -105,8 +109,10 @@ struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
 ***************************************************************/
 
 /*
+
 ritorna TRUE se il processo puntato da p ha figli altrimenti 
 FALSE
+
 */
 
 int emptyChild(struct pcb_t *p){
@@ -115,8 +121,10 @@ int emptyChild(struct pcb_t *p){
 }
 
 /*
+
 inserisce il processo puntato da p in coda alla lista dei 
 processi figli del processo puntato da parent
+
 */
 
 void insertChild(struct pcb_t *parent, struct pcb_t *p){
@@ -140,9 +148,11 @@ struct pcb_t *removeChild(struct pcb_t *p){
 }
 
 /*
+
 toglie il processo puntato da p dalla lista dei processi del suo 
 parent e ritorna il puntatore del processo eliminato, 
 se il processo p non ha un parent torna NULL
+
 */
 
 struct pcb_t *outChild(struct pcb_t *p){
