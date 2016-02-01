@@ -1,5 +1,5 @@
-ARCH_UARM =	arm-none-eabi-
-FLAG_UARM = -mcpu=arm7tdmi -c -o
+CC = arm-none-eabi-
+FLAG_CC = -mcpu=arm7tdmi -c -o
 INCL_UARM = /usr/include/uarm/
 SRC_DIR = src/
 INCL_DIR = include/
@@ -13,17 +13,17 @@ all: jaeOS
 
 jaeOS: $(OBJECTS)
 	mkdir -p $(EXEC_DIR)
-	$(ARCH_UARM)ld -T $(LIB_UARM) $(OBJECTS)
+	$(CC)ld -T $(LIB_UARM) $(OBJECTS)
 	elf2uarm -k $(EXEC_DIR)jaeOS.elf
 
 $(SRC_DIR)pcb.o: $(SRC_DIR)pcb.c $(HEAD_FILE)
-	$(ARCH_UARM)gcc $(FLAG_UARM) $(SRC_DIR)pcb.o $(SRC_DIR)pcb.c
+	$(CC)gcc $(FLAG_CC) $(SRC_DIR)pcb.o $(SRC_DIR)pcb.c
 
 $(SRC_DIR)asl.o: $(SRC_DIR)asl.c $(HEAD_FILE)
-	$(ARCH_UARM)gcc $(FLAG_UARM) $(SRC_DIR)asl.o $(SRC_DIR)asl.c
+	$(CC)gcc $(FLAG_CC) $(SRC_DIR)asl.o $(SRC_DIR)asl.c
 
 $(SRC_DIR)p1test.o: $(SRC_DIR)p1test.c $(HEAD_UARM) $(HEAD_FILE)
-	$(ARCH_UARM)gcc $(FLAG_UARM) $(SRC_DIR)p1test.o $(SRC_DIR)p1test.c
+	$(CC)gcc $(FLAG_CC) $(SRC_DIR)p1test.o $(SRC_DIR)p1test.c
 
 clean:
 	rm -rf *.o $(EXEC_DIR)jaeOS
