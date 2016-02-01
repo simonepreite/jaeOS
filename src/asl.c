@@ -34,9 +34,6 @@ void initASL(){
 3° caso:
 	se il semaforo non c'è lo alloca prendendolo dalla lista semdfree
 
-	ovviamente non funziona ancora probabilmente concettualemte sbagliato
-	come ragionamento da ripensare totalmente.
-
 */
 
 int insertBlocked(int *semAdd, struct pcb_t *p){
