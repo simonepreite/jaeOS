@@ -26,7 +26,7 @@ $(SRC_DIR)p1test.o: $(SRC_DIR)p1test.c $(HEAD_UARM) $(HEAD_FILE)
 	$(CC)gcc $(FLAG_CC) $(SRC_DIR)p1test.o $(SRC_DIR)p1test.c
 
 clean:
-	rm -rf *.o $(EXEC_DIR)jaeOS
+	rm -rf *.o $(EXEC_DIR)jaeOS.elf
 
 cleanall:
 	rm -rf $(SRC_DIR)*.o $(EXEC_DIR)jaeOS $(EXEC_DIR)jaeOS.core.uarm $(EXEC_DIR)jaeOS.stab.uarm $(EXEC_DIR)
