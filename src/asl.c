@@ -12,7 +12,7 @@ HIDDEN struct clist aslh, semdFree;
 //Inizializza la lista semdFree, verrà chiamato solo una volta
 
 void initASL(){
-	static struct semd_t semdTable[MAXPROC];   
+	static semd_t semdTable[MAXPROC];   
 	int i;
 	aslh.next = NULL;
 	semdFree.next = &semdTable[MAXPROC-1].s_link;
@@ -34,11 +34,14 @@ void initASL(){
 3° caso:
 	se il semaforo non c'è lo alloca prendendolo dalla lista semdfree
 
+	ovviamente non funziona ancora probabilmente concettualemte sbagliato
+	come ragionamento da ripensare totalmente.
+
 */
 
-int insertBlocked(int *semAdd, struct pcb_t *p){
+int insertBlocked(int *semAdd, pcb_t *p){
     void *tmp;
-	struct semd_t *scan, *new_sem;
+	semd_t *scan, *new_sem;
 	int trovato = FALSE; 
 
 	if (p != NULL) { 
@@ -93,9 +96,9 @@ semaforo puntato da semAdd
 
 */
 
-struct pcb_t *removeBlocked(int *semAdd){
-	struct pcb_t *p;
-	struct semd_t *scan;
+ pcb_t *removeBlocked(int *semAdd){
+	pcb_t *p;
+	semd_t *scan;
 	int trovato = 0;
 	void *tmp;
 
@@ -124,9 +127,9 @@ da p->p_cursem il processo p
 
 */
 
-struct pcb_t *outBlocked(struct pcb_t *p){
-	struct semd_t *scan;
-	struct pcb_t *out;
+ pcb_t *outBlocked( pcb_t *p){
+	 semd_t *scan;
+	 pcb_t *out;
 
 	int trovato = 0;
 	void *tmp;
@@ -146,9 +149,9 @@ ritorna il puntatore alla testa dei processi bloccati in semAdd
 
 */
 
-struct pcb_t *headBlocked(int *semAdd){
-	struct pcb_t *p;
-	struct semd_t *scan;
+ pcb_t *headBlocked(int *semAdd){
+	 pcb_t *p;
+	semd_t *scan;
 	int trovato = 0;
 	void *tmp;
 	

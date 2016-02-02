@@ -12,7 +12,7 @@ HIDDEN struct clist pcbFree = CLIST_INIT;
 
 //inserisce il pcb passato come parametro in coda alla lista
 
-void freePcb(struct pcb_t *p){
+void freePcb(pcb_t *p){
 	struct clist *t = &pcbFree;
 	
 	clist_enqueue(p, t, p_list);
@@ -26,8 +26,8 @@ void freePcb(struct pcb_t *p){
                                          
 */
 
-struct pcb_t *allocPcb(){
-	struct pcb_t *pcb = NULL;
+pcb_t *allocPcb(){
+	pcb_t *pcb = NULL;
 
 		if(pcbFree.next != NULL){
 			pcb = container_of(pcbFree.next->next, typeof(*pcb), p_list);
@@ -50,7 +50,7 @@ struct pcb_t *allocPcb(){
 // Inizializza la lista pcbFree, verrà chiamato solo una volta all'inizio
 
 void initPcbs(){
-	static struct pcb_t pcb_static[MAXPROC];
+	static pcb_t pcb_static[MAXPROC];
     int i;
 
 	pcbFree.next = &pcb_static[MAXPROC-1].p_list;
@@ -66,7 +66,7 @@ void initPcbs(){
 
 //inserisce il processo puntato da p nella lista puntata in coda da q
 
-void insertProcQ(struct clist *q, struct pcb_t *p){
+void insertProcQ(struct clist *q, pcb_t *p){
 	clist_enqueue(p, q, p_list);
 }
 
@@ -77,9 +77,9 @@ la lista risulta vuota ritorna NULL, non elimina alcun elemento
 
 */
 
-struct pcb_t *headProcQ(struct clist *q){
+pcb_t *headProcQ(struct clist *q){
 	struct clist temp = *q;
-	struct pcb_t *pcb_temp;
+	pcb_t *pcb_temp;
 
 	pcb_temp = clist_head(pcb_temp, temp, p_list);
 	return pcb_temp;
@@ -87,8 +87,8 @@ struct pcb_t *headProcQ(struct clist *q){
 
 //rimuove l'elemento in testa alla lista puntata in coda da q
 
-struct pcb_t *removeProcQ(struct clist *q){
-	struct pcb_t *pcb_temp = NULL; 
+ pcb_t *removeProcQ(struct clist *q){
+	pcb_t *pcb_temp = NULL; 
 
 		if(q->next != NULL){
 			pcb_temp = container_of((q)->next->next, typeof(*pcb_temp), p_list);
@@ -99,7 +99,7 @@ struct pcb_t *removeProcQ(struct clist *q){
 
 //rimuove il processo puntato da p nella lista puntata in coda da q
 
-struct pcb_t *outProcQ(struct clist *q, struct pcb_t *p){
+pcb_t *outProcQ(struct clist *q, pcb_t *p){
 	if (clist_delete(p, q, p_list) == 0) return p;
 	else return NULL;
 }
@@ -115,7 +115,7 @@ FALSE
 
 */
 
-int emptyChild(struct pcb_t *p){
+int emptyChild(pcb_t *p){
 	if(p->p_children.next == NULL) return TRUE;
 	else return FALSE;
 }
@@ -127,7 +127,7 @@ processi figli del processo puntato da parent
 
 */
 
-void insertChild(struct pcb_t *parent, struct pcb_t *p){
+void insertChild(pcb_t *parent, pcb_t *p){
 	struct clist *q = &parent->p_children;
 
 	clist_enqueue(p, q, p_siblings);
@@ -136,8 +136,8 @@ void insertChild(struct pcb_t *parent, struct pcb_t *p){
 
 //decrementa la lista dei processi figli del processo puntato da p
 
-struct pcb_t *removeChild(struct pcb_t *p){
-	struct pcb_t *pcb_temp = NULL; 
+pcb_t *removeChild(pcb_t *p){
+	pcb_t *pcb_temp = NULL; 
 	struct clist *q = &p->p_children;
 
 		if(p->p_children.next != NULL){
@@ -155,8 +155,8 @@ se il processo p non ha un parent torna NULL
 
 */
 
-struct pcb_t *outChild(struct pcb_t *p){
-	struct pcb_t *padre = p->p_parent;
+pcb_t *outChild(pcb_t *p){
+	pcb_t *padre = p->p_parent;
 	struct clist *figli = &padre->p_children;
 
 	if(p->p_parent != NULL){
