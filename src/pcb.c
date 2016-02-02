@@ -15,7 +15,7 @@ HIDDEN struct clist pcbFree = CLIST_INIT;
 void freePcb(pcb_t *p){
 	struct clist *t = &pcbFree;
 	
-	clist_enqueue(p, t, p_list);
+	clist_enqueue(p, t, p_list); // incrementa la lista dei processi liberi perchè un processo non utilizza più lo spazio
 }
 
 /*
@@ -29,10 +29,10 @@ void freePcb(pcb_t *p){
 pcb_t *allocPcb(){
 	pcb_t *pcb = NULL;
 
-		if(pcbFree.next != NULL){
-			pcb = container_of(pcbFree.next->next, typeof(*pcb), p_list);
-			clist_dequeue(&pcbFree);
-			pcb->p_parent = NULL;
+		if(pcbFree.next != NULL){ // controllo che la lista non sia vuota 
+			pcb = container_of(pcbFree.next->next, typeof(*pcb), p_list); // punto pcb alla testa dei processi liberi
+			clist_dequeue(&pcbFree); // decremento la lista dei processi liberi di uno
+			pcb->p_parent = NULL;  // inizializzo la struttura per evitare resuidi di un vecchio utilizzo
 			pcb->p_cursem = NULL;
 			{
 				pcb->p_s.a1 = pcb->p_s.a2 = pcb->p_s.a3 = pcb->p_s.a4 = 0; //da verificare la struttura state_p sta nella libreria uARMtypes.h;
@@ -44,16 +44,16 @@ pcb_t *allocPcb(){
 			pcb->p_children.next = NULL;
 			pcb->p_siblings.next = NULL;
 		}
-	return pcb;
+	return pcb; // il puntatore resta NULL se non è possibile prelevare un processo
 }
 
 // Inizializza la lista pcbFree, verrà chiamato solo una volta all'inizio
 
 void initPcbs(){
-	static pcb_t pcb_static[MAXPROC];
+	static pcb_t pcb_static[MAXPROC]; // spazio dedicato ai processi necessario definirlo all'inizio a causa della mancanza di malloc
     int i;
 
-	pcbFree.next = &pcb_static[MAXPROC-1].p_list;
+	pcbFree.next = &pcb_static[MAXPROC-1].p_list; // linking della pcbFree all'array dei processi 
 	pcb_static[MAXPROC-1].p_list.next = &pcb_static[0].p_list;
 	for(i = 0; i < (MAXPROC-1); i++){
 		pcb_static[i].p_list.next = &pcb_static[i+1].p_list;
@@ -67,7 +67,7 @@ void initPcbs(){
 //inserisce il processo puntato da p nella lista puntata in coda da q
 
 void insertProcQ(struct clist *q, pcb_t *p){
-	clist_enqueue(p, q, p_list);
+	clist_enqueue(p, q, p_list); 
 }
 
 /*
@@ -81,7 +81,7 @@ pcb_t *headProcQ(struct clist *q){
 	struct clist temp = *q;
 	pcb_t *pcb_temp;
 
-	pcb_temp = clist_head(pcb_temp, temp, p_list);
+	pcb_temp = clist_head(pcb_temp, temp, p_list); 
 	return pcb_temp;
 }
 

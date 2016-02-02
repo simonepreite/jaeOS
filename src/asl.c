@@ -14,6 +14,7 @@ HIDDEN struct clist aslh, semdFree;
 void initASL(){
 	static semd_t semdTable[MAXPROC];   
 	int i;
+
 	aslh.next = NULL;
 	semdFree.next = &semdTable[MAXPROC-1].s_link;
 	semdTable[MAXPROC-1].s_link.next = &semdTable[0].s_link;
@@ -61,17 +62,17 @@ int insertBlocked(int *semAdd, pcb_t *p){
 		} 
 		else { //semaforo non trovato
 			if (semdFree.next != NULL) { //semdFree non vuota
-				new_sem = container_of(semdFree.next->next, typeof(*new_sem), s_link);
-				p->p_cursem = new_sem;
+				new_sem = container_of(semdFree.next->next, typeof(*new_sem), s_link); //prendo un nuovo semaforo dalla lista semdFree
+				p->p_cursem = new_sem; 
 				new_sem->s_semAdd = semAdd;
 				new_sem->s_proc.next = NULL;
-				clist_dequeue(&semdFree);
+				clist_dequeue(&semdFree); // decremento della lista dei semafori liberi 
 				insertProcQ(&new_sem->s_proc, p);
-				if(aslh.next == NULL) {
+				if(aslh.next == NULL) { //se la lista è vuota aggiungi in testa
 					clist_enqueue(new_sem, &aslh, s_link);
 					return FALSE;
 				}
-					clist_foreach(scan, &aslh, s_link, tmp){
+					clist_foreach(scan, &aslh, s_link, tmp){ 
 						if(new_sem->s_semAdd < scan->s_semAdd){
 							clist_foreach_add(new_sem, scan, &aslh, s_link, tmp);
 							break;
