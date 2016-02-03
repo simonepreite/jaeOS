@@ -60,7 +60,7 @@ struct clist {
 		}	\
 	}
 
-#define clist_foreach_all(scan, clistp, member, tmp) &scan->member == (tmp)
+#define clist_foreach_all(scan, clistp, member, tmp) ((clistp)->next == NULL || &scan->member == (tmp))
 
 #define clist_delete(elem, clistp, member)({\
 int ret=1;\

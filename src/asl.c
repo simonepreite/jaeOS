@@ -74,7 +74,7 @@ int insertBlocked(int *semAdd, pcb_t *p){
 							break;
 						}
 					}
-						if (clist_foreach_all(scan, &aslh, s_link, tmp)||aslh.next == NULL) { // se la lista è vuota o è stata completamente scorsa
+						if (clist_foreach_all(scan, &aslh, s_link, tmp)) { // se la lista è vuota o è stata completamente scorsa
 							clist_enqueue(new_sem, &aslh, s_link); 
 						}
 				return FALSE;
