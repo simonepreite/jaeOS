@@ -111,7 +111,7 @@ semaforo puntato da semAdd
 		}
 		if(trovato == 1){
 			p = removeProcQ(&scan->s_proc);
-			//freeSem(scan);
+			freeSem(scan);
 			return p;
 		}
 		else return NULL;
@@ -134,7 +134,7 @@ da p->p_cursem il processo p
 	clist_foreach(scan, &aslh, s_link, tmp) { 
 		if (scan->s_semAdd == p->p_cursem->s_semAdd) {
 			out = removeBlocked(p->p_cursem->s_semAdd);
-			//freeSem(scan);
+			freeSem(scan);
 			trovato = 1;
 			return out;
 		}
@@ -180,7 +180,7 @@ libera il semaforo che non ha più processi bloccati in coda
 void freeSem(semd_t *scan){ 
 	void *tmp;
 	if(scan->s_proc.next == NULL){
-		clist_enqueue(scan, &semdFree, s_link); 
 		clist_foreach_delete(scan, &aslh, s_link, tmp);
+		clist_enqueue(scan, &semdFree, s_link); 
 	}
 }
