@@ -177,11 +177,10 @@ ritorna il puntatore alla testa dei processi bloccati in semAdd
 libera il semaforo che non ha più processi bloccati in coda
 
 */
-/*void freeSem(semd_t *scan){ 
+void freeSem(semd_t *scan){ 
 	void *tmp;
 	if(scan->s_proc.next == NULL){
 		clist_enqueue(scan, &semdFree, s_link); 
 		clist_foreach_delete(scan, &aslh, s_link, tmp);
 	}
 }
-*/
