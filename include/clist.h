@@ -69,7 +69,7 @@ if((clistp)->next != NULL){\
 	if(container_of((clistp)->next, typeof(*elem),member) == elem && (clistp)->next->next == (clistp)->next){\
 		(clistp)->next = NULL;\
 		ret=0;\
-}\
+	}\
 else{\
 	for(tmp1=NULL, tmp2=(clistp)->next, scan=(clistp)->next->next; container_of(scan, typeof(*elem), member)!=elem && scan!=tmp1; tmp2=scan, scan=scan->next, tmp1=(clistp)->next);\
   		if(container_of(scan, typeof(*elem), member)==elem){\
