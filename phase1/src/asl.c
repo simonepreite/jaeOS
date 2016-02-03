@@ -35,9 +35,6 @@ void initASL(){
 3° caso:
 	se il semaforo non c'è lo alloca prendendolo dalla lista semdfree
 
-	ovviamente non funziona ancora probabilmente concettualemte sbagliato
-	come ragionamento da ripensare totalmente.
-
 */
 
 int insertBlocked(int *semAdd, pcb_t *p){
@@ -46,7 +43,7 @@ int insertBlocked(int *semAdd, pcb_t *p){
 	int trovato = FALSE; 
 
 	if (p != NULL) { 
-			if(aslh.next != NULL){
+			if(aslh.next != NULL){ // cerca il semaforo nella lista
 	    		clist_foreach(scan, &aslh, s_link, tmp) { 
 		    		if (scan->s_semAdd == semAdd) {
    		        		trovato = TRUE;
@@ -60,9 +57,9 @@ int insertBlocked(int *semAdd, pcb_t *p){
 			p->p_cursem = scan;
 			return FALSE;
 		} 
-		else { //semaforo non trovato
-			if (semdFree.next != NULL) { //semdFree non vuota
-				new_sem = container_of(semdFree.next->next, typeof(*new_sem), s_link); //prendo un nuovo semaforo dalla lista semdFree
+		else { // semaforo non trovato
+			if (semdFree.next != NULL) { // semdFree non vuota
+				new_sem = container_of(semdFree.next->next, typeof(*new_sem), s_link); // prendo un nuovo semaforo dalla lista semdFree
 				p->p_cursem = new_sem; 
 				new_sem->s_semAdd = semAdd;
 				new_sem->s_proc.next = NULL;
