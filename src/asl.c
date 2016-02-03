@@ -68,17 +68,13 @@ int insertBlocked(int *semAdd, pcb_t *p){
 				new_sem->s_proc.next = NULL;
 				clist_dequeue(&semdFree); // decremento della lista dei semafori liberi 
 				insertProcQ(&new_sem->s_proc, p);
-				if(aslh.next == NULL) { //se la lista è vuota aggiungi in testa
-					clist_enqueue(new_sem, &aslh, s_link);
-					return FALSE;
-				}
 					clist_foreach(scan, &aslh, s_link, tmp){ 
 						if(new_sem->s_semAdd < scan->s_semAdd){
 							clist_foreach_add(new_sem, scan, &aslh, s_link, tmp);
 							break;
 						}
 					}
-						if (clist_foreach_all(scan, &aslh, s_link, tmp)) {
+						if (clist_foreach_all(scan, &aslh, s_link, tmp)||aslh.next == NULL) { // se la lista è vuota o è stata completamente scorsa
 							clist_enqueue(new_sem, &aslh, s_link); 
 						}
 				return FALSE;
