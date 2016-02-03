@@ -1,2 +1,0 @@
-
- -  in asl.c de implementare la funzione per cui il eliminato un processo dalla lista dei processi bloccati di un semaforo controlla che il semaforo non abbia più processi bloccati in coda e nel caso liberare il semaforo restituendolo alla lista dei semafori liberi (quindi incrementa la lista dei semafori liberi e decrementa quella dei semafori attivi, rispettivamente semdFree e aslh)
