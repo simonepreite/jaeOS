@@ -17,6 +17,7 @@ EXTERN int insertBlocked(int *semAdd, struct pcb_t *p); /*Inserisce il ProcBlk p
 EXTERN pcb_t *removeBlocked(int *semAdd); /* rimuove il primo ProcBlk, se trovato */
 EXTERN pcb_t *outBlocked(pcb_t *p); /* Rimuove il ProcBlk puntato da p */
 EXTERN pcb_t *headBlocked(int *semAdd); /*ritorna un puntatore al ProcBlk */
+//EXTERN void freeSem(semd_t *scan);
 
 #endif
 
