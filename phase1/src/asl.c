@@ -57,7 +57,7 @@ int insertBlocked(int *semAdd, pcb_t *p){
 			p->p_cursem = scan;
 			return FALSE;
 		} 
-		else { // semaforo non trovato
+		else { //  semaforo non trovato
 			if (semdFree.next != NULL) { // semdFree non vuota
 				new_sem = container_of(semdFree.next->next, typeof(*new_sem), s_link); // prendo un nuovo semaforo dalla lista semdFree
 				p->p_cursem = new_sem; 
