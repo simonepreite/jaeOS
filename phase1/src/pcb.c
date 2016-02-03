@@ -141,7 +141,7 @@ pcb_t *removeChild(pcb_t *p){
 	struct clist *q = &p->p_children;
 
 		if(p->p_children.next != NULL){
-			pcb_temp = p;
+			pcb_temp = container_of((q)->next->next, typeof(*pcb_temp), p_children); // DEVO DARGLI IL PROCESSO FIGLIO NON IL PADRE
 			clist_dequeue(q);
 		}
 	return pcb_temp;
