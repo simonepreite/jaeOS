@@ -86,7 +86,10 @@ int insertBlocked(int *semAdd, pcb_t *p){
 /*
 
 rimuove il primo processo dalla coda dei processi bloccati nel 
-semaforo puntato da semAdd
+semaforo puntato da semAdd.
+Se la coda dei processi bloccati risulta vuota dopo la rimozione 
+del processo il semaforo viene disattivato e torna alla lista dei
+semafori liberi
 
 */
 
@@ -108,7 +111,7 @@ semaforo puntato da semAdd
 		}
 		if(trovato == 1){
 			p = removeProcQ(&scan->s_proc);
-			freeSem(scan);
+			freeSem(scan); // libera il semaforo
 			return p;
 		}
 		else return NULL;
@@ -118,7 +121,10 @@ semaforo puntato da semAdd
 /*
 
 rimuove dalla coda dei processi bloccati nel semaforo puntato
-da p->p_cursem il processo p
+da p->p_cursem il processo p.
+Se la coda dei processi bloccati risulta vuota dopo la rimozione 
+del processo il semaforo viene disattivato e torna alla lista dei
+semafori liberi
 
 */
 
@@ -131,7 +137,7 @@ da p->p_cursem il processo p
 	clist_foreach(scan, &aslh, s_link, tmp) { 
 		if (scan->s_semAdd == p->p_cursem->s_semAdd) {
 			out = removeBlocked(p->p_cursem->s_semAdd);
-			freeSem(scan);
+			freeSem(scan); // libera il semaforo
 			trovato = 1;
 			return out;
 		}
