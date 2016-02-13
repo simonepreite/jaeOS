@@ -22,16 +22,16 @@
  *
  *	Test program for the modules ASL and pcbQueues (phase 1).
  *
- *	Produces progress messages on terminal 0 
- * 	Error messages will also appear on terminal 0 
+ *	Produces progress messages on terminal 0
+ * 	Error messages will also appear on terminal 0
  *	Aborts as soon as an error is detected.
  */
-#include "/usr/include/uarm/uARMconst.h"
-#include "/usr/include/uarm/uARMtypes.h"
-#include "/usr/include/uarm/libuarm.h"
+#include <uARMconst.h>
+#include <uARMtypes.h>
+#include <libuarm.h>
 
 #include "../include/const.h"
- 
+
 #include "../include/clist.h"
 #include "../include/pcb.h"
 #include "../include/asl.h"
@@ -112,7 +112,7 @@ int main() {
 
 	q = outProcQ(&qa, firstproc);
 	if ((q == NULL) || (q != firstproc))
-		adderrbuf("outProcQ(&qa, firstproc) failed on first entry   ");		
+		adderrbuf("outProcQ(&qa, firstproc) failed on first entry   ");
 	freePcb(q);
 
 	q = outProcQ(&qa, midproc);
@@ -186,7 +186,7 @@ int main() {
 	addokbuf("insertChild(), removeChild() and emptyChild() ok   \n");
 	addokbuf("process tree module ok      \n");
 
-	for (i = 0; i < 10; i++) 
+	for (i = 0; i < 10; i++)
 		freePcb(procp[i]);
 
 
@@ -238,7 +238,7 @@ int main() {
 		adderrbuf("headBlocked(1): NULL for an existent queue   ");
 	if (q != procp[9])
 		adderrbuf("headBlocked(1): wrong process returned   ");
-	
+
 	p = outBlocked(q);
 	if (p != q)
 		adderrbuf("outBlocked(1): couldn't remove from valid queue   ");

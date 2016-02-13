@@ -1,10 +1,10 @@
 #compilatore
 CC = arm-none-eabi-gcc
 #flag compilatore
-FLAG_CC = -mcpu=arm7tdmi -c -o
+FLAG_CC = -mcpu=arm7tdmi -I $(INCL_UARM) -c -o 
 #linker
 UL = arm-none-eabi-ld
-#flag linker 
+#flag linker
 FLAG_UL = -T
 #converitore per uARM
 UC = elf2uarm
@@ -21,7 +21,7 @@ LIB_UARM = $(INCL_UARM)ldscripts/elf32ltsarm.h.uarmcore.x -o $(EXEC_DIR)jaeOS.el
 #object file
 OBJECTS = $(SRC_DIR)p1test.o $(SRC_DIR)pcb.o $(SRC_DIR)asl.o
 #header file
-HEAD_FILE = $(INCL_DIR)const.h $(INCL_DIR)clist.h $(INCL_DIR)pcb.h $(INCL_DIR)asl.h 
+HEAD_FILE = $(INCL_DIR)const.h $(INCL_DIR)clist.h $(INCL_DIR)pcb.h $(INCL_DIR)asl.h
 #header file uarm
 HEAD_UARM = $(INCL_UARM)uARMconst.h $(INCL_UARM)uARMtypes.h $(INCL_UARM)libuarm.h
 
