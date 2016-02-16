@@ -1,0 +1,4 @@
+insertBlocked in asl.c con un solo foreach;
+snellire il codice eliminando tutte le istruzioni superflue;
+creare funzioni d'appoggio che eseguano le instruzioni ripetitive o semplicemente ingombranti;
+se vengono in mente altre idee, ottimizzazioni ecc in corso d'opera ben vengano;
