@@ -16,10 +16,9 @@ void initASL(){
 	int i;
 
 	aslh.next = NULL;
-	semdFree.next = &semdTable[MAXPROC-1].s_link;
-	semdTable[MAXPROC-1].s_link.next = &semdTable[0].s_link;
-	for(i = 0; i < (MAXPROC-1); i++){
-		semdTable[i].s_link.next = &semdTable[i+1].s_link;
+	for(i = 0; i < (MAXPROC); i++){
+		semd_t *q = &semdTable[i];
+		clist_enqueue(q, &semdFree, s_link);
 	}
 }
 
@@ -136,7 +135,8 @@ semafori liberi
 	void *tmp;
 	clist_foreach(scan, &aslh, s_link, tmp) { 
 		if (scan->s_semAdd == p->p_cursem->s_semAdd) {
-			out = removeBlocked(p->p_cursem->s_semAdd);
+			struct clist *q = &scan->s_proc;
+			out = outProcQ(q, p);
 			freeSem(scan); // libera il semaforo
 			trovato = 1;
 			return out;

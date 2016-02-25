@@ -53,10 +53,9 @@ void initPcbs(){
 	static pcb_t pcb_static[MAXPROC]; // spazio dedicato ai processi necessario definirlo all'inizio a causa della mancanza di malloc
     int i;
 
-	pcbFree.next = &pcb_static[MAXPROC-1].p_list; // linking della pcbFree all'array dei processi
-	pcb_static[MAXPROC-1].p_list.next = &pcb_static[0].p_list;
-	for(i = 0; i < (MAXPROC-1); i++){
-		pcb_static[i].p_list.next = &pcb_static[i+1].p_list;
+	for(i = 0; i < (MAXPROC); i++){
+		pcb_t *q = &pcb_static[i];
+		clist_enqueue(q, &pcbFree, p_list); // linking della pcbFree all'array dei processi
 	}
 }
 
