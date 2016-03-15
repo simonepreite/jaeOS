@@ -1,7 +1,7 @@
 #ifndef _CLIST_H
 #define _CLIST_H
 
-//typedef unsigned int size_t;
+typedef unsigned int size_t;
 
 #define container_of(ptr, type, member) ({      \
 		    const typeof( ((type *)0)->member ) *__mptr = (ptr);  \
@@ -30,10 +30,9 @@ struct clist {
 #define clist_empty(clistx) (((clistx).next) == NULL)
 
 #define clist_foreach(scan, clistp, member, tmp)  \
-	tmp = NULL;\
 	if((clistp)->next != NULL)	\
-	for (scan = container_of((clistp)->next->next, typeof(*scan), member);      \
-		tmp!=(clistp)->next; tmp = &((scan)->member),  scan = container_of((scan)->member.next, typeof(*scan), member))
+	for (tmp = NULL,scan = container_of((clistp)->next->next, typeof(*scan), member);      \
+		&scan->member != (tmp); scan = container_of(scan->member.next, typeof(*scan), member), tmp=(clistp)->next->next)
 
 #define clist_tail(elem, clistx, member)	\
 	(clistx.next == NULL) ? NULL : container_of(clistx.next, typeof(*elem), member);
@@ -53,13 +52,15 @@ struct clist {
 
 #define clist_pop(clistp) clist_dequeue(clistp)
 #define clist_dequeue(clistp)	\
+	if((clistp)->next != NULL){	\
 		if((clistp)->next == (clistp)->next->next){	\
 			(clistp)->next = NULL;	\
 		} else {	\
 			(clistp)->next->next = (clistp)->next->next->next;	\
-		}	
+		}	\
+	}
 
-#define clist_foreach_all(scan, clistp, member, tmp) ((tmp)==(clistp)->next)//((clistp)->next == NULL || &scan->member == (tmp))
+#define clist_foreach_all(scan, clistp, member, tmp) ((clistp)->next == NULL || &scan->member == (tmp))
 
 #define clist_delete(elem, clistp, member)({\
 int ret=1;\
@@ -90,31 +91,19 @@ ret;\
 })
 
 #define clist_foreach_delete(scan, clistp, member, tmp)\
-	if(tmp){struct clist *delptr = tmp;\
-		if(&(scan->member) == (clistp)->next){\
-			(clistp)->next = delptr;\
-			(delptr)->next = (scan)->member.next;\
+	for (tmp = &scan->member; scan->member.next != (tmp); scan = container_of(scan->member.next, typeof(*scan), member));\
+		if((clistp)->next->next==&scan->member && (clistp)->next==&scan->member) (clistp)->next=NULL;\
+		if((clistp)->next==(tmp)){\
+			 scan->member.next=(clistp)->next->next;\
+			 (clistp)->next=&scan->member;\
 		}\
-		else if(&(scan->member) == (clistp)->next->next){\
-			delptr = (clistp)->next;\
-			(delptr)->next = (scan)->member.next;\
-		}\
-		else (delptr)->next = (delptr)->next->next;\
-	}\
-	else {clist_dequeue(clistp);}
-							 
-							 
-							 
-        
-/* this macro should be used *inside* a clist_foreach loop to add an element
-	before the current one */
-#define clist_foreach_add(elem, scan, clistp, member, tmp)\
-	if(tmp){\
-		(elem)->member.next = &((scan)->member);\
-		((struct clist*)tmp)->next = &((elem)->member);\
-	}\
-	else{ clist_push(elem,clistp,member);}  
-                                                             
+		else scan->member.next=scan->member.next->next;\
+	scan=container_of((tmp), typeof(*scan), member);\
+	
+#define clist_foreach_add(elem, scan, clistp, member, tmp) \
+		for (tmp = &scan->member; scan->member.next != (tmp); scan = container_of(scan->member.next, typeof(*scan), member));\
+			elem->member.next=scan->member.next;\
+			scan->member.next=&elem->member;\
 
 #endif
 

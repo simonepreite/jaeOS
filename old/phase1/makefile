@@ -1,7 +1,7 @@
 #compilatore
 CC = arm-none-eabi-gcc
 #flag compilatore
-FLAG_CC = -mcpu=arm7tdmi -I $(INCL_UARM) -I $(INCL_DIR) -c -o 
+FLAG_CC = -mcpu=arm7tdmi -I $(INCL_UARM) -c -o 
 #linker
 UL = arm-none-eabi-ld
 #flag linker

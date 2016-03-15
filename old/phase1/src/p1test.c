@@ -1,9 +1,6 @@
 /*****************************************************************************
  * p1test.c Year 2015 v.0.1 January, 08 2016                                 *
  * Copyright 2004, 2005 Michael Goldweber, Davide Brini.                     *
- /*****************************************************************************
- * p1test.c Year 2015 v.0.1 January, 08 2016                                 *
- * Copyright 2004, 2005 Michael Goldweber, Davide Brini.                     *
  * Modified 2010-2016 Renzo Davoli, Marco Melletti                           *
  *                                                                           *
  * This file is part of jaeos16. (derived from Kaya)                         *
@@ -33,11 +30,11 @@
 #include <uARMtypes.h>
 #include <libuarm.h>
 
-#include "const.h"
+#include "../include/const.h"
 
-#include "clist.h"
-#include "pcb.h"
-#include "asl.h"
+#include "../include/clist.h"
+#include "../include/pcb.h"
+#include "../include/asl.h"
 
 #define	MAXSEM	MAXPROC
 
@@ -210,7 +207,7 @@ int main() {
 		if (insertBlocked(&sem[i], procp[i]))
 			adderrbuf("insertBlocked() test #2: unexpected TRUE   ");
 	}
-	
+
 	/* check if semaphore descriptors are returned to free list */
 	p = removeBlocked(&sem[11]);
 	if (p == NULL)

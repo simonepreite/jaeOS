@@ -60,14 +60,18 @@ int main()
 					free(elem);
 				} else
 					printf("delete %p->err\n",elem);
-				
+				/*clist_delete(elem, &myclist, list);
+				printf("return: %d\n", clist_delete(elem, &myclist, list));
+				*/
 				break;
 				
 			case '-':
 				value=strtol(buf+1,NULL,0);
 				clist_foreach(scan, &myclist, list, tmp) {
 					if (value==scan->value)
-					{					
+					{	
+						//printf("== %p %d\n",scan,scan->value);
+						//printf("== %p %p %d\n",scan, &scan->list,scan->value);						
 						clist_foreach_delete(scan, &myclist, list, tmp);
 						printf("delete %p->done\n",scan);
 						free(scan);

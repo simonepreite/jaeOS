@@ -1,6 +1,6 @@
 #ifndef PCB_H
 #define PCB_H
-#include "uARMtypes.h"
+#include "/usr/include/uarm/uARMtypes.h"
 #include "clist.h" 
 /* struttura processi */
 
@@ -32,9 +32,5 @@ EXTERN int emptyChild( pcb_t *p);
 EXTERN void insertChild(pcb_t *parent, pcb_t *p);
 EXTERN pcb_t *removeChild(pcb_t *p);
 EXTERN pcb_t *outChild(pcb_t *p);
-
-/* funzioni ausiliarie */
-
-EXTERN void init_proc(pcb_t *pcb);
 
 #endif

@@ -1,9 +1,18 @@
-#include "../include/const.h"
-#include "../include/clist.h"
-#include "../include/pcb.h"
-#include "../include/asl.h"
+#include "const.h"
+#include "clist.h"
+#include "pcb.h"
+#include "asl.h"
 
-HIDDEN struct clist aslh, semdFree;
+/* struttura semafori */
+
+typedef struct semd_t{
+	int *s_semAdd; 
+	struct clist s_link; 
+	struct clist s_proc; 
+}semd_t;
+
+
+HIDDEN struct clist aslh, semdFree = CLIST_INIT;
 
 /***************************************************************
 *                    ACTIVE SEMAPHORE LIST                     *
@@ -18,7 +27,7 @@ void initASL(){
 	aslh.next = NULL;
 	for(i = 0; i < (MAXPROC); i++){
 		semd_t *q = &semdTable[i];
-		clist_enqueue(q, &semdFree, s_link);
+		clist_enqueue(q, &semdFree, s_link); 
 	}
 }
 
@@ -39,46 +48,25 @@ void initASL(){
 int insertBlocked(int *semAdd, pcb_t *p){
     void *tmp;
 	semd_t *scan, *new_sem;
-	int trovato = FALSE; 
 
-	if (p != NULL) { 
-			if(aslh.next != NULL){ // cerca il semaforo nella lista
-	    		clist_foreach(scan, &aslh, s_link, tmp) { 
-		    		if (scan->s_semAdd == semAdd) {
-   		        		trovato = TRUE;
-			    		p->p_cursem->s_semAdd=semAdd;
-			    		break;
-		    		}
-				}
-			}
-		if (trovato) { // semaforo trovato
-			insertProcQ(&scan->s_proc, p); 
-			p->p_cursem = scan;
-			return FALSE;
-		} 
-		else { //  semaforo non trovato
-			if (semdFree.next != NULL) { // semdFree non vuota
-				new_sem = container_of(semdFree.next->next, typeof(*new_sem), s_link); // prendo un nuovo semaforo dalla lista semdFree
-				p->p_cursem = new_sem; 
-				new_sem->s_semAdd = semAdd;
-				new_sem->s_proc.next = NULL;
-				clist_dequeue(&semdFree); // decremento della lista dei semafori liberi 
-				insertProcQ(&new_sem->s_proc, p);
-					clist_foreach(scan, &aslh, s_link, tmp){ 
-						if(new_sem->s_semAdd < scan->s_semAdd){
-							clist_foreach_add(new_sem, scan, &aslh, s_link, tmp);
-							break;
-						}
-					}
-						if (clist_foreach_all(scan, &aslh, s_link, tmp)) { // se la lista è vuota o è stata completamente scorsa
-							clist_enqueue(new_sem, &aslh, s_link); 
-						}
+	if(aslh.next != NULL || semdFree.next != NULL){ 
+	    clist_foreach(scan, &aslh, s_link, tmp) { 
+		    if (scan->s_semAdd == semAdd) { //
+   		        insertProcQ(&scan->s_proc, p); 
+				p->p_cursem = scan;
 				return FALSE;
-				}
-			else { // caso lista semdFree vuota
-				return TRUE; 
+		    }
+		    if(semAdd < scan->s_semAdd){
+		    	if((new_sem = new_semaphore(new_sem, p, semAdd))==NULL) return TRUE; // alloca un nuovo semaforo
+		    	clist_foreach_add(new_sem, scan, &aslh, s_link, tmp);
+				return FALSE;		    		
 			}
-		}	
+		}
+			if (clist_foreach_all(scan, &aslh, s_link, tmp)) { 
+				if((new_sem=new_semaphore(new_sem, p, semAdd))==NULL) return TRUE; 
+				clist_enqueue(new_sem, &aslh, s_link); 
+				return FALSE;
+			}
 	}
 }
 
@@ -92,10 +80,9 @@ semafori liberi
 
 */
 
- pcb_t *removeBlocked(int *semAdd){
-	pcb_t *p;
-	semd_t *scan;
-	int trovato = 0;
+pcb_t *removeBlocked(int *semAdd){
+	pcb_t *p = NULL;
+	semd_t *scan = NULL;
 	void *tmp;
 
 	if(aslh.next == NULL) {
@@ -103,17 +90,18 @@ semafori liberi
 	}
 	else{
 		clist_foreach(scan, &aslh, s_link, tmp){
-			if(scan->s_semAdd == semAdd){
-				trovato = 1;
-				break;
+			if( scan->s_semAdd <= semAdd){
+				if(scan->s_semAdd == semAdd){
+					p = removeProcQ(&scan->s_proc);
+					if(scan->s_proc.next==NULL){
+						clist_foreach_delete(p->p_cursem, &aslh, s_link, tmp);
+						clist_enqueue(p->p_cursem, &semdFree, s_link); 
+					}
+					return p;
+				}
 			}
 		}
-		if(trovato == 1){
-			p = removeProcQ(&scan->s_proc);
-			freeSem(scan); // libera il semaforo
-			return p;
-		}
-		else return NULL;
+	return p;
 	}
 }
 
@@ -127,34 +115,27 @@ semafori liberi
 
 */
 
+//non stabile
  pcb_t *outBlocked(pcb_t *p){
-	 semd_t *scan;
-	 pcb_t *out;
-
-	int trovato = 0;
-	void *tmp;
-	clist_foreach(scan, &aslh, s_link, tmp) { 
-		if (scan->s_semAdd == p->p_cursem->s_semAdd) {
-			struct clist *q = &scan->s_proc;
+	 pcb_t *out = NULL;
+	 void *tmp;
+	 struct clist *q = &p->p_cursem->s_proc;
+	
+	if(q->next!=NULL){
 			out = outProcQ(q, p);
-			freeSem(scan); // libera il semaforo
-			trovato = 1;
-			return out;
-		}
+			if(p->p_cursem->s_proc.next==NULL){
+				clist_delete(p->p_cursem, &aslh, s_link);
+				clist_enqueue(p->p_cursem, &semdFree, s_link); 
+			}
 	}
-	if(!trovato) return NULL;
+	return out;
 }
 
-/*
-
-ritorna il puntatore alla testa dei processi bloccati in semAdd
-
-*/
+//ritorna il puntatore alla testa dei processi bloccati in semAdd
 
  pcb_t *headBlocked(int *semAdd){
-	 pcb_t *p;
+	 pcb_t *p = NULL;
 	semd_t *scan;
-	int trovato = 0;
 	void *tmp;
 	
 	if(aslh.next == NULL) {
@@ -163,27 +144,35 @@ ritorna il puntatore alla testa dei processi bloccati in semAdd
 	else{
 		clist_foreach(scan, &aslh, s_link, tmp){
 			if(scan->s_semAdd == semAdd){
-				trovato = 1;
-				break;
+				p = clist_head(p, scan->s_proc, p_list);
+				return p;
 			}
 		}
-		if(trovato == 1){
-			p = clist_head(p, scan->s_proc, p_list);
-			return p;
-		}
-		else return NULL;
+	return p;
 	}
 }
 
+
+/***************************************************************
+*                      AUXILIARY FUNCTION                      *
+***************************************************************/
+
 /*
 
-libera il semaforo che non ha più processi bloccati in coda
+prende un semaphoro dalla lista dei semdFree e lo attiva 
+ammesso che la lista dei semafori liberi non sia vuota
 
 */
-void freeSem(semd_t *scan){ 
-	void *tmp;
-	if(scan->s_proc.next == NULL){
-		clist_foreach_delete(scan, &aslh, s_link, tmp);
-		clist_enqueue(scan, &semdFree, s_link); 
+
+semd_t *new_semaphore(semd_t *new_sem, pcb_t *p, int *semAdd){
+	new_sem = NULL;
+	if(!clist_empty(semdFree)){
+		new_sem = clist_head( new_sem, semdFree, s_link);//container_of(semdFree.next->next, typeof(*new_sem), s_link); // prendo un nuovo semaforo dalla lista semdFree
+		p->p_cursem = new_sem; 
+		new_sem->s_semAdd = semAdd;
+		new_sem->s_proc.next = NULL;
+		clist_dequeue(&semdFree); // decremento della lista dei semafori liberi 
+		insertProcQ(&new_sem->s_proc, p);
 	}
+	return new_sem;
 }
