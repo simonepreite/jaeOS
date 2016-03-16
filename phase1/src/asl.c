@@ -2,7 +2,7 @@
 #include "clist.h"
 #include "pcb.h"
 #include "asl.h"
-//modificato da netbook
+
 /* struttura semafori */
 
 typedef struct semd_t{
@@ -115,8 +115,7 @@ semafori liberi
 
 */
 
-//non stabile
- pcb_t *outBlocked(pcb_t *p){
+pcb_t *outBlocked(pcb_t *p){
 	 pcb_t *out = NULL;
 	 struct clist *q = &p->p_cursem->s_proc;
 	
@@ -132,7 +131,7 @@ semafori liberi
 
 //ritorna il puntatore alla testa dei processi bloccati in semAdd
 
- pcb_t *headBlocked(int *semAdd){
+pcb_t *headBlocked(int *semAdd){
 	pcb_t *p = NULL;
 	semd_t *scan;
 	
