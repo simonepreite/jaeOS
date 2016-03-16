@@ -2,7 +2,7 @@
 #include "clist.h"
 #include "pcb.h"
 #include "asl.h"
-
+//modificato da netbook
 /* struttura semafori */
 
 typedef struct semd_t{
@@ -94,7 +94,7 @@ pcb_t *removeBlocked(int *semAdd){
 				if(scan->s_semAdd == semAdd){
 					p = removeProcQ(&scan->s_proc);
 					if(scan->s_proc.next==NULL){
-						clist_foreach_delete(p->p_cursem, &aslh, s_link, tmp);
+						clist_foreach_delete(p->p_cursem, &aslh, s_link, tmp); 
 						clist_enqueue(p->p_cursem, &semdFree, s_link); 
 					}
 					return p;
@@ -121,7 +121,7 @@ semafori liberi
 	 struct clist *q = &p->p_cursem->s_proc;
 	
 	if(q->next!=NULL){
-			out = outProcQ(q, p);
+			out = outProcQ(&p->p_cursem->s_proc, p);
 			if(p->p_cursem->s_proc.next==NULL){
 				clist_delete(p->p_cursem, &aslh, s_link);
 				clist_enqueue(p->p_cursem, &semdFree, s_link); 
@@ -133,7 +133,7 @@ semafori liberi
 //ritorna il puntatore alla testa dei processi bloccati in semAdd
 
  pcb_t *headBlocked(int *semAdd){
-	 pcb_t *p = NULL;
+	pcb_t *p = NULL;
 	semd_t *scan;
 	
 	if(aslh.next == NULL) {
