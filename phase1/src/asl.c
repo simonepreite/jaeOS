@@ -14,6 +14,8 @@ typedef struct semd_t{
 
 HIDDEN struct clist aslh, semdFree = CLIST_INIT;
 
+void *tmp;
+
 /***************************************************************
 *                    ACTIVE SEMAPHORE LIST                     *
 ***************************************************************/
@@ -46,7 +48,6 @@ void initASL(){
 */
 
 int insertBlocked(int *semAdd, pcb_t *p){
-    void *tmp;
 	semd_t *scan, *new_sem;
 
 	if(aslh.next != NULL || semdFree.next != NULL){ 
@@ -83,7 +84,6 @@ semafori liberi
 pcb_t *removeBlocked(int *semAdd){
 	pcb_t *p = NULL;
 	semd_t *scan = NULL;
-	void *tmp;
 
 	if(aslh.next == NULL) {
 		return NULL;
@@ -118,7 +118,6 @@ semafori liberi
 //non stabile
  pcb_t *outBlocked(pcb_t *p){
 	 pcb_t *out = NULL;
-	 void *tmp;
 	 struct clist *q = &p->p_cursem->s_proc;
 	
 	if(q->next!=NULL){
@@ -136,7 +135,6 @@ semafori liberi
  pcb_t *headBlocked(int *semAdd){
 	 pcb_t *p = NULL;
 	semd_t *scan;
-	void *tmp;
 	
 	if(aslh.next == NULL) {
 		return NULL;
@@ -167,7 +165,7 @@ ammesso che la lista dei semafori liberi non sia vuota
 semd_t *new_semaphore(semd_t *new_sem, pcb_t *p, int *semAdd){
 	new_sem = NULL;
 	if(!clist_empty(semdFree)){
-		new_sem = clist_head( new_sem, semdFree, s_link);//container_of(semdFree.next->next, typeof(*new_sem), s_link); // prendo un nuovo semaforo dalla lista semdFree
+		new_sem = clist_head( new_sem, semdFree, s_link);
 		p->p_cursem = new_sem; 
 		new_sem->s_semAdd = semAdd;
 		new_sem->s_proc.next = NULL;
