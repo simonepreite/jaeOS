@@ -63,11 +63,11 @@ int insertBlocked(int *semAdd, pcb_t *p){
 				return FALSE;		    		
 			}
 		}
-			if (clist_foreach_all(scan, &aslh, s_link, tmp)) { 
-				if((new_sem=new_semaphore(new_sem, p, semAdd))==NULL) return TRUE; 
-				clist_enqueue(new_sem, &aslh, s_link); 
-				return FALSE;
-			}
+		if (clist_foreach_all(scan, &aslh, s_link, tmp)) { 
+			if((new_sem=new_semaphore(new_sem, p, semAdd))==NULL) return TRUE; 
+			clist_enqueue(new_sem, &aslh, s_link); 
+			return FALSE;
+		}
 	}
 }
 
@@ -94,8 +94,8 @@ pcb_t *removeBlocked(int *semAdd){
 				if(scan->s_semAdd == semAdd){
 					p = removeProcQ(&scan->s_proc);
 					if(scan->s_proc.next==NULL){
-						clist_foreach_delete(p->p_cursem, &aslh, s_link, tmp); 
-						clist_enqueue(p->p_cursem, &semdFree, s_link); 
+						clist_foreach_delete(scan, &aslh, s_link, tmp); 
+						clist_enqueue(scan, &semdFree, s_link); 
 					}
 					return p;
 				}

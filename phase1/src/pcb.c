@@ -75,7 +75,7 @@ pcb_t *headProcQ(struct clist *q){
 	pcb_t *pcb_temp = NULL; 
 
 		if(q->next != NULL){
-			pcb_temp = clist_head(pcb_temp, (*q), p_list);//container_of((q)->next->next, typeof(*pcb_temp), p_list);
+			pcb_temp = clist_head(pcb_temp, (*q), p_list);
 			clist_dequeue(q);
 		}
 	return pcb_temp;
