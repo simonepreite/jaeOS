@@ -1,17 +1,20 @@
 #ifndef PCB_H
 #define PCB_H
-#include "/usr/include/uarm/uARMtypes.h"
+#include "uARMtypes.h"
+#include "types.h"
 #include "clist.h" 
-/* struttura processi */
+
+/* struttura processi 
 
 typedef struct pcb_t{
 	struct pcb_t *p_parent;
-	struct semd_t *p_cursem; /*pointer to the sem_d on which process blocked*/
-	state_t p_s; /*process state*/
+	struct semd_t *p_cursem; //pointer to the sem_d on which process blocked
+	state_t p_s; //process state
 	struct clist p_list; 
 	struct clist p_children; 
 	struct clist p_siblings; 
 }pcb_t;
+*/
 
 /* prototipi funzioni liste */
 
@@ -32,5 +35,9 @@ EXTERN int emptyChild( pcb_t *p);
 EXTERN void insertChild(pcb_t *parent, pcb_t *p);
 EXTERN pcb_t *removeChild(pcb_t *p);
 EXTERN pcb_t *outChild(pcb_t *p);
+
+/* funzioni ausiliarie */
+
+EXTERN void init_proc(pcb_t *pcb);
 
 #endif

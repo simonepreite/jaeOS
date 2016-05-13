@@ -1,7 +1,7 @@
 #ifndef _CLIST_H
 #define _CLIST_H
 
-//typedef unsigned int    size_t;
+typedef unsigned int size_t;
 
 #define container_of(ptr, type, member) ({      \
 		    const typeof( ((type *)0)->member ) *__mptr = (ptr);  \
@@ -19,31 +19,32 @@ struct clist {
 #define clist_enqueue(elem, clistp, member) ({\
 	if((clistp)->next == NULL) {\
 		(clistp)->next=&elem->member;\
-		elem->list.next=&elem->member;\
+		elem->member.next=&elem->member;\
 	} else {\
-		elem->list.next = (clistp)->next->next; \
-    	(clistp)->next->next = &elem->list;  \
-   		(clistp)->next = &elem->list;  \
+		elem->member.next = (clistp)->next->next; \
+    	(clistp)->next->next = &elem->member;  \
+   		(clistp)->next = &elem->member;  \
 	}\
 })
 
 #define clist_empty(clistx) (((clistx).next) == NULL)
 
 #define clist_foreach(scan, clistp, member, tmp)  \
+	tmp = NULL;\
 	if((clistp)->next != NULL)	\
-	for (tmp = NULL,scan = container_of((clistp)->next->next, typeof(*scan), member);      \
-		&scan->member != (tmp); scan = container_of(scan->member.next, typeof(*scan), member), tmp=(clistp)->next->next)
+	for (scan = container_of((clistp)->next->next, typeof(*scan), member);      \
+		tmp!=(clistp)->next; tmp = &((scan)->member),  scan = container_of((scan)->member.next, typeof(*scan), member))
 
 #define clist_tail(elem, clistx, member)	\
-	(clistx.next == NULL) ? NULL : container_of(clistx.next, typeof(*scan), member);
+	(clistx.next == NULL) ? NULL : container_of(clistx.next, typeof(*elem), member);
 
 #define clist_head(elem, clistx, member)	\
-	(clistx.next == NULL) ? NULL : container_of(clistx.next->next, typeof(*scan), member);
+	(clistx.next == NULL) ? NULL : container_of(clistx.next->next, typeof(*elem), member);
 
 #define clist_push(elem, clistp, member) ({\
 	if((clistp)->next == NULL) {\
-		(clistp)->next=&elem->member;\
-		elem->member.next=&elem->member;\
+		(clistp)->next = &elem->member;\
+		elem->member.next = &elem->member;\
 	} else { \
 		elem->member.next = (clistp)->next->next;	\
 		(clistp)->next->next = &elem->member;	\
@@ -52,25 +53,23 @@ struct clist {
 
 #define clist_pop(clistp) clist_dequeue(clistp)
 #define clist_dequeue(clistp)	\
-	if((clistp)->next != NULL){	\
 		if((clistp)->next == (clistp)->next->next){	\
 			(clistp)->next = NULL;	\
 		} else {	\
 			(clistp)->next->next = (clistp)->next->next->next;	\
-		}	\
-	}
+		}	
 
-#define clist_foreach_all(scan, clistp, member, tmp) ((clistp)->next == NULL || &scan->member == (tmp))
+#define clist_foreach_all(scan, clistp, member, tmp) ((tmp)==(clistp)->next) 
 
 #define clist_delete(elem, clistp, member)({\
 int ret=1;\
 struct clist *tmp1, *tmp2, *scan;\
-if((clistp)->next!=NULL){\
-	if(container_of((clistp)->next, typeof(*elem),member)==elem && (clistp)->next->next==(clistp)->next){\
-		(clistp)->next=NULL;\
+if((clistp)->next != NULL){\
+	if(container_of((clistp)->next, typeof(*elem),member) == elem && (clistp)->next->next == (clistp)->next){\
+		(clistp)->next = NULL;\
 		ret=0;\
 	}\
-	else{\
+else{\
 	for(tmp1=NULL, tmp2=(clistp)->next, scan=(clistp)->next->next; container_of(scan, typeof(*elem), member)!=elem && scan!=tmp1; tmp2=scan, scan=scan->next, tmp1=(clistp)->next);\
   		if(container_of(scan, typeof(*elem), member)==elem){\
 			if (tmp2->next==(clistp)->next){\
@@ -85,25 +84,32 @@ if((clistp)->next!=NULL){\
      			ret=0;\
      		}\
   		}\
-	}\
+}\
 }\
 ret;\
 })
 
 #define clist_foreach_delete(scan, clistp, member, tmp)\
-	for (tmp = &scan->member; scan->member.next != (tmp); scan = container_of(scan->member.next, typeof(*scan), member));\
-		if((clistp)->next->next==&scan->member && (clistp)->next==&scan->member) (clistp)->next=NULL;\
-		if((clistp)->next==(tmp)){\
-			 scan->member.next=(clistp)->next->next;\
-			 (clistp)->next=&scan->member;\
+	if(tmp){struct clist *delptr = tmp;\
+		if(&(scan->member) == (clistp)->next){\
+			(clistp)->next = delptr;\
+			(delptr)->next = (scan)->member.next;\
 		}\
-		else scan->member.next=scan->member.next->next;\
-	scan=container_of((tmp), typeof(*scan), member);\
-	
-#define clist_foreach_add(elem, scan, clistp, member, tmp) \
-		for (tmp = &scan->member; scan->member.next != (tmp); scan = container_of(scan->member.next, typeof(*scan), member));\
-			elem->member.next=scan->member.next;\
-			scan->member.next=&elem->member;\
+		else if(&(scan->member) == (clistp)->next->next){\
+			delptr = (clistp)->next;\
+			(delptr)->next = (scan)->member.next;\
+		}\
+		else (delptr)->next = (delptr)->next->next;\
+	}\
+	else {clist_dequeue(clistp);}
+							 
+#define clist_foreach_add(elem, scan, clistp, member, tmp)\
+	if(tmp){\
+		(elem)->member.next = &((scan)->member);\
+		((struct clist*)tmp)->next = &((elem)->member);\
+	}\
+	else{ clist_push(elem,clistp,member);}  
+                                                             
 
 #endif
 
