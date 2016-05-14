@@ -40,8 +40,7 @@ all: jaeOS
 
 jaeOS: phase0 phase1 phase2 
 
-phase0: $(P0)p0test.c $(P0)clist.h
-	gcc $(P0)p0test.c -o $(P0)p0test
+phase0: $(P0)p1test
 
 phase1: $(OBJECTS_SUP)
 	mkdir -p $(EXEC_P1)
@@ -52,6 +51,9 @@ phase2: $(OBJECTS_KER)
 	mkdir -p $(EXEC_P2)
 	$(UL) $(FLAG_UL) $(LIB_UARM_P2) $(OBJECTS_KER)
 	$(UC) $(FLAG_UC) $(EXEC_P2)jaeOS.elf
+
+$(P0)p1test: $(P0)p0test.c $(P0)clist.h
+	gcc $(P0)p0test.c -o $(P0)p0test
 
 $(SRC_SUP)pcb.o: $(SRC_SUP)pcb.c $(HEAD_SUP)
 	$(CC) $(FLAG_CC_P1) $(SRC_SUP)pcb.o $(SRC_SUP)pcb.c

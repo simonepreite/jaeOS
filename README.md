@@ -20,11 +20,14 @@
 ############################################################################
 
 #####                           AUTORI                                 #####
+#                                                                          #
 #	Alessio 		Innocenzi		alessio.innocenzi@studio.unibo.it      #
 #	Michelangelo 	Monoriti		michelangel.monoriti@studio.unibo.it   #
 #	Pierluigi 		Ballandi		pierluigi.ballandi@studio.unibo.it     #
 #	Simone 			Preite 			simone.preite@studio.unibo.it          #
-############################################################################                                                    
+#                                                                          #
+############################################################################ 
+
 #####                     DECOMPRIMERE IL PROGETTO                     #####
 #                                                                          #
 #	- eseguire il seguente comando nella directory dove è contenuto        #
