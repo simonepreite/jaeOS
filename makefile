@@ -2,8 +2,9 @@
 #compilatore
 CC = arm-none-eabi-gcc
 #flag compilatore
-FLAG_CC_P1 = -mcpu=arm7tdmi -I $(INCL_UARM) -I $(INCL_P1) -c -o 
-FLAG_CC_P2 = -mcpu=arm7tdmi -I $(INCL_UARM) -I $(INCL_P1) -I $(INCL_P2) -c -o 
+FLAG_CC = -mcpu=arm7tdmi -I $(INCL_UARM) -I $(INCL_P1)
+FLAG_CC_P1 = $(FLAG_CC) -c -o 
+FLAG_CC_P2 = $(FLAG_CC) -I $(INCL_P2) -c -o 
 #linker
 UL = arm-none-eabi-ld
 #flag linker
@@ -25,11 +26,13 @@ INCL_P2 = $(P2)include/
 EXEC_P1 = exec_phase1/
 EXEC_P2 = kernel/
 #librerie linker
-LIB_UARM_P1 = $(INCL_UARM)ldscripts/elf32ltsarm.h.uarmcore.x -o $(EXEC_P1)phase1.elf $(INCL_UARM)crtso.o $(INCL_UARM)libuarm.o
-LIB_UARM_P2 = $(INCL_UARM)ldscripts/elf32ltsarm.h.uarmcore.x -o $(EXEC_P2)jaeOS.elf $(INCL_UARM)crtso.o $(INCL_UARM)libuarm.o
+LIB_UARM = $(INCL_UARM)ldscripts/elf32ltsarm.h.uarmcore.x $(INCL_UARM)crtso.o $(INCL_UARM)libuarm.o
+LIB_UARM_P1 = $(LIB_UARM) -o $(EXEC_P1)phase1.elf
+LIB_UARM_P2 = $(LIB_UARM) -o $(EXEC_P2)jaeOS.elf
 #object file (probabilmente verranno separati in futuro)
-OBJECTS_SUP = $(SRC_SUP)pcb.o $(SRC_SUP)asl.o $(SRC_SUP)p1test.o
-OBJECTS_KER = $(SRC_SUP)pcb.o $(SRC_SUP)asl.o $(SRC_KER)initial.o $(SRC_KER)exeptions.o $(SRC_KER)scheduler.o $(SRC_KER)interrupts.o $(SRC_KER)p2test.o
+OBJECTS_PCB = $(SRC_SUP)pcb.o $(SRC_SUP)asl.o
+OBJECTS_SUP = $(OBJECTS_PCB) $(SRC_SUP)p1test.o
+OBJECTS_KER = $(OBJECTS_PCB) $(SRC_KER)initial.o $(SRC_KER)exeptions.o $(SRC_KER)scheduler.o $(SRC_KER)interrupts.o $(SRC_KER)p2test.o
 #header file (probabilmente verranno separati in futuro)
 HEAD_SUP = $(INCL_P1)const.h $(INCL_P1)types.h $(INCL_P1)clist.h $(INCL_P1)pcb.h $(INCL_P1)asl.h 
 HEAD_KER = $(INCL_P2)exeptions.h $(INCL_P2)initial.h $(INCL_P2)interrupts.h $(INCL_P2)scheduler.h $(INCL_P1)types.h
