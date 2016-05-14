@@ -59,7 +59,7 @@ struct clist {
 			(clistp)->next->next = (clistp)->next->next->next;	\
 		}	
 
-#define clist_foreach_all(scan, clistp, member, tmp) ((tmp)==(clistp)->next)//((clistp)->next == NULL || &scan->member == (tmp))
+#define clist_foreach_all(scan, clistp, member, tmp) ((tmp)==(clistp)->next) 
 
 #define clist_delete(elem, clistp, member)({\
 int ret=1;\
@@ -103,11 +103,6 @@ ret;\
 	}\
 	else {clist_dequeue(clistp);}
 							 
-							 
-							 
-        
-/* this macro should be used *inside* a clist_foreach loop to add an element
-	before the current one */
 #define clist_foreach_add(elem, scan, clistp, member, tmp)\
 	if(tmp){\
 		(elem)->member.next = &((scan)->member);\
