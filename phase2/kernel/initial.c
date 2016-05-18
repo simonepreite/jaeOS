@@ -4,7 +4,7 @@
 UI processCounter;
 UI softBlockCounter;
 pcb_t *readyQueue;
-pcb_t *currentProcess;
+pcb_t *curProc;
 
 
 
@@ -13,9 +13,24 @@ int main(){
 
 	pcb_t *firstProcess;
 
+	processCount = 0;
+
+	softBlockCounter = 0;
+
+    curProc = NULL;
+
 	initPcbs();
 
     initASL();
+
+    startingProcess = allocPcb();
+    if(startingProcess == NULL){
+        PANIC();
+    }
+
+    insertProcQ(&readyQueue, firstProcess);
+
+    processCounter++;
 
     scheduler();
 
