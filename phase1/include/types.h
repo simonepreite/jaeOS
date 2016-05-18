@@ -9,13 +9,17 @@ typedef unsigned int size_t;
 typedef unsigned int pid_t;
 typedef unsigned int cputime_t;
 
+typedef unsigned int UI;
+typedef signed int SI;
+typedef unsigned char UC;
+typedef signed char SC;
+
 struct semd_t;
 
 /* process control block type */
 typedef struct pcb_t {
 	struct pcb_t *p_parent; /* pointer to parent */
-	struct semd_t *p_cursem; /* pointer to the semd_t on
-				    which process blocked */
+	struct semd_t *p_cursem; /* pointer to the semd_t on which process blocked */
 	pid_t p_pid;
 	state_t p_s; /* processor state */
 	state_t p_excpvec[EXCP_COUNT]; /*exception states vector*/
