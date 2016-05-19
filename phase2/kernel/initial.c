@@ -23,8 +23,8 @@ int main(){
 
     initASL();
 
-    startingProcess = allocPcb();
-    if(startingProcess == NULL){
+    firstProcess = allocPcb();
+    if(firstProcess == NULL){
         PANIC();
     }
 
