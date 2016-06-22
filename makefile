@@ -3,8 +3,8 @@
 CC = arm-none-eabi-gcc
 #flag compilatore
 FLAG_CC = -mcpu=arm7tdmi -I $(INCL_UARM) -I $(INCL_P1)
-FLAG_CC_P1 = $(FLAG_CC) -c -o 
-FLAG_CC_P2 = $(FLAG_CC) -I $(INCL_P2) -c -o 
+FLAG_CC_P1 = $(FLAG_CC) -c -o
+FLAG_CC_P2 = $(FLAG_CC) -I $(INCL_P2) -c -o
 #linker
 UL = arm-none-eabi-ld
 #flag linker
@@ -34,16 +34,16 @@ OBJECTS_PCB = $(SRC_SUP)pcb.o $(SRC_SUP)asl.o
 OBJECTS_SUP = $(OBJECTS_PCB) $(SRC_SUP)p1test.o
 OBJECTS_KER = $(OBJECTS_PCB) $(SRC_KER)initial.o $(SRC_KER)exeptions.o $(SRC_KER)scheduler.o $(SRC_KER)interrupts.o $(SRC_KER)p2test.o
 #header file (probabilmente verranno separati in futuro)
-HEAD_SUP = $(INCL_P1)const.h $(INCL_P1)types.h $(INCL_P1)clist.h $(INCL_P1)pcb.h $(INCL_P1)asl.h 
+HEAD_SUP = $(INCL_P1)const.h $(INCL_P1)types.h $(INCL_P1)clist.h $(INCL_P1)pcb.h $(INCL_P1)asl.h
 HEAD_KER = $(INCL_P2)exeptions.h $(INCL_P2)initial.h $(INCL_P2)interrupts.h $(INCL_P2)scheduler.h $(INCL_P1)types.h
 #header file uarm
 HEAD_UARM = $(INCL_UARM)uARMconst.h $(INCL_UARM)uARMtypes.h $(INCL_UARM)libuarm.h
 
 all: jaeOS
 
-jaeOS: phase0 phase1 phase2 
+jaeOS: phase0 phase1 phase2
 
-phase0: $(P0)p1test
+phase0: $(P0)p0test
 
 phase1: $(OBJECTS_SUP)
 	mkdir -p $(EXEC_P1)
@@ -55,7 +55,7 @@ phase2: $(OBJECTS_KER)
 	$(UL) $(FLAG_UL) $(LIB_UARM_P2) $(OBJECTS_KER)
 	$(UC) $(FLAG_UC) $(EXEC_P2)jaeOS.elf
 
-$(P0)p1test: $(P0)p0test.c $(P0)clist.h
+$(P0)p0test: $(P0)p0test.c $(P0)clist.h
 	gcc $(P0)p0test.c -o $(P0)p0test
 
 $(SRC_SUP)pcb.o: $(SRC_SUP)pcb.c $(HEAD_SUP)
@@ -86,7 +86,7 @@ clean_p0:
 	rm -rf $(P0)p0test
 
 clean_p1:
-	rm -rf $(SRC_SUP)*.o $(EXEC_P1) 
+	rm -rf $(SRC_SUP)*.o $(EXEC_P1)
 
 clean_p2:
 	rm -rf $(SRC_KER)*.o $(EXEC_P2)
