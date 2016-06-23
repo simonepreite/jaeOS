@@ -1,6 +1,6 @@
 #include <uARMconst.h>
 #include <uARMtypes.h>
-#include "../../phase1/include/types.h"
+#include "types.h"
 
 UI processCounter;
 UI softBlockCounter;
