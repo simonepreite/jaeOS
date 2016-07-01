@@ -1,11 +1,4 @@
-#include <uARMconst.h>
-#include <uARMtypes.h>
-#include "types.h"
-
-UI processCounter;
-UI softBlockCounter;
-pcb_t *readyQueue;
-pcb_t *curProc;
+#include <initial.h>
 
 void initArea(memaddr area, memaddr handler){
     state_t *newArea = (state_t*) area;
@@ -14,21 +7,19 @@ void initArea(memaddr area, memaddr handler){
     /* Setta pc alla funzione che gestirà l'eccezione */
     newArea->pc = handler;
     /* Setta sp a RAMTOP */
-    newArea->sp = RAMTOP;
+    newArea->sp = RAM_TOP;
     /* Setta il registro di Stato per mascherare tutti gli interrupt e si mette in kernel-mode. */
     newArea->cpsr=STATUS_ALL_INT_DISABLE((newArea->cpsr) | STATUS_SYS_MODE);
     /* Disabilita la memoria virtuale */
         /* setCONTROL((getCONTROL()) & ~(DISABLE_VM));*/
-    newArea->CP15_Control = (newArea->CP15_Control) & ~(ENABLE_VM);
+    //newArea->CP15_Control = (newArea->CP15_Control) & ~(CP15_ENABLE_VM);
 }
 
 
 int main(){
 
 	pcb_t *firstProcess;
-
-	processCount = 0;
-
+	processCounter = 0;
 	softBlockCounter = 0;
 
     curProc = NULL;
@@ -36,10 +27,9 @@ int main(){
 		initArea(INT_NEWAREA, (memaddr)intHandler);
 		initArea(TLB_NEWAREA, (memaddr)tlbHandler);
 		initArea(PGMTRAP_NEWAREA, (memaddr)pgmHandler);
-		initArea(SYSBK_NEWAREA, (memaddr)sysBpHandler);
+		initArea(SYSBK_NEWAREA, (memaddr)sysHandler);
 
 		initPcbs();
-
     initASL();
 
     firstProcess = allocPcb();
@@ -48,9 +38,7 @@ int main(){
     }
 
     insertProcQ(&readyQueue, firstProcess);
-
     processCounter++;
-
     scheduler();
 
 	return 0;

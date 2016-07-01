@@ -1,19 +1,30 @@
-#include <const.h>
+#include <exceptions.h>
 
-void sysBpHandler(){
+state_t *tlb_old = (state_t*) TLB_OLDAREA;
+state_t *pgmtrap_old = (state_t*) PGMTRAP_OLDAREA;
+state_t *sysbp_old = (state_t*) SYSBK_OLDAREA;
+
+
+void pgmHandler(){
+}
+
+void tlbHandler(){
+}
+
+void sysHandler(){
     /* Se il processo è in kernel mode gestisce adeguatamente */
-    if( (curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
-	    unsigned int cause = sysbp_old.CP15_Cause;
-		unsigned int a0 = sysbp_old->a1;//rivedere con specifiche nuove
-		unsigned int a1 = sysbp_old->a2;//rivedere con specifiche nuove
-		unsigned int a2 = sysbp_old->a3;//rivedere con specifiche nuove
-		unsigned int a3 = sysbp_old->a4;//rivedere con specifiche nuove
+    if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
+	    unsigned int cause = sysbp_old->CP15_Cause;
+		  unsigned int a1 = sysbp_old->a1;//rivedere con specifiche nuove
+		  unsigned int a2 = sysbp_old->a2;//rivedere con specifiche nuove
+		  unsigned int a3 = sysbp_old->a3;//rivedere con specifiche nuove
+		  unsigned int a4 = sysbp_old->a4;//rivedere con specifiche nuove
 		/* Se l'eccezione è di tipo System call */
 		if(cause==EXC_SYSCALL){
 		    /* Se è fra SYS1 e SYS8 richiama le funzioni adeguate */
-		    switch(a0){
+		    switch(a1){
 		        case CREATEPROCESS:
-		            createProcess((state_t *) a1);
+		            createProcess((state_t *)a1);
 		            break;
 		        case TERMINATEPROCESS:
 		            terminateProcess(curProc);
@@ -47,18 +58,18 @@ void sysBpHandler(){
 		        	break;
 		        /* Altrimenti la gestione viene passata in alto */
 		        default:
-		            useExStVec(SPECSYSBP);
+		            //useExStVec(SPECSYSBP);
 		            break;
-		            
+
 		    }
 		/* Se l'eccezione è di tipo breakpoint viene passata in alto */
 		} else if(cause==EXC_BREAKPOINT){
-		    useExStVec(SPECSYSBP);
+		    //useExStVec(SPECSYSBP);
 		/* Caso particolare */
 		} else {
 		    PANIC();
 		}
-		
+
 	    /* Richiamo lo scheduler */
 	    scheduler();
 	/* Altrimenti se è in user-mode */
