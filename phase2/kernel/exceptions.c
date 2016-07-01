@@ -24,10 +24,10 @@ void sysHandler(){
 		    /* Se è fra SYS1 e SYS8 richiama le funzioni adeguate */
 		    switch(a1){
 		        case CREATEPROCESS:
-		            createProcess((state_t *)a1);
+		            //createProcess((state_t *)a1);
 		            break;
 		        case TERMINATEPROCESS:
-		            terminateProcess(curProc);
+		            //terminateProcess(curProc);
 		            break;
 	            case SEMOP:
 	                //function
