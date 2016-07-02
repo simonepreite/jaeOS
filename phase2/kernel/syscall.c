@@ -1,8 +1,9 @@
+#include <syscall.h>
 
 void createProcess(state_t *stato){
 
 }
 
-void terminateProcess(pct_t *p){
+void terminateProcess(pcb_t *p){
 
 }

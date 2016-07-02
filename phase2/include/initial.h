@@ -3,7 +3,6 @@
 
 #include <uARMconst.h>
 #include <uARMtypes.h>
-#include <types.h>
 #include <arch.h>
 #include <exceptions.h>
 #include <interrupts.h>

@@ -32,7 +32,7 @@ LIB_UARM_P2 = $(LIB_UARM) -o $(EXEC_P2)jaeOS.elf
 #object file (probabilmente verranno separati in futuro)
 OBJECTS_PCB = $(SRC_SUP)pcb.o $(SRC_SUP)asl.o
 OBJECTS_SUP = $(OBJECTS_PCB) $(SRC_SUP)p1test.o
-OBJECTS_KER = $(OBJECTS_PCB) $(SRC_KER)initial.o $(SRC_KER)exceptions.o $(SRC_KER)scheduler.o $(SRC_KER)interrupts.o $(SRC_KER)p2test.o
+OBJECTS_KER = $(OBJECTS_PCB) $(SRC_KER)initial.o $(SRC_KER)exceptions.o $(SRC_KER)syscall.o $(SRC_KER)scheduler.o $(SRC_KER)interrupts.o $(SRC_KER)p2test.o
 #header file (probabilmente verranno separati in futuro)
 HEAD_SUP = $(INCL_P1)const.h $(INCL_P1)types.h $(INCL_P1)clist.h $(INCL_P1)pcb.h $(INCL_P1)asl.h
 HEAD_KER = $(INCL_P2)exceptions.h $(INCL_P2)initial.h $(INCL_P2)interrupts.h $(INCL_P2)scheduler.h $(INCL_P2)syscall.h $(INCL_P1)types.h
@@ -69,6 +69,9 @@ $(SRC_SUP)p1test.o: $(SRC_SUP)p1test.c $(HEAD_UARM) $(HEAD_SUP)
 
 $(SRC_KER)initial.o: $(SRC_KER)initial.c $(HEAD_KER)
 	$(CC) $(FLAG_CC_P2) $(SRC_KER)initial.o $(SRC_KER)initial.c
+
+$(SRC_KER)syscall.o: $(SRC_KER)syscall.c $(HEAD_KER)
+	$(CC) $(FLAG_CC_P2) $(SRC_KER)syscall.o $(SRC_KER)syscall.c
 
 $(SRC_KER)exceptions.o: $(SRC_KER)exceptions.c $(HEAD_KER)
 	$(CC) $(FLAG_CC_P2) $(SRC_KER)exceptions.o $(SRC_KER)exceptions.c
