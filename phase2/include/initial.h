@@ -4,6 +4,7 @@
 #include <uARMconst.h>
 #include <uARMtypes.h>
 #include <arch.h>
+#include <types.h>
 #include <exceptions.h>
 #include <interrupts.h>
 #include <scheduler.h>
