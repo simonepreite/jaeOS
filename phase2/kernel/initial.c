@@ -36,6 +36,12 @@ int main(){
     if(firstProcess == NULL){
         PANIC();
     }
+    firstProcess->p_s.cpsr = STATUS_NULL;
+    firstProcess->p_s.cpsr = firstProcess->p_s.cpsr | STATUS_SYS_MODE;
+    //firstProcess->p_s.cpsr = (firstProcess->p_s.CP15_Control) & ~(CP15_ENABLE_VM);
+    firstProcess->p_s.sp = RAM_TOP - FRAME_SIZE;
+    firstProcess->p_s.pc = (memaddr)test;
+    createProcess(&firstProcess->p_s);
 
     insertProcQ(&readyQueue, firstProcess);
     processCounter++;
