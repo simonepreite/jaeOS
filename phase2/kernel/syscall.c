@@ -33,7 +33,7 @@ void saveCurState(state_t *state, state_t *newState){
 int createProcess(state_t *stato){
   pcb_t *newProc = allocPcb();
 
-  if(newProc!=NULL) return -1; // fail
+  if(newProc != NULL) return -1; // fail
 
   saveCurState(stato, &(newProc->p_s));
 
@@ -47,23 +47,45 @@ int createProcess(state_t *stato){
 
 //work in progress
 
-void terminateProcess(pcb_t *p){
-  if(p != NULL){
-    while(!emptyChild(p)){
-      terminateProcess(removeChild(p));
+void terminateProcess(int p){
+  if(p != 0){
+    while(!emptyChild((pcb_t*)p)){
+      terminateProcess((int)removeChild((pcb_t*)p));
     }
-    outChild(p);
+    outChild((pcb_t*)p);
 
-    if(p->p_cursem){
-      if (!outBlocked(p)) PANIC();
+    if(((pcb_t*)p)->p_cursem){
+      if (!outBlocked((pcb_t*)p)) PANIC();
       softBlockCounter--;
     }
-    outProcQ(readyQueue, p);
+    outProcQ(readyQueue, (pcb_t*)p);
     processCounter--;
 
-    if(p==curProc){
-       curProc=NULL;
+    if((pcb_t*)p == curProc){
+       curProc = NULL;
     }
   }
+}
 
+void semaphoreOperation(int *sem, int weight){
+  if(weight == 1){
+    pcb_t *firstBlock;
+    (*sem)++;
+    firstBlock = removeBlocked(sem);
+    if(firstBlock != NULL){
+      insertProcQ(readyQueue, firstBlock);
+      firstBlock->p_cursem = NULL;
+    }
+  }
+  else if (weight == -1){
+    (*sem)--;
+    if(*sem < 0){
+      insertBlocked(sem, curProc);
+    }
+  }
+  else PANIC();
+}
+
+pid_t getPid(){
+  return curProc->p_pid;
 }

@@ -151,6 +151,7 @@ pcb_t *outChild(pcb_t *p){
 void init_proc(pcb_t *pcb){
 	pcb->p_parent = NULL;  // inizializzo la struttura per evitare resuidi di un vecchio utilizzo
 	pcb->p_cursem = NULL;
+	pcb->p_pid = (pid_t)pcb;
 		{
 			pcb->p_s.a1 = pcb->p_s.a2 = pcb->p_s.a3 = pcb->p_s.a4 = 0;
 			pcb->p_s.v1 = pcb->p_s.v2 = pcb->p_s.v3 = pcb->p_s.v4 = pcb->p_s.v5 = pcb->p_s.v6 = 0;

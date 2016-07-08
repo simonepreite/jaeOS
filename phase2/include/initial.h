@@ -5,6 +5,7 @@
 #include <uARMtypes.h>
 #include <arch.h>
 #include <pcb.h>
+#include <asl.h>
 #include <exceptions.h>
 #include <interrupts.h>
 #include <scheduler.h>

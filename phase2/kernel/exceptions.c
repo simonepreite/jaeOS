@@ -27,10 +27,10 @@ void sysHandler(){
 		            curProc->p_s.a1 = createProcess((state_t *)a2);
 		            break;
 		        case TERMINATEPROCESS:
-		            terminateProcess(curProc);
+		            terminateProcess(a2);
 		            break;
 	            case SEMOP:
-	                //function
+                semaphoreOperation((int*)a2, a3);
 		            break;
 	            case SPECSYSHDL:
 	            	//function
@@ -38,12 +38,12 @@ void sysHandler(){
 	            case SPECTLBHDL:
 	            	//function
 		            break;
-		        case SPECPGMTHDL:
+		          case SPECPGMTHDL:
 		        	//function
-		        	break;
-		        case EXITTRAP:
+		        	  break;
+		          case EXITTRAP:
 		        	//function
-		        	break;
+		        	  break;
 	            case GETCPUTIME:
 	            	//function
 		            break;
@@ -53,9 +53,10 @@ void sysHandler(){
 	            case IODEVOP:
 	            	//function
 		            break;
-		        case GETPID:
+		          case GETPID:
+                curProc->p_s.a1 = getPid();
 		        	//function
-		        	break;
+		        	  break;
 		        /* Altrimenti la gestione viene passata in alto */
 		        default:
 		            //useExStVec(SPECSYSBP);
