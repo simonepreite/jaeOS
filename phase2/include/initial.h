@@ -4,7 +4,7 @@
 #include <uARMconst.h>
 #include <uARMtypes.h>
 #include <arch.h>
-#include <types.h>
+#include <pcb.h>
 #include <exceptions.h>
 #include <interrupts.h>
 #include <scheduler.h>
@@ -12,7 +12,7 @@
 
 UI processCounter;
 UI softBlockCounter;
-pcb_t *readyQueue;
+struct clist *readyQueue;
 pcb_t *curProc;
 
 EXTERN void test();

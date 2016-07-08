@@ -21,8 +21,8 @@ int main(){
 	pcb_t *firstProcess;
 	processCounter = 0;
 	softBlockCounter = 0;
-
-    curProc = NULL;
+  curProc = NULL;
+  readyQueue = NULL;
 
 		initArea(INT_NEWAREA, (memaddr)intHandler);
 		initArea(TLB_NEWAREA, (memaddr)tlbHandler);
@@ -38,12 +38,11 @@ int main(){
     }
     firstProcess->p_s.cpsr = STATUS_NULL;
     firstProcess->p_s.cpsr = firstProcess->p_s.cpsr | STATUS_SYS_MODE;
-    //firstProcess->p_s.cpsr = (firstProcess->p_s.CP15_Control) & ~(CP15_ENABLE_VM);
+    firstProcess->p_s.cpsr = CP15_DISABLE_VM(firstProcess->p_s.CP15_Control);
     firstProcess->p_s.sp = RAM_TOP - FRAME_SIZE;
     firstProcess->p_s.pc = (memaddr)test;
-    createProcess(&firstProcess->p_s);
 
-    insertProcQ(&readyQueue, firstProcess);
+    insertProcQ(readyQueue, firstProcess);
     processCounter++;
     scheduler();
 

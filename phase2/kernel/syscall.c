@@ -40,7 +40,7 @@ int createProcess(state_t *stato){
   processCounter++;
 
   insertChild(curProc, newProc);
-  insertProcQ(&readyQueue, newProc);
+  insertProcQ(readyQueue, newProc);
 
   return 0; // Success
 }
@@ -58,7 +58,7 @@ void terminateProcess(pcb_t *p){
       if (!outBlocked(p)) PANIC();
       softBlockCounter--;
     }
-    outProcQ(&readyQueue, p);
+    outProcQ(readyQueue, p);
     processCounter--;
 
     if(p==curProc){

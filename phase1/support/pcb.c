@@ -39,7 +39,7 @@ pcb_t *allocPcb(){
 
 void initPcbs(){
 	static pcb_t pcb_static[MAXPROC];
-    int i;
+  int i;
 
 	for(i = 0; i < (MAXPROC); i++){
 		pcb_t *q = &pcb_static[i];
