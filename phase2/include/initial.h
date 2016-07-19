@@ -10,6 +10,7 @@
 #include <interrupts.h>
 #include <scheduler.h>
 #include <syscall.h>
+#include <libuarm.h>
 
 UI processCounter;
 UI softBlockCounter;

@@ -9,7 +9,7 @@ void initArea(memaddr area, memaddr handler){
     /* Setta sp a RAMTOP */
     newArea->sp = RAM_TOP;
     /* Setta il registro di Stato per mascherare tutti gli interrupt e si mette in kernel-mode. */
-    new_areas[i]->cpsr = STATUS_NULL  | STATUS_SYS_MODE;
+    newArea->cpsr = STATUS_NULL  | STATUS_SYS_MODE;
     newArea->cpsr=STATUS_ALL_INT_DISABLE(newArea->cpsr);
     /* Disabilita la memoria virtuale */
         /* setCONTROL((getCONTROL()) & ~(DISABLE_VM));*/
