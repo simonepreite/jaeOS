@@ -12,6 +12,7 @@ void scheduler(){
 
 
     //} else
+    /* gestione deadlock*/
     if(curProc == NULL) {
 
         /* Se la readyQueue è vuota */
