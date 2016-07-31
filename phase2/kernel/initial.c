@@ -39,7 +39,7 @@ int main(){
     }
     firstProcess->p_s.cpsr = STATUS_NULL;
     firstProcess->p_s.cpsr = firstProcess->p_s.cpsr | STATUS_SYS_MODE;
-    firstProcess->p_s.cpsr = CP15_DISABLE_VM(firstProcess->p_s.CP15_Control);
+    firstProcess->p_s.CP15_Control = CP15_DISABLE_VM(firstProcess->p_s.CP15_Control);
     firstProcess->p_s.sp = RAM_TOP - FRAME_SIZE;
     firstProcess->p_s.pc = (memaddr)test;
 
