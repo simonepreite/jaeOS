@@ -48,6 +48,7 @@ int createProcess(state_t *stato){
 //work in progress
 
 void terminateProcess(int p){
+  //da rifare con pid e non con il puntatore
   if(p != 0){
     while(!emptyChild((pcb_t*)p)){
       terminateProcess((int)removeChild((pcb_t*)p));

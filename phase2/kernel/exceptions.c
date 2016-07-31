@@ -15,10 +15,10 @@ void sysHandler(){
     /* Se il processo è in kernel mode gestisce adeguatamente */
     if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
 	    unsigned int cause = sysbp_old->CP15_Cause;
-		  unsigned int a1 = sysbp_old->a1;//rivedere con specifiche nuove
-		  unsigned int a2 = sysbp_old->a2;//rivedere con specifiche nuove
-		  unsigned int a3 = sysbp_old->a3;//rivedere con specifiche nuove
-		  unsigned int a4 = sysbp_old->a4;//rivedere con specifiche nuove
+		  unsigned int a1 = sysbp_old->a1;
+		  unsigned int a2 = sysbp_old->a2;
+		  unsigned int a3 = sysbp_old->a3;
+		  unsigned int a4 = sysbp_old->a4;
 		/* Se l'eccezione è di tipo System call */
 		if(cause==EXC_SYSCALL){
 		    /* Se è fra SYS1 e SYS8 richiama le funzioni adeguate */

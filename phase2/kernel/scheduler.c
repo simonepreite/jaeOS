@@ -3,15 +3,11 @@
 void scheduler(){
 
     /* Se c'è un processo in esecuzione */
-    //if(currentProcess != NULL) {
-        /* Setta l'interval timer al prossimo evento */
-        //setNextTimer();
+
 
 		/* Carica lo stato del processo corrente */
 		LDST(&(curProc->p_s));
 
-
-    //} else
     /* gestione deadlock*/
     if(curProc == NULL) {
 
