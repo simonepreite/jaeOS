@@ -101,11 +101,11 @@ void semaphoreOperation(int *sem, int weight){
     }
   }
   else if (weight == 0){
-    terminateProcess(curProc->pid)
+    terminateProcess(curProc->pid);
   }
   else PANIC();
 }
 
 pid_t getPid(){
-  return curProc->p_pid;
+  return curProc->pid;
 }
