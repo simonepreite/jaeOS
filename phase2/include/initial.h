@@ -15,6 +15,7 @@
 UI processCounter;
 UI softBlockCounter;
 struct clist *readyQueue;
+int semDevices[MAX_DEVICES];
 pcb_t *curProc;
 
 EXTERN void test();

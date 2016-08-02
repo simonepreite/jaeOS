@@ -20,7 +20,7 @@ struct semd_t;
 typedef struct pcb_t {
 	struct pcb_t *p_parent; /* pointer to parent */
 	struct semd_t *p_cursem; /* pointer to the semd_t on which process blocked */
-	pid_t p_pid;
+	pid_t pid; /*process id*/
 	state_t p_s; /* processor state */
 	struct clist p_list; /* process list */
 	struct clist p_children; /* children list entry point*/

@@ -30,6 +30,14 @@ void saveCurState(state_t *state, state_t *newState){
 *                     SYSCALL KERNEL MODE                      *
 ***************************************************************/
 
+// questa funziona si occupa di assegnare pid univoci ai processi
+
+pid_t genPid(){
+  //serve argomento, magari una variabile condivisa
+  /* code */
+
+}
+
 int createProcess(state_t *stato){
   pcb_t *newProc = allocPcb();
 
@@ -40,18 +48,21 @@ int createProcess(state_t *stato){
   processCounter++;
 
   insertChild(curProc, newProc);
+  newProc->pid = genPid();
   insertProcQ(readyQueue, newProc);
 
   return 0; // Success
 }
 
-//work in progress
-
-void terminateProcess(int p){
-  //da rifare con pid e non con il puntatore
+void terminateProcess(pid_t p){
+  //work in progress
+  /*devo trovare il pid nella lista dei processi
+  fare containerof per avere il puntatore del processo
+  vittima e killare tutta la sua progenie
+  */
   if(p != 0){
     while(!emptyChild((pcb_t*)p)){
-      terminateProcess((int)removeChild((pcb_t*)p));
+      terminateProcess((int)removeChild((pcb_t*)p)->pid);
     }
     outChild((pcb_t*)p);
 
@@ -63,7 +74,7 @@ void terminateProcess(int p){
     processCounter--;
 
     if((pcb_t*)p == curProc){
-       curProc = NULL;
+      curProc = NULL;
     }
   }
 }
@@ -75,14 +86,22 @@ void semaphoreOperation(int *sem, int weight){
     firstBlock = removeBlocked(sem);
     if(firstBlock != NULL){
       insertProcQ(readyQueue, firstBlock);
+      //decremento di softBlockCounter se sono su un semaforo soft
       firstBlock->p_cursem = NULL;
     }
   }
   else if (weight == -1){
     (*sem)--;
     if(*sem < 0){
-      insertBlocked(sem, curProc);
+      //inserire kernel time su nuovi elementi della struttura
+      if(insertBlocked(sem, curProc)!=0) PANIC();
+      //controllare incremento di softBlockCounter solo su semafori soft
+      //dire allo scheduler di caricare il processo successivo
+      curProc = NULL;
     }
+  }
+  else if (weight == 0){
+    terminateProcess(curProc->pid)
   }
   else PANIC();
 }
