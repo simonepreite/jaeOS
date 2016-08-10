@@ -19,6 +19,7 @@ int semDevices[MAX_DEVICES];
 pcb_t *curProc;
 
 EXTERN void test();
+EXTERN void print(char *msg);
 EXTERN void initArea(memaddr area, memaddr handler);
 
 

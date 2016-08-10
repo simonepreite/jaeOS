@@ -21,15 +21,15 @@ int main(){
 	softBlockCounter = 0;
   curProc = NULL;
   readyQueue = NULL;
-
+    print("main");
 		initArea(INT_NEWAREA, (memaddr)intHandler);
 		initArea(TLB_NEWAREA, (memaddr)tlbHandler);
 		initArea(PGMTRAP_NEWAREA, (memaddr)pgmHandler);
 		initArea(SYSBK_NEWAREA, (memaddr)sysHandler);
-
+    print("init area OK");
 		initPcbs();
     initASL();
-
+    print("init OK");
     for(i = 0; i < MAX_DEVICES; i++) semDevices[i] = 0;
 
     if((firstProcess = allocPcb())==NULL){
