@@ -32,11 +32,9 @@ void saveCurState(state_t *state, state_t *newState){
 
 // questa funziona si occupa di assegnare pid univoci ai processi
 
-pid_t genPid(unsigned int a){
+pid_t genPid(){
   //serve argomento, magari una variabile condivisa
-  unsigned int x = 2;
-  while(x <= count) x = x * 2;
-  return x * a + count;
+  /* code */
 
 }
 
@@ -50,7 +48,7 @@ int createProcess(state_t *stato){
   processCounter++;
 
   insertChild(curProc, newProc);
-  newProc->pid = genPid(newProc->pid);
+  newProc->pid = genPid();
   insertProcQ(readyQueue, newProc);
 
   return 0; // Success
