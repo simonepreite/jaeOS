@@ -1,5 +1,4 @@
 #include <initial.h>
-unsigned int count = 0;
 
 void initArea(memaddr area, memaddr handler){
     state_t* newArea = (state_t*)area;
@@ -22,7 +21,6 @@ int main(){
 	softBlockCounter = 0;
   curProc = NULL;
   readyQueue = NULL;
-
     print("main");
 		initArea(INT_NEWAREA, (memaddr)intHandler);
 		initArea(TLB_NEWAREA, (memaddr)tlbHandler);
@@ -46,7 +44,6 @@ int main(){
 
     insertProcQ(readyQueue, firstProcess);
     processCounter++;
-    count++;
     scheduler();
 
 	return 0;
