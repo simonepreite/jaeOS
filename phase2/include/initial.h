@@ -12,8 +12,8 @@
 #include <syscall.h>
 #include <libuarm.h>
 
-UI processCounter;
-UI softBlockCounter;
+UI processCounter;		// number of total processes
+UI softBlockCounter;	// number of processes waiting for an interrupt
 struct clist *readyQueue;
 int semDevices[MAX_DEVICES];
 pcb_t *curProc;

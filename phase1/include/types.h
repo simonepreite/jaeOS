@@ -22,9 +22,18 @@ typedef struct pcb_t {
 	struct semd_t *p_cursem; /* pointer to the semd_t on which process blocked */
 	pid_t pid; /*process id*/
 	state_t p_s; /* processor state */
+	state_t excp_state_vector[EXCP_COUNT];
 	struct clist p_list; /* process list */
 	struct clist p_children; /* children list entry point*/
 	struct clist p_siblings; /* children list: links to the siblings */
 } pcb_t;
+
+/* custom type to descride scheduler situations */
+typdef enum sched_t {
+	SCHED_RUNNING,		// scheduler code executed when the system is running (not launch, not reset)
+	SCHED_START,		// scheduler code executed on launch
+	SCHED_RESET,		// scheduler code executed on reset
+	SCHED_CONTINUE		// scheduler code to let current process continue execution
+};
 
 #endif
