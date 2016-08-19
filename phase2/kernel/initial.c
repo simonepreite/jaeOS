@@ -17,7 +17,7 @@ void initArea(memaddr area, memaddr handler){
 
 
 int main(){
-    int i;
+  int i;
 	pcb_t *firstProcess;
 
     // Initialize kernel variables
@@ -29,9 +29,9 @@ int main(){
 
     // Initialize new areas in ROM Reserved Frame
     initArea(INT_NEWAREA, (memaddr)intHandler);
-	initArea(TLB_NEWAREA, (memaddr)tlbHandler);
-	initArea(PGMTRAP_NEWAREA, (memaddr)pgmHandler);
-	initArea(SYSBK_NEWAREA, (memaddr)sysHandler);
+	  initArea(TLB_NEWAREA, (memaddr)tlbHandler);
+	  initArea(PGMTRAP_NEWAREA, (memaddr)pgmHandler);
+	  initArea(SYSBK_NEWAREA, (memaddr)sysHandler);
 
     print("init area OK");
 
