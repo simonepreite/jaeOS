@@ -1,32 +1,30 @@
 ############################################################################
 #                                                                          #
-#                        _                ____    _____                    # 
+#                        _                ____    _____                    #
 #                       (_)              / __ \  / ____|                   #
 #                        _   __ _   ___ | |  | || (___                     #
 #                       | | / _` | / _ \| |  | | \___ \                    #
-#                       | || (_| ||  __/| |__| | ____) |                   # 
+#                       | || (_| ||  __/| |__| | ____) |                   #
 #                       | | \__,_| \___| \____/ |_____/                    #
 #                      _/ |                                                #
 #                     |__/                                                 #
 #              _____   ______            _____   __  __  ______            #
 #             |  __ \ |  ____|    /\    |  __ \ |  \/  ||  ____|           #
-#             | |__) || |__      /  \   | |  | || \  / || |__              # 
-#             |  _  / |  __|    / /\ \  | |  | || |\/| ||  __|             # 
+#             | |__) || |__      /  \   | |  | || \  / || |__              #
+#             |  _  / |  __|    / /\ \  | |  | || |\/| ||  __|             #
 #             | | \ \ | |____  / ____ \ | |__| || |  | || |____            #
 #             |_|  \_\|______|/_/    \_\|_____/ |_|  |_||______|           #   
 #                                                                          #  
 #                                                                          #
-#                                                                          # 
+#                                                                          #
 ############################################################################
 
 #####                           AUTORI                                 #####
 #                                                                          #
-#	Alessio 		Innocenzi		alessio.innocenzi@studio.unibo.it      #
-#	Michelangelo 	Monoriti		michelangel.monoriti@studio.unibo.it   #
-#	Pierluigi 		Ballandi		pierluigi.ballandi@studio.unibo.it     #
+#	Matteo          Del Vecchio     matteo.delvecchio@studio.unibo.it      #
 #	Simone 			Preite 			simone.preite@studio.unibo.it          #
 #                                                                          #
-############################################################################ 
+############################################################################
 
 #####                     DECOMPRIMERE IL PROGETTO                     #####
 #                                                                          #
@@ -90,7 +88,7 @@
 #	Lulu Books. 2011:                                                      #
 #		http://www.cs.unibo.it/~renzo/so/princOfOperations.pdf             #
 #                                                                          #
-#	Michael Goldweber, Renzo Davoli Student Guide                          # 
+#	Michael Goldweber, Renzo Davoli Student Guide                          #
 #	to the Kaya Operating System. Lulu Books. 2009:                        #
 #		http://www.cs.unibo.it/~renzo/so/Kaya.pdf                          #
 #                                                                          #
@@ -99,9 +97,3 @@
 #		http://www.cs.unibo.it/~renzo/so/jaeos16/                          #
 #                                                                          #
 ############################################################################
-
-
-
-                                                                                                  
-                                                                                                  
-                                                                           
