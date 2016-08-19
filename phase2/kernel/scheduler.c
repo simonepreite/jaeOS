@@ -1,4 +1,3 @@
-#include <initial.h>
 #include <scheduler.h>
 
 void scheduler(sched_t status) {
@@ -7,7 +6,6 @@ void scheduler(sched_t status) {
 
     if (status == SCHED_START) {
     	setTIMER(SCHED_TIME_SLICE);		// dico ad uARM che il time slice è di 5ms
-
     }
 
     // Manca la gestione dei tempi
@@ -20,14 +18,13 @@ void scheduler(sched_t status) {
 
 	    curProc = removeProcQ(&readyQueue);
 	    if (!curProc) {
-	    	if (!readyQueue) {
+	    	if (clist_empty(readyQueue)) {//!readyQueue
 	    		if (processCounter == 0) HALT();
 	    		if (processCounter > 0 && softBlockCounter == 0) PANIC();
 	    		if (processCounter > 0 && softBlockCounter > 0) WAIT();
 	    	}
 	    }
 	}
-
-	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLED((curProc->p_s).cpsr); // davvero necessario?
-    LDST(&(curProc->p_s));
+	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr); // davvero necessario?
+  LDST(&(curProc->p_s));
 }

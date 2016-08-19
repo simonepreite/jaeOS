@@ -25,21 +25,15 @@ int main(){
 	softBlockCounter = 0;
   curProc = NULL;
 
-    print("main");
-
     // Initialize new areas in ROM Reserved Frame
     initArea(INT_NEWAREA, (memaddr)intHandler);
 	  initArea(TLB_NEWAREA, (memaddr)tlbHandler);
 	  initArea(PGMTRAP_NEWAREA, (memaddr)pgmHandler);
 	  initArea(SYSBK_NEWAREA, (memaddr)sysHandler);
 
-    print("init area OK");
-
     // Initialize Phase1 data structures
     initPcbs();
     initASL();
-
-    print("init OK");
 
     // Initialize device semaphores to 0
     for(i = 0; i < MAX_DEVICES; i++)
@@ -55,7 +49,6 @@ int main(){
     firstProcess->p_s.CP15_Control = CP15_DISABLE_VM(firstProcess->p_s.CP15_Control);   // Virtual memory disabled
     firstProcess->p_s.sp = RAM_TOP - FRAME_SIZE; // Setting stack pointer
     firstProcess->p_s.pc = (memaddr)test;   // Setting program counter
-
     // Process put in ready queue
     insertProcQ(&readyQueue, firstProcess);
     processCounter++;

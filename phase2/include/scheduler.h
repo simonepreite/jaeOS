@@ -1,8 +1,8 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include <types.h>
+#include <initial.h>
 
-EXTERN void scheduler(sched_t status);
+void scheduler(sched_t status);
 
 #endif

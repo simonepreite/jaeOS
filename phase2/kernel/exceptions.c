@@ -64,7 +64,7 @@ void sysHandler(){
     }else PANIC(); //non necessario insieme al controllo su cause
     //processo corrente, ricalcolare tempi
     /* Richiamo lo scheduler */
-    scheduler();
+    scheduler(SCHED_CONTINUE);
     /* Altrimenti se è in user-mode */
   } else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
     /* Gestisco come fosse una program trap */
