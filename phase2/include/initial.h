@@ -6,7 +6,6 @@
 #include <arch.h>
 #include <pcb.h>
 #include <asl.h>
-#include <types.h>
 #include <exceptions.h>
 #include <interrupts.h>
 #include <scheduler.h>
@@ -22,7 +21,7 @@ EXTERN unsigned int count;
 
 EXTERN void test();
 EXTERN void print(char *msg);
-EXTERN void initArea(memaddr area, memaddr handler);
+void initArea(memaddr area, memaddr handler);
 
 
 #endif
