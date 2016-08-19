@@ -6,6 +6,7 @@
 #include <arch.h>
 #include <pcb.h>
 #include <asl.h>
+#include <types.h>
 #include <exceptions.h>
 #include <interrupts.h>
 #include <scheduler.h>
@@ -14,7 +15,7 @@
 
 UI processCounter;		// number of total processes
 UI softBlockCounter;	// number of processes waiting for an interrupt
-struct clist *readyQueue;
+EXTERN struct clist readyQueue;
 int semDevices[MAX_DEVICES];
 pcb_t *curProc;
 EXTERN unsigned int count;

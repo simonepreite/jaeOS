@@ -29,7 +29,7 @@ typedef struct pcb_t {
 } pcb_t;
 
 /* custom type to descride scheduler situations */
-typdef enum sched_t {
+typedef enum sched_t {
 	SCHED_RUNNING,		// scheduler code executed when the system is running (not launch, not reset)
 	SCHED_START,		// scheduler code executed on launch
 	SCHED_RESET,		// scheduler code executed on reset

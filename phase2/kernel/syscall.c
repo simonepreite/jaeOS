@@ -52,7 +52,7 @@ int createProcess(state_t *stato){
 
 	insertChild(curProc, newProc);
 	newProc->pid = genPid(newProc->pid);
-	insertProcQ(readyQueue, newProc);
+	insertProcQ(&readyQueue, newProc);
 
 	return 0; // Success
 }
@@ -73,7 +73,7 @@ void terminateProcess(pid_t p){
 			if (!outBlocked((pcb_t*)p)) PANIC();
 			softBlockCounter--;
 		}
-		outProcQ(readyQueue, (pcb_t*)p);
+		outProcQ(&readyQueue, (pcb_t*)p);
 		processCounter--;
 
 		if((pcb_t*)p == curProc){
@@ -87,9 +87,9 @@ void semaphoreOperation(int *sem, int weight){
 		pcb_t *firstBlock;
 		(*sem)++;
 		firstBlock = removeBlocked(sem);
-	
+
 		if(firstBlock != NULL){
-			insertProcQ(readyQueue, firstBlock);
+			insertProcQ(&readyQueue, firstBlock);
 			//decremento di softBlockCounter se sono su un semaforo soft
 			firstBlock->p_cursem = NULL;
 		}
