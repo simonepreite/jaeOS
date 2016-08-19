@@ -43,7 +43,7 @@ int main(){
     if((firstProcess = allocPcb()) == NULL)
         PANIC();
 
-    firstProcess->pid = genPid();   // Generate Process ID
+    firstProcess->pid = genPid(firstProcess->pid);   // Generate Process ID
     firstProcess->p_s.cpsr = STATUS_NULL;
     firstProcess->p_s.cpsr = firstProcess->p_s.cpsr | STATUS_SYS_MODE;  // Process executed in kernel mode
     firstProcess->p_s.CP15_Control = CP15_DISABLE_VM(firstProcess->p_s.CP15_Control);   // Virtual memory disabled

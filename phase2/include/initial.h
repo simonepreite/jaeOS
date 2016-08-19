@@ -20,8 +20,8 @@ pcb_t *curProc;
 EXTERN unsigned int count;
 
 EXTERN void test();
-EXTERN void print(char *msg);
 EXTERN void scheduler(sched_t status);
+EXTERN pid_t genPid(unsigned int a);
 void initArea(memaddr area, memaddr handler);
 
 

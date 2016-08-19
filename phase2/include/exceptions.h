@@ -5,8 +5,9 @@
 #include <initial.h>
 #include <syscall.h>
 
-EXTERN void pgmHandler();
-EXTERN void tlbHandler();
-EXTERN void sysHandler();
+void pgmHandler();
+void tlbHandler();
+void sysHandler();
+EXTERN void saveCurState(state_t *state, state_t *newState);
 
 #endif

@@ -34,11 +34,9 @@ void saveCurState(state_t *state, state_t *newState){
 
 pid_t genPid(unsigned int a){
 	HIDDEN unsigned int count = 0;
-	count++;
 
-	unsigned int x = 2;
-	while(x <= count) x = x * 2;
-	return x * a + count;
+	count++;
+	return a + count;
 }
 
 int createProcess(state_t *stato){
@@ -98,7 +96,7 @@ void semaphoreOperation(int *sem, int weight){
 		(*sem)--;
 		if(*sem < 0){
 			//inserire kernel time su nuovi elementi della struttura
-			if(insertBlocked(sem, curProc)!=0)
+			if(insertBlocked(sem, curProc))
 				PANIC();
 			//controllare incremento di softBlockCounter solo su semafori soft
 			//dire allo scheduler di caricare il processo successivo
