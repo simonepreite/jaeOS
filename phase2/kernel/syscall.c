@@ -55,6 +55,20 @@ int createProcess(state_t *stato){
 	return 0; // Success
 }
 
+void search_pid(pid_t parent, pid_t pid, pid_t* save){
+	pid_t* scan;
+	clist_foreach(scan, &parent->p_children, p_siblings, tmp){
+		if(!emptyChild(scan))
+			search_pid(headProcQ(scan->p_children), pid, save)
+		if(scan->pid==pid){
+			save=scan;
+		}
+		if(save!=NULL){
+			break;
+		}
+	}
+}
+
 void terminateProcess(pid_t p){
 	//work in progress
 	/*devo trovare il pid nella lista dei processi
