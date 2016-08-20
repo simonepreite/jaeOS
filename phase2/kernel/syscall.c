@@ -57,15 +57,15 @@ int createProcess(state_t *stato){
 
 void searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 	void* tmp = NULL;
-	pid_t* scan;
-	clist_foreach(scan, &parent->p_children, p_siblings, tmp){
+	pcb_t* scan;
+	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
 			save=scan;
 			break;
 		}
 		else {
 			if(!emptyChild(scan))
-				search_pid(headProcQ(scan->p_children), pid, save);
+				searchPid(headProcQ(&scan->p_children), pid, save);
 			if(save)
 				break;
 		}
@@ -87,7 +87,7 @@ void terminateProcess(pid_t p){
 	if(p == 0 || curProc->pid == p){
 		terminator(curProc);
 	}
-	search_pid(curProc, p, save);
+	searchPid(curProc, p, save);
 	terminator(save);
 
 	if(p != 0){
