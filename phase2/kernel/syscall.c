@@ -55,18 +55,25 @@ int createProcess(state_t *stato){
 	return 0; // Success
 }
 
-void search_pid(pid_t parent, pid_t pid, pid_t* save){
+void searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
+	void* tmp = NULL;
 	pid_t* scan;
 	clist_foreach(scan, &parent->p_children, p_siblings, tmp){
-		if(!emptyChild(scan))
-			search_pid(headProcQ(scan->p_children), pid, save)
 		if(scan->pid==pid){
 			save=scan;
-		}
-		if(save!=NULL){
 			break;
 		}
+		else {
+			if(!emptyChild(scan))
+				search_pid(headProcQ(scan->p_children), pid, save);
+			if(save)
+				break;
+		}
 	}
+}
+
+void terminator(pcb_t* proc){
+
 }
 
 void terminateProcess(pid_t p){
@@ -75,6 +82,14 @@ void terminateProcess(pid_t p){
 	fare containerof per avere il puntatore del processo
 	vittima e killare tutta la sua progenie
 	*/
+	pcb_t* save = NULL;
+
+	if(p == 0 || curProc->pid == p){
+		terminator(curProc);
+	}
+	search_pid(curProc, p, save);
+	terminator(save);
+
 	if(p != 0){
 		while(!emptyChild((pcb_t*)p)){
 			terminateProcess((int)removeChild((pcb_t*)p)->pid);
