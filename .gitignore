@@ -35,3 +35,6 @@ phase0/p0test
 # Compiled folders
 exec_phase1/
 kernel/
+
+# Mac OS Spotlight files
+.DS_Store
