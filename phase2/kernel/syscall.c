@@ -73,39 +73,30 @@ void searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 }
 
 void terminator(pcb_t* proc){
-
+	while(!emptyChild(proc))
+		terminator(removeChild(proc));
+	//controllare se il processo è bloccato ad un semaforo
+	//altrimenti toglierlo dalla lista dei processi pronti
+	processCounter--;
+	freePcb(p);
 }
 
 void terminateProcess(pid_t p){
-	//work in progress
-	/*devo trovare il pid nella lista dei processi
-	fare containerof per avere il puntatore del processo
-	vittima e killare tutta la sua progenie
-	*/
 	pcb_t* save = NULL;
 
 	if(p == 0 || curProc->pid == p){
 		terminator(curProc);
-	}
-	searchPid(curProc, p, save);
-	terminator(save);
-
-	if(p != 0){
-		while(!emptyChild((pcb_t*)p)){
-			terminateProcess((int)removeChild((pcb_t*)p)->pid);
-		}
-		outChild((pcb_t*)p);
-
-		if(((pcb_t*)p)->p_cursem){
-			if (!outBlocked((pcb_t*)p)) PANIC();
-			softBlockCounter--;
-		}
-		outProcQ(&readyQueue, (pcb_t*)p);
 		processCounter--;
-
-		if((pcb_t*)p == curProc){
-			curProc = NULL;
-		}
+		outChild(curProc);
+		outProcQ(&readyQueue, curProc);
+		freePcb(curProc);
+		// bisogna dire allo scheduler di caricare il processo successivo
+	}
+	else{
+		searchPid(curProc, p, save);
+		if(!save) PANIC();
+		terminator(save);
+		// lo scheduler deve ricaricare curProc
 	}
 }
 
