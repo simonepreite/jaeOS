@@ -78,7 +78,8 @@ void terminator(pcb_t* proc){
 	//controllare se il processo è bloccato ad un semaforo
 	//altrimenti toglierlo dalla lista dei processi pronti
 	processCounter--;
-	freePcb(proc);
+	if (proc != curProc)
+		freePcb(proc);
 }
 
 void terminateProcess(pid_t p){
@@ -86,17 +87,18 @@ void terminateProcess(pid_t p){
 
 	if(p == 0 || curProc->pid == p){
 		terminator(curProc);
-		processCounter--;
 		outChild(curProc);
 		outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
 		// bisogna dire allo scheduler di caricare il processo successivo
+		//scheduler(SCHED_RUNNING);		// approfondire se si può fare
 	}
 	else{
 		searchPid(curProc, p, save);
 		if(!save) PANIC();
 		terminator(save);
 		// lo scheduler deve ricaricare curProc
+		//scheduler(SCHED_CONTINUE);
 	}
 }
 
