@@ -78,7 +78,7 @@ void terminator(pcb_t* proc){
 	//controllare se il processo è bloccato ad un semaforo
 	//altrimenti toglierlo dalla lista dei processi pronti
 	processCounter--;
-	freePcb(p);
+	freePcb(proc);
 }
 
 void terminateProcess(pid_t p){
