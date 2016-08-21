@@ -6,6 +6,31 @@ unsigned int softBlockCounter;	// number of processes waiting for an interrupt
 struct clist readyQueue;
 pcb_t *curProc;
 
+void saveCurState(state_t *state, state_t *newState){
+	newState->a1 = state->a1;
+	newState->a2 = state->a2;
+	newState->a3 = state->a3;
+	newState->a4 = state->a4;
+	newState->v1 = state->v1;
+	newState->v2 = state->v2;
+	newState->v3 = state->v3;
+	newState->v4 = state->v4;
+	newState->v5 = state->v5;
+	newState->v6 = state->v6;
+	newState->sl = state->sl;
+	newState->fp = state->fp;
+	newState->ip = state->ip;
+	newState->sp = state->sp;
+	newState->lr = state->lr;
+	newState->pc = state->pc;
+	newState->cpsr = state->cpsr;
+	newState->CP15_Control = state->CP15_Control;
+	newState->CP15_EntryHi = state->CP15_EntryHi;
+	newState->CP15_Cause = state->CP15_Cause;
+	newState->TOD_Hi = state->TOD_Hi;
+	newState->TOD_Low = state->TOD_Low;
+}
+
 pid_t genPid(unsigned int a){
 	HIDDEN unsigned int count = 0;
 
@@ -103,6 +128,11 @@ void semaphoreOperation(int *sem, int weight){
 		terminateProcess(curProc->pid);
 	}
 	else PANIC();
+}
+
+void getCpuTime(cputime_t *global_time, cputime_t *user_time){
+	*global_time = curProc->global_time;
+	*user_time = curProc->global_time - curProc->kernel_mode;
 }
 
 pid_t getPid(){
