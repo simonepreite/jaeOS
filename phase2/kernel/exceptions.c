@@ -45,7 +45,7 @@ void sysHandler(){
         //function
         break;
         case GETCPUTIME:
-        //function
+          getCpuTime((cputime_t*)a2, (cputime_t*)a3);
         break;
         case WAITCLOCK:
         //function

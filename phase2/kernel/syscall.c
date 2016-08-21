@@ -131,6 +131,11 @@ void semaphoreOperation(int *sem, int weight){
 	else PANIC();
 }
 
+void getCpuTime(cputime_t *global_time, cputime_t *user_time){
+	*global_time = curProc->global_time;
+	*user_time = curProc->global_time - curProc->kernel_mode;
+}
+
 pid_t getPid(){
 	return curProc->pid;
 }
