@@ -17,7 +17,6 @@ UI softBlockCounter;	// number of processes waiting for an interrupt
 EXTERN struct clist readyQueue;
 int semDevices[MAX_DEVICES];
 pcb_t *curProc;
-EXTERN unsigned int count;
 
 EXTERN void test();
 EXTERN void scheduler(sched_t status);
