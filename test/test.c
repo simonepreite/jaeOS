@@ -41,9 +41,11 @@ pid_t genPid(unsigned int a){
 int createProcess(state_t *stato){
 	pcb_t *newProc = allocPcb();
 
-	if(newProc != NULL) return -1; // fail
-
-	saveCurState(stato, &(newProc->p_s));
+	if(newProc == NULL) {
+    tprint("newProc NULL\n");
+    return -1; // fail
+  }
+	//saveCurState(stato, &(newProc->p_s));
 
 	processCounter++;
 
@@ -72,8 +74,10 @@ void searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 }
 
 void terminator(pcb_t* proc){
-	while(!emptyChild(proc))
-		terminator(removeChild(proc));
+  tprint("terminator\n");
+	while(!emptyChild(proc)){
+    tprint("recursion\n");
+		terminator(removeChild(proc));}
 	//controllare se il processo è bloccato ad un semaforo
 	//altrimenti toglierlo dalla lista dei processi pronti
 	processCounter--;
@@ -85,7 +89,9 @@ void terminateProcess(pid_t p){
 	pcb_t* save = NULL;
 
 	if(p == 0 || curProc->pid == p){
+    tprint("ok process\n");
 		terminator(curProc);
+    tprint("terminator finish\n");
 		outChild(curProc);
 		outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
@@ -94,6 +100,7 @@ void terminateProcess(pid_t p){
 	}
 	else{
 		searchPid(curProc, p, save);
+    tprint("searchPid finish");
 		if(!save) PANIC();
 		terminator(save);
 		// lo scheduler deve ricaricare curProc
@@ -140,6 +147,17 @@ pid_t getPid(){
 }
 
 int main(int argc, char const *argv[]) {
-  tprint("hello world\n");
+  int i;
+  state_t *p;
+  pid_t pid[20];
+  initPcbs();
+  initASL();
+  for(i=0;i<20;i++){
+    if(createProcess(p)==-1) tprint("createProcess fail\n");
+    pid[i]=(headProcQ(&readyQueue))->pid;
+    if(i==0) curProc=headProcQ(&readyQueue);
+  }
+  insertChild(curProc, headProcQ(&readyQueue));
+  terminateProcess(pid[0]);
   return 0;
 }

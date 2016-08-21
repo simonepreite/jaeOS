@@ -43,4 +43,4 @@ clean:
 	rm -rf *.o test.elf
 
 cleanall:
-	rm -rf *.o test test.elf.core.uarm test.elf.stab.uarm
+	rm -rf *.o test test.elf.core.uarm test.elf.stab.uarm test.elf

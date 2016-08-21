@@ -42,7 +42,7 @@ pid_t genPid(unsigned int a){
 int createProcess(state_t *stato){
 	pcb_t *newProc = allocPcb();
 
-	if(newProc != NULL) return -1; // fail
+	if(newProc == NULL) return -1; // fail
 
 	saveCurState(stato, &(newProc->p_s));
 
