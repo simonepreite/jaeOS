@@ -5,6 +5,7 @@ unsigned int processCounter;		// number of total processes
 unsigned int softBlockCounter;	// number of processes waiting for an interrupt
 struct clist readyQueue;
 pcb_t *curProc;
+pcb_t *curProc2;
 pcb_t *proc;
 pcb_t *child;
 
@@ -22,9 +23,9 @@ void saveCurState(state_t *state, state_t *newState){
 	newState->sl = state->sl;
 	newState->fp = state->fp;
 	newState->ip = state->ip;
-	newState->sp = state->sp;
-	newState->lr = state->lr;
-	newState->pc = state->pc;
+	//newState->sp = state->sp;
+	//newState->lr = state->lr;
+	//newState->pc = state->pc;
 	newState->cpsr = state->cpsr;
 	newState->CP15_Control = state->CP15_Control;
 	newState->CP15_EntryHi = state->CP15_EntryHi;
@@ -47,7 +48,7 @@ int createProcess(state_t *stato){
     tprint("newProc NULL\n");
     return -1; // fail
   }
-	//saveCurState(stato, &(newProc->p_s));
+	saveCurState(stato, &(newProc->p_s));
 
 	processCounter++;
 
@@ -94,11 +95,11 @@ void terminateProcess(pid_t p){
 
 	if(p == 0 || curProc->pid == p){
     tprint("ok process\n");
-		terminator(curProc);
+		terminator(curProc2);
     tprint("terminator finish\n");
-		outChild(curProc);
-		outProcQ(&readyQueue, curProc);
-		freePcb(curProc);
+		outChild(curProc2);
+		outProcQ(&readyQueue, curProc2);
+		freePcb(curProc2);
 		// bisogna dire allo scheduler di caricare il processo successivo
 		//scheduler(SCHED_RUNNING);		// approfondire se si può fare
 	}
@@ -163,10 +164,11 @@ int main(int argc, char const *argv[]) {
   for(i=0;i<20;i++){
     if(createProcess(p)==-1) tprint("createProcess fail\n");
     pid[i]=(proc)->pid;
-    if(i==1) curProc=proc;
+    if(i==1) curProc2=proc;
     if(i==3) child=proc;
   }
-  insertChild(curProc, child);
-  terminateProcess(pid[1]);
+  insertChild(curProc2, child);
+  terminateProcess(0);
+
   return 0;
 }
