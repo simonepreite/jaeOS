@@ -131,6 +131,28 @@ void semaphoreOperation(int *sem, int weight){
 	else PANIC();
 }
 
+UI iodevop(UI command, int lineNum, UI deviceNum) {
+	devreg_t *deviceRegister = DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
+	
+	UI terminalReading = (lineNum == INT_TERMINAL && deviceNum >> 31) ? N_DEV_PER_IL : 0;	// controllo se voglio ricevere o trasmettere dal terminale
+	int index = EXT_IL_INDEX(lineNum) * N_DEV_PER_IL;		// calcolo l'indice del primo semaforo associato all'interrupt line richiesta
+	index += deviceNum;			// calcolo l'indice del semaforo per il device richiesto
+	index += terminalReading;		// aggiungo 8 o meno, in base al tipo di operazione sul terminale
+
+	semaphoreOperation(&semDevices[index], -1);		// eseguo SYS3 con peso -1 perchè il processo deve bloccarsi e il peso può solo essere +/-1
+
+	// Riprendo l'esecuzione dopo l'interrupt
+	if (lineNum == INT_TERMINAL) {
+		if (terminalReading > 0) {
+			deviceRegister->term.recv_command = command;
+			//deviceRegister->term.recv_status = ??
+		}
+		else {
+			// anche in caso di transmission vanno assrgnati command e status?
+		}
+	}
+}
+
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
 	*global_time = curProc->global_time;
 	*user_time = curProc->global_time - curProc->kernel_mode;
