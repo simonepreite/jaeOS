@@ -5,6 +5,8 @@ unsigned int processCounter;		// number of total processes
 unsigned int softBlockCounter;	// number of processes waiting for an interrupt
 struct clist readyQueue;
 pcb_t *curProc;
+pcb_t *proc;
+pcb_t *child;
 
 void saveCurState(state_t *state, state_t *newState){
 	newState->a1 = state->a1;
@@ -40,7 +42,7 @@ pid_t genPid(unsigned int a){
 
 int createProcess(state_t *stato){
 	pcb_t *newProc = allocPcb();
-
+  proc = newProc; //debug instruction
 	if(newProc == NULL) {
     tprint("newProc NULL\n");
     return -1; // fail
@@ -61,11 +63,13 @@ void searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 	pcb_t* scan;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
+      tprint("if searchPid\n");
 			save=scan;
 			break;
 		}
 		else {
 			if(!emptyChild(scan))
+      tprint("recursion searchPid\n");
 				searchPid(headProcQ(&scan->p_children), pid, save);
 			if(save)
 				break;
@@ -77,7 +81,8 @@ void terminator(pcb_t* proc){
   tprint("terminator\n");
 	while(!emptyChild(proc)){
     tprint("recursion\n");
-		terminator(removeChild(proc));}
+		terminator(removeChild(proc));
+  }
 	//controllare se il processo è bloccato ad un semaforo
 	//altrimenti toglierlo dalla lista dei processi pronti
 	processCounter--;
@@ -100,8 +105,8 @@ void terminateProcess(pid_t p){
 	}
 	else{
 		searchPid(curProc, p, save);
-    tprint("searchPid finish");
-		if(!save) PANIC();
+    tprint("searchPid finish\n");
+		if(save==NULL) PANIC();
 		terminator(save);
 		// lo scheduler deve ricaricare curProc
 		//scheduler(SCHED_CONTINUE);
@@ -150,14 +155,16 @@ int main(int argc, char const *argv[]) {
   int i;
   state_t *p;
   pid_t pid[20];
+
   initPcbs();
   initASL();
   for(i=0;i<20;i++){
     if(createProcess(p)==-1) tprint("createProcess fail\n");
-    pid[i]=(headProcQ(&readyQueue))->pid;
-    if(i==0) curProc=headProcQ(&readyQueue);
+    pid[i]=(proc)->pid;
+    if(i==1) curProc=proc;
+    if(i==3) child=proc;
   }
-  insertChild(curProc, headProcQ(&readyQueue));
-  terminateProcess(pid[0]);
+  insertChild(curProc, child);
+  terminateProcess(pid[3]);
   return 0;
 }
