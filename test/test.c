@@ -47,7 +47,7 @@ int createProcess(state_t *stato){
     tprint("newProc NULL\n");
     return -1; // fail
   }
-	//saveCurState(stato, &(newProc->p_s));
+	saveCurState(stato, &(newProc->p_s));
 
 	processCounter++;
 
