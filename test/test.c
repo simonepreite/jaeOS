@@ -64,7 +64,6 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
       tprint("if searchPid\n");
-			//save=scan;
 			return scan;
 		}
 		else {
@@ -168,6 +167,6 @@ int main(int argc, char const *argv[]) {
     if(i==3) child=proc;
   }
   insertChild(curProc, child);
-  terminateProcess(pid[3]);
+  terminateProcess(pid[1]);
   return 0;
 }
