@@ -55,19 +55,18 @@ int createProcess(state_t *stato){
 	return 0; // Success
 }
 
-void searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
+pcb_t* searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 	void* tmp = NULL;
 	pcb_t* scan;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
-			save=scan;
-			break;
+			return scan;
 		}
 		else {
 			if(!emptyChild(scan))
-				searchPid(headProcQ(&scan->p_children), pid, save);
+				save = searchPid(headProcQ(&scan->p_children), pid, save);
 			if(save)
-				break;
+				return save;
 		}
 	}
 }
@@ -133,7 +132,7 @@ void semaphoreOperation(int *sem, int weight){
 
 UI iodevop(UI command, int lineNum, UI deviceNum) {
 	devreg_t *deviceRegister = DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
-	
+
 	UI terminalReading = (lineNum == INT_TERMINAL && deviceNum >> 31) ? N_DEV_PER_IL : 0;	// controllo se voglio ricevere o trasmettere dal terminale
 	int index = EXT_IL_INDEX(lineNum) * N_DEV_PER_IL;		// calcolo l'indice del primo semaforo associato all'interrupt line richiesta
 	index += deviceNum;			// calcolo l'indice del semaforo per il device richiesto

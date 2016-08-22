@@ -58,21 +58,21 @@ int createProcess(state_t *stato){
 	return 0; // Success
 }
 
-void searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
+pcb_t* searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 	void* tmp = NULL;
 	pcb_t* scan;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
       tprint("if searchPid\n");
-			save=scan;
-			break;
+			//save=scan;
+			return scan;
 		}
 		else {
 			if(!emptyChild(scan))
       tprint("recursion searchPid\n");
-				searchPid(headProcQ(&scan->p_children), pid, save);
+				save = searchPid(headProcQ(&scan->p_children), pid, save);
 			if(save)
-				break;
+				return save;
 		}
 	}
 }
@@ -91,7 +91,7 @@ void terminator(pcb_t* proc){
 }
 
 void terminateProcess(pid_t p){
-	pcb_t* save = NULL;
+	pcb_t *save = NULL;
 
 	if(p == 0 || curProc->pid == p){
     tprint("ok process\n");
@@ -104,9 +104,12 @@ void terminateProcess(pid_t p){
 		//scheduler(SCHED_RUNNING);		// approfondire se si può fare
 	}
 	else{
-		searchPid(curProc, p, save);
+		save = searchPid(curProc, p, save);
     tprint("searchPid finish\n");
-		if(save==NULL) PANIC();
+		if(save==NULL){
+			tprint("save NULL\n");
+			PANIC();
+		}
 		terminator(save);
 		// lo scheduler deve ricaricare curProc
 		//scheduler(SCHED_CONTINUE);
