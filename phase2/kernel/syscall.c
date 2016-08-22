@@ -102,36 +102,42 @@ void terminateProcess(pid_t p){
 }
 
 void semaphoreOperation(int *sem, int weight){
-	if(weight == 1){
-		pcb_t *firstBlock;
-		(*sem)++;
-		firstBlock = removeBlocked(sem);
+	if (!sem) PANIC();
 
-		if(firstBlock != NULL){
-			insertProcQ(&readyQueue, firstBlock);
-			//decremento di softBlockCounter se sono su un semaforo soft
-			firstBlock->p_cursem = NULL;
+	if(weight >= 1){	// resources to be freed
+		(*sem) += weight;
+		pcb_t *firstBlocked = headBlocked(sem);
+
+		if(firstBlocked != NULL){		// c'è un processo bloccato sul semaforo
+			if (firstBlocked->waitingResCount <= (*sem)) {		// si sono liberate abbastanza risorse per liberarlo
+				firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
+				softBlockCounter--;								// decremento il contatore dei processi bloccati soft
+				firstBlocked->p_cursem = NULL;					// annullo il conllegamento tra il processo ed il semaforo
+				firstBlocked->waitingResCount = 0;				// il processo non è più in attesa di risorse
+				insertProcQ(&readyQueue, firstBlocked);			// inserisco il processo nella coda ready
+			}
 		}
 	}
-	else if (weight == -1){
-		(*sem)--;
+	else if (weight <= -1){		// resources to be allocated
+		(*sem) += weight;
 		if(*sem < 0){
 			//inserire kernel time su nuovi elementi della struttura
+			curProc->waitingResCount = weight;		// il processo ha bisogno di weight risorse
+
 			if(insertBlocked(sem, curProc))
 				PANIC();
-			//controllare incremento di softBlockCounter solo su semafori soft
+			
+			softBlockCounter++;
 			//dire allo scheduler di caricare il processo successivo
 			curProc = NULL;
 		}
 	}
-	else if (weight == 0){
+	else
 		terminateProcess(curProc->pid);
-	}
-	else PANIC();
 }
 
 UI iodevop(UI command, int lineNum, UI deviceNum) {
-	devreg_t *deviceRegister = DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
+	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
 
 	UI terminalReading = (lineNum == INT_TERMINAL && deviceNum >> 31) ? N_DEV_PER_IL : 0;	// controllo se voglio ricevere o trasmettere dal terminale
 	int index = EXT_IL_INDEX(lineNum) * N_DEV_PER_IL;		// calcolo l'indice del primo semaforo associato all'interrupt line richiesta
@@ -140,21 +146,35 @@ UI iodevop(UI command, int lineNum, UI deviceNum) {
 
 	semaphoreOperation(&semDevices[index], -1);		// eseguo SYS3 con peso -1 perchè il processo deve bloccarsi e il peso può solo essere +/-1
 
+	UI status = 0;
 	// Riprendo l'esecuzione dopo l'interrupt
 	if (lineNum == INT_TERMINAL) {
-		if (terminalReading > 0) {
+		if (terminalReading > 0) {		// terminal in lettura
 			deviceRegister->term.recv_command = command;
-			//deviceRegister->term.recv_status = ??
+			status = deviceRegister->term.recv_status;
 		}
-		else {
-			// anche in caso di transmission vanno assrgnati command e status?
+		else {		// terminal in scrittura
+			deviceRegister->term.transm_command = command;
+			status = deviceRegister->term.transm_status;
 		}
 	}
+	else {		// altri dispositivi
+		deviceRegister->dtp.command = command;
+		status = deviceRegister->dtp.status;
+	}
+
+	return status;
 }
 
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
 	*global_time = curProc->global_time;
 	*user_time = curProc->global_time - curProc->kernel_mode;
+}
+
+void waitForClock() {
+	softBlockCounter++;			// there's one more blocked process
+	int index = MAX_DEVICES - 1;	// pseudo clock semaphore is the last one in the array
+	semaphoreOperation(&semDevices[index], -1);		// lock the current semaphore
 }
 
 pid_t getPid(){

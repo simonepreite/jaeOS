@@ -10,6 +10,7 @@ void terminateProcess(pid_t p);
 void semaphoreOperation(int *sem, int weight);
 UI iodevop(UI command, int lineNum, UI deviceNum);
 void getCpuTime(cputime_t *global_time, cputime_t *user_time);
+void waitForClock();
 pid_t getPid();
 
 #endif

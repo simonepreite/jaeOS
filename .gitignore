@@ -36,5 +36,8 @@ phase0/p0test
 exec_phase1/
 kernel/
 
+# uARM Compiled Tests
+*.uarm
+
 # Mac OS Spotlight files
 .DS_Store
