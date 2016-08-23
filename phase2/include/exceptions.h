@@ -3,7 +3,6 @@
 
 #include <const.h>
 #include <initial.h>
-#include <libuarm.h>
 
 
 EXTERN cputime_t kernelStart;

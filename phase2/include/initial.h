@@ -8,8 +8,7 @@
 #include <asl.h>
 #include <exceptions.h>
 #include <interrupts.h>
-//#include <scheduler.h>
-//#include <syscall.h>
+#include <libuarm.h>
 
 UI processCounter;		// number of total processes
 UI softBlockCounter;	// number of processes waiting for an interrupt
