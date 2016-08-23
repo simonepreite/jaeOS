@@ -48,6 +48,11 @@
 
 #define EXCP_COUNT 6
 
+/* define exception type */
+#define SYS 0
+#define TLB 1
+#define PGMT 2
+
 /* device types count with separate terminal read and write devs */
 #define N_DEV_TYPES (N_EXT_IL+1)
 

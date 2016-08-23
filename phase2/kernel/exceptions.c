@@ -1,5 +1,7 @@
 #include <exceptions.h>
 
+// probabilemnte questo assegnamento è da eliminare e va rifatto all'interno
+// dei rispettivi handler
 state_t *tlb_old = (state_t*)TLB_OLDAREA;
 state_t *pgmtrap_old = (state_t*)PGMTRAP_OLDAREA;
 state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
@@ -20,11 +22,11 @@ void tlbHandler(){
 void sysHandler(){
   /* processo in kernel mode? */
   if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
-    unsigned int cause = sysbp_old->CP15_Cause;
-    unsigned int a1 = sysbp_old->a1;
-    unsigned int a2 = sysbp_old->a2;
-    unsigned int a3 = sysbp_old->a3;
-    unsigned int a4 = sysbp_old->a4;
+    UI cause = sysbp_old->CP15_Cause;
+    UI a1 = sysbp_old->a1;
+    UI a2 = sysbp_old->a2;
+    UI a3 = sysbp_old->a3;
+    UI a4 = sysbp_old->a4;
     kernelStart=getTODLO();
     /* Se l'eccezione è di tipo System call */
     if(cause==EXC_SYSCALL){
@@ -40,17 +42,17 @@ void sysHandler(){
           semaphoreOperation((int*)a2, a3);
         break;
         case SPECSYSHDL:
-        //function
-        break;
+          //function
+          break;
         case SPECTLBHDL:
-        //function
-        break;
+          //function
+          break;
         case SPECPGMTHDL:
-        //function
-        break;
+          //function
+          break;
         case EXITTRAP:
-        //function
-        break;
+          exitTrap(a2, a3);
+          break;
         case GETCPUTIME:
           getCpuTime((cputime_t*)a2, (cputime_t*)a3);
         break;

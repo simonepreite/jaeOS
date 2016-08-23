@@ -19,7 +19,7 @@ cputime_t kernelStart;
 
 EXTERN void test();
 EXTERN void scheduler(sched_t status);
-EXTERN pid_t genPid(unsigned int a);
+EXTERN pid_t genPid(UI a);
 void initArea(memaddr area, memaddr handler);
 
 

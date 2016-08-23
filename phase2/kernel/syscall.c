@@ -32,8 +32,8 @@ void saveCurState(state_t *state, state_t *newState){
 
 // questa funziona si occupa di assegnare pid univoci ai processi
 
-pid_t genPid(unsigned int a){
-	HIDDEN unsigned int count = 0;
+pid_t genPid(UI a){
+	HIDDEN UI count = 0;
 
 	count++;
 	return a + count;
@@ -178,6 +178,30 @@ UI iodevop(UI command, int lineNum, UI deviceNum) {
 	}
 
 	return status;
+}
+
+void exitTrap(UI exType, UI ret){
+	
+	switch(exType){
+		case SYS:{
+			curProc->excp_state_vector[EXCP_SYS_OLD].a1 = ret;
+			LSDT(curProc->excp_state_vector[EXCP_SYS_OLD]);
+			break;
+		}
+		case TLB:{
+			curProc->excp_state_vector[EXCP_TLB_OLD].a1 = ret;
+			LSDT(curProc->excp_state_vector[EXCP_TLB_OLD]);
+			break;
+		}
+		case PGMT:{
+			curProc->excp_state_vector[EXCP_PGMT_OLD.a1] = ret;
+			LSDT(curProc->excp_state_vector[EXCP_PGMT_OLD]);
+			break;
+		}
+		default:{
+			PANIC();
+		}
+	}
 }
 
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
