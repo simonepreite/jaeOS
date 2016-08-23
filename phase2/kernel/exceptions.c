@@ -19,7 +19,7 @@ void sysHandler(){
     unsigned int a2 = sysbp_old->a2;//rivedere con specifiche nuove
     unsigned int a3 = sysbp_old->a3;//rivedere con specifiche nuove
     unsigned int a4 = sysbp_old->a4;//rivedere con specifiche nuove
-    kernelStart=getTODOLO();
+    kernelStart=getTODLO();
     /* Se l'eccezione è di tipo System call */
     if(cause==EXC_SYSCALL){
       /* Se è fra SYS1 e SYS8 richiama le funzioni adeguate */
@@ -63,7 +63,7 @@ void sysHandler(){
       }
     }else PANIC(); //non necessario insieme al controllo su cause
     //processo corrente, ricalcolare tempi
-    curProc->kernel_mode = getTODOLO() - kernelStart;
+    curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */
     scheduler(SCHED_CONTINUE);
     /* Altrimenti se è in user-mode */
