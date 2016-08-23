@@ -6,32 +6,45 @@ state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
 
 
 void pgmHandler(){
+  kernelStart=getTODLO();
+
+  curProc->kernel_mode = getTODLO() - kernelStart;
 }
 
 void tlbHandler(){
+  kernelStart=getTODLO();
+
+  curProc->kernel_mode = getTODLO() - kernelStart;
 }
 
 void sysHandler(){
   /* processo in kernel mode? */
   if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
     unsigned int cause = sysbp_old->CP15_Cause;
+<<<<<<< Updated upstream
     unsigned int a1 = sysbp_old->a1;//rivedere con specifiche nuove
     unsigned int a2 = sysbp_old->a2;//rivedere con specifiche nuove
     unsigned int a3 = sysbp_old->a3;//rivedere con specifiche nuove
     unsigned int a4 = sysbp_old->a4;//rivedere con specifiche nuove
+=======
+    unsigned int a1 = sysbp_old->a1;
+    unsigned int a2 = sysbp_old->a2;
+    unsigned int a3 = sysbp_old->a3;
+    unsigned int a4 = sysbp_old->a4;
+>>>>>>> Stashed changes
     kernelStart=getTODLO();
     /* Se l'eccezione è di tipo System call */
     if(cause==EXC_SYSCALL){
       /* Se è fra SYS1 e SYS8 richiama le funzioni adeguate */
       switch(a1){
         case CREATEPROCESS:
-        curProc->p_s.a1 = createProcess((state_t *)a2);
+          curProc->p_s.a1 = createProcess((state_t *)a2);
         break;
         case TERMINATEPROCESS:
-        terminateProcess(a2);
+          terminateProcess(a2);
         break;
         case SEMOP:
-        semaphoreOperation((int*)a2, a3);
+          semaphoreOperation((int*)a2, a3);
         break;
         case SPECSYSHDL:
         //function
@@ -49,17 +62,16 @@ void sysHandler(){
           getCpuTime((cputime_t*)a2, (cputime_t*)a3);
         break;
         case WAITCLOCK:
-        //function
-        break;
+          waitForClock();
+          break;
         case IODEVOP:
-        //function
-        break;
+          curProc->p_s.a1 = iodevop(a2, a3, a4);
+          break;
         case GETPID:
-        curProc->p_s.a1 = getPid();
-        //function
-        break;
+          curProc->p_s.a1 = getPid();
+          break;
         default:
-        PANIC();
+          PANIC();
       }
     }else PANIC(); //non necessario insieme al controllo su cause
     //processo corrente, ricalcolare tempi

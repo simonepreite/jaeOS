@@ -7,7 +7,6 @@
 
 #include <arch.h>
 
-#define HIDDEN static
 #define EXTERN extern
 #define memaddr unsigned int
 
