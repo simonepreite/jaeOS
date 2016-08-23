@@ -5,7 +5,7 @@
 
 void saveCurState(state_t *state, state_t *newState);
 int createProcess(state_t *stato);
-pcb_t* searchPid(pcb_t *parent, pid_t pid, pcb_t* save);
+pcb_t* searchPid(pcb_t *parent, pid_t pid);
 void terminateProcess(pid_t p);
 void semaphoreOperation(int *sem, int weight);
 UI iodevop(UI command, int lineNum, UI deviceNum);

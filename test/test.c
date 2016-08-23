@@ -6,6 +6,8 @@ unsigned int softBlockCounter;	// number of processes waiting for an interrupt
 struct clist readyQueue;
 pcb_t *curProc;
 pcb_t *curProc2;
+
+pcb_t *init;
 pcb_t *proc;
 pcb_t *child;
 
@@ -52,16 +54,17 @@ int createProcess(state_t *stato){
 
 	processCounter++;
 
-	insertChild(curProc, newProc);
+  //insertChild(curProc, newProc); // commentata p debug
 	newProc->pid = genPid(newProc->pid);
 	insertProcQ(&readyQueue, newProc);
 
 	return 0; // Success
 }
 
-pcb_t* searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
+pcb_t* searchPid(pcb_t *parent, pid_t pid){
 	void* tmp = NULL;
 	pcb_t* scan;
+  pcb_t* save = NULL;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
       tprint("if searchPid\n");
@@ -70,11 +73,12 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
 		else {
 			if(!emptyChild(scan))
       tprint("recursion searchPid\n");
-				save = searchPid(headProcQ(&scan->p_children), pid, save);
+				save = searchPid(headProcQ(&scan->p_children), pid);
 			if(save)
 				return save;
 		}
 	}
+  return NULL;
 }
 
 void terminator(pcb_t* proc){
@@ -87,6 +91,7 @@ void terminator(pcb_t* proc){
 	//altrimenti toglierlo dalla lista dei processi pronti
 	processCounter--;
 	if (proc != curProc)
+    outChild(proc);
 		freePcb(proc);
 }
 
@@ -95,18 +100,18 @@ void terminateProcess(pid_t p){
 
 	if(p == 0 || curProc->pid == p){
     tprint("ok process\n");
-		terminator(curProc2);
+		terminator(curProc);
     tprint("terminator finish\n");
-		outChild(curProc2);
-		outProcQ(&readyQueue, curProc2);
-		freePcb(curProc2);
+		outChild(curProc);
+		outProcQ(&readyQueue, curProc);
+		freePcb(curProc);
+    curProc=NULL;
 		// bisogna dire allo scheduler di caricare il processo successivo
 		//scheduler(SCHED_RUNNING);		// approfondire se si può fare
 	}
 	else{
-		save = searchPid(curProc, p, save);
     tprint("searchPid finish\n");
-		if(save==NULL){
+		if(!(save=searchPid(curProc, p))){
 			tprint("save NULL\n");
 			PANIC();
 		}
@@ -164,10 +169,22 @@ int main(int argc, char const *argv[]) {
   for(i=0;i<20;i++){
     if(createProcess(p)==-1) tprint("createProcess fail\n");
     pid[i]=(proc)->pid;
-    if(i==1) curProc2=proc;
-    if(i==3) child=proc;
+    if(i==0) init=proc;
+    if(i==2) curProc2=proc;
+    if(i==3) {
+      child=proc;
+      curProc=proc;
+      insertProcQ(&readyQueue, curProc);
+    }
+    if(i>0 && i!=2) insertChild(init, proc);
   }
-  insertChild(curProc2, child);
+  insertChild(curProc, curProc2);
+  //terminateProcess(6);
+  terminateProcess(pid[2]);
+  tprint("prima terminateProcess\n");
+  /*terminateProcess(pid[2]);
+  tprint("seconda terminateProcess\n");*/
+
   terminateProcess(0);
 
   return 0;

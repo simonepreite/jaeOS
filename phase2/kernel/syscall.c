@@ -55,46 +55,60 @@ int createProcess(state_t *stato){
 	return 0; // Success
 }
 
-pcb_t* searchPid(pcb_t *parent, pid_t pid, pcb_t* save){
+pcb_t* searchPid(pcb_t *parent, pid_t pid){
 	void* tmp = NULL;
 	pcb_t* scan;
+  pcb_t* save = NULL;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
+      tprint("if searchPid\n");
 			return scan;
 		}
 		else {
 			if(!emptyChild(scan))
-				save = searchPid(headProcQ(&scan->p_children), pid, save);
+      tprint("recursion searchPid\n");
+				save = searchPid(headProcQ(&scan->p_children), pid);
 			if(save)
 				return save;
 		}
 	}
+  return NULL;
 }
 
 void terminator(pcb_t* proc){
-	while(!emptyChild(proc))
+  tprint("terminator\n");
+	while(!emptyChild(proc)){
+    tprint("recursion\n");
 		terminator(removeChild(proc));
+  }
 	//controllare se il processo è bloccato ad un semaforo
 	//altrimenti toglierlo dalla lista dei processi pronti
 	processCounter--;
 	if (proc != curProc)
+    outChild(proc);
 		freePcb(proc);
 }
 
 void terminateProcess(pid_t p){
-	pcb_t* save = NULL;
+	pcb_t *save = NULL;
 
 	if(p == 0 || curProc->pid == p){
+    tprint("ok process\n");
 		terminator(curProc);
+    tprint("terminator finish\n");
 		outChild(curProc);
 		outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
+    curProc=NULL;
 		// bisogna dire allo scheduler di caricare il processo successivo
 		//scheduler(SCHED_RUNNING);		// approfondire se si può fare
 	}
 	else{
-		searchPid(curProc, p, save);
-		if(!save) PANIC();
+    tprint("searchPid finish\n");
+		if(!(save=searchPid(curProc, p))){
+			tprint("save NULL\n");
+			PANIC();
+		}
 		terminator(save);
 		// lo scheduler deve ricaricare curProc
 		//scheduler(SCHED_CONTINUE);
@@ -126,7 +140,7 @@ void semaphoreOperation(int *sem, int weight){
 
 			if(insertBlocked(sem, curProc))
 				PANIC();
-			
+
 			softBlockCounter++;
 			//dire allo scheduler di caricare il processo successivo
 			curProc = NULL;

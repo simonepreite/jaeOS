@@ -4,6 +4,7 @@
 #include <const.h>
 #include <initial.h>
 
+EXTERN cputime_t kernelStart;
 void pgmHandler();
 void tlbHandler();
 void sysHandler();
