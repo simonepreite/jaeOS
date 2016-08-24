@@ -5,11 +5,11 @@
 
 // auxiliary prototype
 
-//void saveCurState(state_t *state, state_t *newState);
+void saveCurState(state_t *state, state_t *newState);
 pid_t genPid(UI a);
 pcb_t* searchPid(pcb_t *parent, pid_t pid);
 void terminator(pcb_t* proc);
-void setVM(UI old, UI new, memaddr handler, memaddr stack, UI flags);
+void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags);
 
 //  system call prototype
 

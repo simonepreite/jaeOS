@@ -6,16 +6,40 @@ state_t *tlb_old = (state_t*)TLB_OLDAREA;
 state_t *pgmtrap_old = (state_t*)PGMTRAP_OLDAREA;
 state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
 
+/***************************************************************
+*                      AUXILIARY FUNCTION                      *
+***************************************************************/
 
-void pgmHandler(){
-  kernelStart=getTODLO();
 
-  curProc->kernel_mode = getTODLO() - kernelStart;
+void handlerSYSTLBPGM(UI old, UI new, state_t* state){
+  switch(new){
+    case TLB:{
+      if(curProc->tags != 2||3||6||7)
+          terminateProcess(0);
+          scheduler(SCHED_NEXT);
+      break;
+    }
+    case PGMT:{
+      if(curProc->tags != 4||5||6||7)
+          terminateProcess(0);
+          scheduler(SCHED_NEXT);
+      break;
+    }
+    // forse riesco ad usarla anche come handler per syscall
+  }
+  saveCurState(&curProc->excp_state_vector[old], state);
+  curProc->excp_state_vector[new].a1 = state->CP15_Cause;
+  curProc->excp_state_vector[new].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[new].cpsr);
+  LDST(&(curProc->excp_state_vector[new]));
 }
+
+/***************************************************************
+*                           HANDLERS                           *
+***************************************************************/
 
 void tlbHandler(){
   kernelStart=getTODLO();
-
+  handlerSYSTLBPGM(TLB, EXCP_TLB_NEW, tlb_old);
   curProc->kernel_mode = getTODLO() - kernelStart;
 }
 
@@ -43,13 +67,13 @@ void sysHandler(){
           semaphoreOperation((int*)a2, a3);
         break;
         case SPECSYSHDL:
-          pecifySysBp(a2, a3, a4);
+          specifySysBp(a2, a3, a4);
           break;
         case SPECTLBHDL:
-          specifyTlb(a2, a3, a4)
+          specifyTlb(a2, a3, a4);
           break;
         case SPECPGMTHDL:
-          specifyPgm(a2, a3, a4)
+          specifyPgm(a2, a3, a4);
           break;
         case EXITTRAP:
           exitTrap(a2, a3);
@@ -73,7 +97,7 @@ void sysHandler(){
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */
-    scheduler(SCHED_CONTINUE);
+    scheduler(SCHED_CONTINUE);//non è detto che sia continue il flag, se chiamo la terminate sul processo stesso devo fare reset
     /* Altrimenti se è in user-mode */
   } else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
     /* Gestisco come fosse una program trap */
@@ -83,4 +107,10 @@ void sysHandler(){
     /* Richiamo l'handler per le pgmtrap */
     pgmHandler();
   }
+}
+
+void pgmHandler(){
+  kernelStart=getTODLO();
+  handlerSYSTLBPGM(PGMT, EXCP_PGMT_NEW, pgmtrap_old);
+  curProc->kernel_mode = getTODLO() - kernelStart;
 }

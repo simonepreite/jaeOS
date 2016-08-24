@@ -6,7 +6,7 @@
 
 // c'è la STST che fa la stessa cosa
 
-/*void saveCurState(state_t *state, state_t *newState){
+void saveCurState(state_t *state, state_t *newState){
 	newState->a1 = state->a1;
 	newState->a2 = state->a2;
 	newState->a3 = state->a3;
@@ -29,7 +29,7 @@
 	newState->CP15_Cause = state->CP15_Cause;
 	newState->TOD_Hi = state->TOD_Hi;
 	newState->TOD_Low = state->TOD_Low;
-}*/
+}
 
 // questa funziona si occupa di assegnare pid univoci ai processi
 
@@ -78,7 +78,7 @@ void terminator(pcb_t* proc){
 
 // azioni ripetitive syscall 4,5,6
 
-void setVM(UI old, UI new, memaddr handler, memaddr stack, UI flags){
+void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 
 	/* domanda aperta: come fare senza specificare un nuovo array nella struttura dati?
 	 idea utilizzo la maschera di bit che usa similmente a linux per rwx permettendo così
@@ -87,36 +87,37 @@ void setVM(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	 switch(old){
 		 case SYS:{
 			 if(curProc->tags == 1||3||5||7)
-			 			termainateProcess(0);
+			 			terminateProcess(0);
 			else
 		 			 	curProc->tags |= 1;
 			 break;
 		 }
 		 case TLB:{
 			 if(curProc->tags == 2||3||6||7)
-			 			termainateProcess(0);
+			 			terminateProcess(0);
 			else
 		 			 	curProc->tags |= 2;
 			 break;
 		 }
 		 case PGMT:{
 			 if(curProc->tags == 4||5||6||7)
-			 			termainateProcess(0);
+			 			terminateProcess(0);
 			 else
 			 			curProc->tags |= 3;
 			 break;
 		 }
 	 }
 
-	STST(&(curProc->excp_state_vector[old]));
+	STST(&(curProc->excp_state_vector[old])); // old o new?
 
-	//saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]); // istruzione probabilmente molto inutile
+	//saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]); // istruzione probabilmente molto inutile, che differenza c'è tra questa e STST?
 
-	curProc->excp_state_vector[new].pc = pc;
-	curProc->excp_state_vector[new].sp = sp;
+	curProc->excp_state_vector[new].pc = handler;
+	curProc->excp_state_vector[new].sp = stack;
 	flags &= (0x80000007); // 3 bit meno significativi a 1 per settare VM
-	curProc->excp_state_vector[new].cprs &= (0x7FFFFFF8); // 3 bit più significativi essendo 7 non sono sicuro della faccenda, APPROFONDIRE
-	curProc->excp_state_vector[new].cprs |= flags;
+	curProc->excp_state_vector[new].cpsr &= (0x7FFFFFF8); // 3 bit più significativi essendo 7 non sono sicuro della faccenda, APPROFONDIRE
+	curProc->excp_state_vector[new].cpsr |= flags;
+	curProc->excp_state_vector[new].CP15_EntryHi = setEntryHi(getEntryHi());
 }
 
 /***************************************************************
@@ -203,15 +204,15 @@ void semaphoreOperation(int *sem, int weight){
 }
 
 void specifySysBp(memaddr handler, memaddr stack, UI flags){
-	setVM(SYS, EXCP_SYS_NEW, handler, stack, flags);
+	setSYSTLBPGMT(SYS, EXCP_SYS_NEW, handler, stack, flags);
 }
 
 void specifyTlb(memaddr handler, memaddr stack, UI flags){
-	setVM(TLB, EXCP_TLB_NEW, handler, stack, flags);
+	setSYSTLBPGMT(TLB, EXCP_TLB_NEW, handler, stack, flags);
 }
 
 void specifyPgm(memaddr handler, memaddr stack, UI flags){
-	setVM(PGMT, EXCP_PGMT_NEW, handler, stack, flags);
+	setSYSTLBPGMT(PGMT, EXCP_PGMT_NEW, handler, stack, flags);
 }
 
 void exitTrap(UI exType, UI ret){
@@ -219,17 +220,17 @@ void exitTrap(UI exType, UI ret){
 	switch(exType){
 		case SYS:{
 			curProc->excp_state_vector[EXCP_SYS_OLD].a1 = ret;
-			LSDT(curProc->excp_state_vector[EXCP_SYS_OLD]);
+			LDST(&curProc->excp_state_vector[EXCP_SYS_OLD]);
 			break;
 		}
 		case TLB:{
 			curProc->excp_state_vector[EXCP_TLB_OLD].a1 = ret;
-			LSDT(curProc->excp_state_vector[EXCP_TLB_OLD]);
+			LDST(&curProc->excp_state_vector[EXCP_TLB_OLD]);
 			break;
 		}
 		case PGMT:{
-			curProc->excp_state_vector[EXCP_PGMT_OLD.a1] = ret;
-			LSDT(curProc->excp_state_vector[EXCP_PGMT_OLD]);
+			curProc->excp_state_vector[EXCP_PGMT_OLD].a1 = ret;
+			LDST(&curProc->excp_state_vector[EXCP_PGMT_OLD]);
 			break;
 		}
 		default:{

@@ -85,7 +85,7 @@ typedef unsigned int cpu_t;
 #define OFF       0
 
 #define SYSQUESTION 14
-#define SYS
+#define SYS 0
 
 /* just to be clear */
 #define SEMAPHORE		int

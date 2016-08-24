@@ -28,7 +28,7 @@ EXTERN pcb_t *outChild(pcb_t *p);
 /* funzioni ausiliarie */
 
 void init_proc(pcb_t *pcb);
-void init_state_t((state_t*)p){
+void init_state_t(state_t p);
 
 
 #endif

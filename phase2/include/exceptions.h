@@ -6,11 +6,16 @@
 
 EXTERN cputime_t kernelStart;
 
-void pgmHandler();
+// auxiliary prototype
+
+EXTERN void saveCurState(state_t *state, state_t *newState);
+void handlerSYSTLBPGM(UI old, UI new, state_t* state);
+
+// handler prototype
+
 void tlbHandler();
 void sysHandler();
-
-//EXTERN void saveCurState(state_t *state, state_t *newState);
+void pgmHandler();
 
 // SYSTEM CALL
 
