@@ -148,17 +148,33 @@ pcb_t *outChild(pcb_t *p){
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
 
+void init_state_t((state_t*)p){
+	p.a1 = p.a2 = p.a3 = p.a4 = 0;
+	p.v1 = p.v2 = p.v3 = p.v4 = pcb->p_s.v5 = p.v6 = 0;
+	p.sl = p.fp = p.ip = p.sp = pcb->p_s.lr = p.pc = p.cpsr = 0;
+	p.CP15_Control = p.CP15_EntryHi = p.CP15_Cause = p.TOD_Hi = p.TOD_Low = 0;
+}
+
 void init_proc(pcb_t *pcb){
+	int i = 0;
+
 	pcb->p_parent = NULL;  // inizializzo la struttura per evitare resuidi di un vecchio utilizzo
 	pcb->p_cursem = NULL;
 	pcb->pid = (pid_t)&pcb;
-		{
+		/*{
 			pcb->p_s.a1 = pcb->p_s.a2 = pcb->p_s.a3 = pcb->p_s.a4 = 0;
 			pcb->p_s.v1 = pcb->p_s.v2 = pcb->p_s.v3 = pcb->p_s.v4 = pcb->p_s.v5 = pcb->p_s.v6 = 0;
 			pcb->p_s.sl = pcb->p_s.fp = pcb->p_s.ip = pcb->p_s.sp = pcb->p_s.lr = pcb->p_s.pc = pcb->p_s.cpsr = 0;
 			pcb->p_s.CP15_Control = pcb->p_s.CP15_EntryHi = pcb->p_s.CP15_Cause = pcb->p_s.TOD_Hi = pcb->p_s.TOD_Low = 0;
-		}
+		}*/
+	init_state_t(pcb->p_s);
+	for(i=0; i<EXCP_COUNT;i++)
+		init_state_t(excp_state_vector[i]); // chiamare funzione state_t init
 	pcb->p_list.next = NULL;
 	pcb->p_children.next = NULL;
 	pcb->p_siblings.next = NULL;
+	kernel_mode = 0;
+	global_time = 0;
+	waitingResCount = 0;
+	tags = 0;
 }

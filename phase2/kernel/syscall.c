@@ -1,7 +1,12 @@
 #include <syscall.h>
 
+/***************************************************************
+*                      AUXILIARY FUNCTION                      *
+***************************************************************/
 
-void saveCurState(state_t *state, state_t *newState){
+// c'è la STST che fa la stessa cosa
+
+/*void saveCurState(state_t *state, state_t *newState){
 	newState->a1 = state->a1;
 	newState->a2 = state->a2;
 	newState->a3 = state->a3;
@@ -24,11 +29,7 @@ void saveCurState(state_t *state, state_t *newState){
 	newState->CP15_Cause = state->CP15_Cause;
 	newState->TOD_Hi = state->TOD_Hi;
 	newState->TOD_Low = state->TOD_Low;
-}
-
-/***************************************************************
-*                     SYSCALL KERNEL MODE                      *
-***************************************************************/
+}*/
 
 // questa funziona si occupa di assegnare pid univoci ai processi
 
@@ -39,21 +40,7 @@ pid_t genPid(UI a){
 	return a + count;
 }
 
-int createProcess(state_t *stato){
-	pcb_t *newProc = allocPcb();
-
-	if(newProc == NULL) return -1; // fail
-
-	saveCurState(stato, &(newProc->p_s));
-
-	processCounter++;
-
-	insertChild(curProc, newProc);
-	newProc->pid = genPid(newProc->pid);
-	insertProcQ(&readyQueue, newProc);
-
-	return 0; // Success
-}
+// supporto alla terminate process
 
 pcb_t* searchPid(pcb_t *parent, pid_t pid){
 	void* tmp = NULL;
@@ -87,6 +74,71 @@ void terminator(pcb_t* proc){
 	if (proc != curProc)
     outChild(proc);
 		freePcb(proc);
+}
+
+// azioni ripetitive syscall 4,5,6
+
+void setVM(UI old, UI new, memaddr handler, memaddr stack, UI flags){
+
+	/* domanda aperta: come fare senza specificare un nuovo array nella struttura dati?
+	 idea utilizzo la maschera di bit che usa similmente a linux per rwx permettendo così
+	 di utilizzare un solo intero invece di un array */
+
+	 switch(old){
+		 case SYS:{
+			 if(curProc->tags == 1||3||5||7)
+			 			termainateProcess(0);
+			else
+		 			 	curProc->tags |= 1;
+			 break;
+		 }
+		 case TLB:{
+			 if(curProc->tags == 2||3||6||7)
+			 			termainateProcess(0);
+			else
+		 			 	curProc->tags |= 2;
+			 break;
+		 }
+		 case PGMT:{
+			 if(curProc->tags == 4||5||6||7)
+			 			termainateProcess(0);
+			 else
+			 			curProc->tags |= 3;
+			 break;
+		 }
+	 }
+
+	STST(&(curProc->excp_state_vector[old]));
+
+	//saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]); // istruzione probabilmente molto inutile
+
+	curProc->excp_state_vector[new].pc = pc;
+	curProc->excp_state_vector[new].sp = sp;
+	flags &= (0x80000007); // 3 bit meno significativi a 1 per settare VM
+	curProc->excp_state_vector[new].cprs &= (0x7FFFFFF8); // 3 bit più significativi essendo 7 non sono sicuro della faccenda, APPROFONDIRE
+	curProc->excp_state_vector[new].cprs |= flags;
+}
+
+/***************************************************************
+*                     SYSCALL KERNEL MODE                      *
+***************************************************************/
+
+int createProcess(state_t *stato){
+	pcb_t *newProc = allocPcb();
+
+	if(newProc == NULL) return -1; // fail
+
+	//saveCurState(stato, &(newProc->p_s));
+
+	STST(newProc);
+
+	processCounter++;
+
+	insertChild(curProc, newProc);
+	newProc->pid = genPid(newProc->pid);
+	insertProcQ(&readyQueue, newProc);
+
+	return 0; // Success
 }
 
 void terminateProcess(pid_t p){
@@ -150,38 +202,20 @@ void semaphoreOperation(int *sem, int weight){
 		terminateProcess(curProc->pid);
 }
 
-UI iodevop(UI command, int lineNum, UI deviceNum) {
-	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
+void specifySysBp(memaddr handler, memaddr stack, UI flags){
+	setVM(SYS, EXCP_SYS_NEW, handler, stack, flags);
+}
 
-	UI terminalReading = (lineNum == INT_TERMINAL && deviceNum >> 31) ? N_DEV_PER_IL : 0;	// controllo se voglio ricevere o trasmettere dal terminale
-	int index = EXT_IL_INDEX(lineNum) * N_DEV_PER_IL;		// calcolo l'indice del primo semaforo associato all'interrupt line richiesta
-	index += deviceNum;			// calcolo l'indice del semaforo per il device richiesto
-	index += terminalReading;		// aggiungo 8 o meno, in base al tipo di operazione sul terminale
+void specifyTlb(memaddr handler, memaddr stack, UI flags){
+	setVM(TLB, EXCP_TLB_NEW, handler, stack, flags);
+}
 
-	semaphoreOperation(&semDevices[index], -1);		// eseguo SYS3 con peso -1 perchè il processo deve bloccarsi e il peso può solo essere +/-1
-
-	UI status = 0;
-	// Riprendo l'esecuzione dopo l'interrupt
-	if (lineNum == INT_TERMINAL) {
-		if (terminalReading > 0) {		// terminal in lettura
-			deviceRegister->term.recv_command = command;
-			status = deviceRegister->term.recv_status;
-		}
-		else {		// terminal in scrittura
-			deviceRegister->term.transm_command = command;
-			status = deviceRegister->term.transm_status;
-		}
-	}
-	else {		// altri dispositivi
-		deviceRegister->dtp.command = command;
-		status = deviceRegister->dtp.status;
-	}
-
-	return status;
+void specifyPgm(memaddr handler, memaddr stack, UI flags){
+	setVM(PGMT, EXCP_PGMT_NEW, handler, stack, flags);
 }
 
 void exitTrap(UI exType, UI ret){
-	
+
 	switch(exType){
 		case SYS:{
 			curProc->excp_state_vector[EXCP_SYS_OLD].a1 = ret;
@@ -209,10 +243,39 @@ void getCpuTime(cputime_t *global_time, cputime_t *user_time){
 	*user_time = curProc->global_time - curProc->kernel_mode;
 }
 
-void waitForClock() {
+void waitForClock(){
 	softBlockCounter++;			// there's one more blocked process
 	int index = MAX_DEVICES - 1;	// pseudo clock semaphore is the last one in the array
 	semaphoreOperation(&semDevices[index], -1);		// lock the current semaphore
+}
+
+UI iodevop(UI command, int lineNum, UI deviceNum) {
+	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
+
+	UI terminalReading = (lineNum == INT_TERMINAL && deviceNum >> 31) ? N_DEV_PER_IL : 0;	// controllo se voglio ricevere o trasmettere dal terminale
+	int index = EXT_IL_INDEX(lineNum) * N_DEV_PER_IL;		// calcolo l'indice del primo semaforo associato all'interrupt line richiesta
+	index += deviceNum;			// calcolo l'indice del semaforo per il device richiesto
+	index += terminalReading;		// aggiungo 8 o meno, in base al tipo di operazione sul terminale
+
+	semaphoreOperation(&semDevices[index], -1);		// eseguo SYS3 con peso -1 perchè il processo deve bloccarsi e il peso può solo essere +/-1
+
+	UI status = 0;
+	// Riprendo l'esecuzione dopo l'interrupt
+	if (lineNum == INT_TERMINAL) {
+		if (terminalReading > 0) {		// terminal in lettura
+			deviceRegister->term.recv_command = command;
+			status = deviceRegister->term.recv_status;
+		}
+		else {		// terminal in scrittura
+			deviceRegister->term.transm_command = command;
+			status = deviceRegister->term.transm_status;
+		}
+	}
+	else {		// altri dispositivi
+		deviceRegister->dtp.command = command;
+		status = deviceRegister->dtp.status;
+	}
+	return status;
 }
 
 pid_t getPid(){

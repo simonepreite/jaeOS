@@ -1,7 +1,7 @@
 #include <exceptions.h>
 
-// probabilemnte questo assegnamento è da eliminare e va rifatto all'interno
-// dei rispettivi handler
+// assegno i puntatori alle aree di memoria
+
 state_t *tlb_old = (state_t*)TLB_OLDAREA;
 state_t *pgmtrap_old = (state_t*)PGMTRAP_OLDAREA;
 state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
@@ -22,6 +22,7 @@ void tlbHandler(){
 void sysHandler(){
   /* processo in kernel mode? */
   if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
+    STST(sysbp_old);
     UI cause = sysbp_old->CP15_Cause;
     UI a1 = sysbp_old->a1;
     UI a2 = sysbp_old->a2;
@@ -42,13 +43,13 @@ void sysHandler(){
           semaphoreOperation((int*)a2, a3);
         break;
         case SPECSYSHDL:
-          //function
+          pecifySysBp(a2, a3, a4);
           break;
         case SPECTLBHDL:
-          //function
+          specifyTlb(a2, a3, a4)
           break;
         case SPECPGMTHDL:
-          //function
+          specifyPgm(a2, a3, a4)
           break;
         case EXITTRAP:
           exitTrap(a2, a3);

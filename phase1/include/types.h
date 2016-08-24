@@ -29,6 +29,7 @@ typedef struct pcb_t {
 	cputime_t kernel_mode;
 	cputime_t global_time;
 	UI waitingResCount;
+	UI tags;
 } pcb_t;
 
 /* custom type to descride scheduler situations */
