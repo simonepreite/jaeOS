@@ -89,21 +89,21 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 			 if(curProc->tags == 1||3||5||7)
 			 			terminateProcess(0);
 			else
-		 			 	curProc->tags |= 1;
+		 			 	curProc->tags ^= 1;
 			 break;
 		 }
 		 case TLB:{
 			 if(curProc->tags == 2||3||6||7)
 			 			terminateProcess(0);
 			else
-		 			 	curProc->tags |= 2;
+		 			 	curProc->tags ^= 2;
 			 break;
 		 }
 		 case PGMT:{
 			 if(curProc->tags == 4||5||6||7)
 			 			terminateProcess(0);
 			 else
-			 			curProc->tags |= 3;
+			 			curProc->tags ^= 4;
 			 break;
 		 }
 	 }

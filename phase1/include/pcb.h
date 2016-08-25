@@ -27,8 +27,13 @@ EXTERN pcb_t *outChild(pcb_t *p);
 
 /* funzioni ausiliarie */
 
-void init_proc(pcb_t *pcb);
-void init_state_t(state_t p);
+#define init_state_t(p)({\
+	p.a1 = p.a2 = p.a3 = p.a4 = 0;\
+	p.v1 = p.v2 = p.v3 = p.v4 = p.v5 = p.v6 = 0;\
+	p.sl = p.fp = p.ip = p.sp = p.lr = p.pc = p.cpsr = 0;\
+	p.CP15_Control = p.CP15_EntryHi = p.CP15_Cause = p.TOD_Hi = p.TOD_Low = 0;\
+})
 
+void init_proc(pcb_t *pcb);
 
 #endif
