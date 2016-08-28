@@ -84,29 +84,46 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	 idea utilizzo la maschera di bit che usa similmente a linux per rwx permettendo così
 	 di utilizzare un solo intero invece di un array */
 
-	 switch(old){
-		 case SYS:{
-			 if(curProc->tags == 1||3||5||7)
-			 			terminateProcess(0);
-			else
-		 			 	curProc->tags ^= 1;
-			 break;
-		 }
-		 case TLB:{
-			 if(curProc->tags == 2||3||6||7)
-			 			terminateProcess(0);
-			else
-		 			 	curProc->tags ^= 2;
-			 break;
-		 }
-		 case PGMT:{
-			 if(curProc->tags == 4||5||6||7)
-			 			terminateProcess(0);
-			 else
-			 			curProc->tags ^= 4;
-			 break;
-		 }
-	 }
+	if (old == SYS) {
+		switch (curProc->tags) {
+			case 1:
+			case 3:
+			case 5:
+			case 7:
+				terminateProcess(0);
+				break;
+			default:
+				curProc->tags ^= 1;
+				break;
+		}
+	}
+	else if (old == TLB) {
+		switch (curProc->tags) {
+			case 2:
+			case 3:
+			case 6:
+			case 7:
+				terminateProcess(0);
+				break;
+			default:
+				curProc->tags ^= 2;
+				break;
+		}
+	}
+	else if (old == PGMT) {
+		switch (curProc->tags) {
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+				terminateProcess(0);
+				break;
+			default:
+				curProc->tags ^= 4;
+				break;
+		}
+	}
+	else PANIC();
 
 	STST(&(curProc->excp_state_vector[old])); // old o new?
 
@@ -154,7 +171,7 @@ void terminateProcess(pid_t p){
 		freePcb(curProc);
     curProc=NULL;
 		// bisogna dire allo scheduler di caricare il processo successivo
-		//scheduler(SCHED_RUNNING);		// approfondire se si può fare
+		//scheduler(SCHED_NEXT);		// approfondire se si può fare
 	}
 	else{
     tprint("searchPid finish\n");

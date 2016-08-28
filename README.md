@@ -21,7 +21,7 @@
 
 #####                           AUTORI                                 #####
 #                                                                          #
-#	Matteo          Del Vecchio     matteo.delvecchio@studio.unibo.it      #
+#	Matteo          Del Vecchio     matteo.delvecchio6@studio.unibo.it      #
 #	Simone 			Preite 			simone.preite@studio.unibo.it          #
 #                                                                          #
 ############################################################################

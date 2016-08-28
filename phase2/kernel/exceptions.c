@@ -12,25 +12,85 @@ state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
 
 
 void handlerSYSTLBPGM(UI old, UI new, state_t* state){
-  switch(new){
-    case TLB:{
-      if(curProc->tags != 2||3||6||7)
-          terminateProcess(0);
-          scheduler(SCHED_NEXT);
-      break;
+
+    if (new == TLB) {
+        switch (curProc->tags) {
+            case 1:
+            case 4:
+            case 5:
+                terminateProcess(0);
+                scheduler(SCHED_NEXT);
+                break;
+            default:
+                break;
+        }
     }
-    case PGMT:{
-      if(curProc->tags != 4||5||6||7)
-          terminateProcess(0);
-          scheduler(SCHED_NEXT);
-      break;
+    else if (new == PGMT) {
+        switch (curProc->tags) {
+            case 1:
+            case 2:
+            case 3:
+                terminateProcess(0);
+                scheduler(SCHED_NEXT);
+                break;
+            default:
+                break;
+        }
     }
-    // forse riesco ad usarla anche come handler per syscall
-  }
-  saveCurState(&curProc->excp_state_vector[old], state);
-  curProc->excp_state_vector[new].a1 = state->CP15_Cause;
-  curProc->excp_state_vector[new].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[new].cpsr);
-  LDST(&(curProc->excp_state_vector[new]));
+    else if (new == SYS) {
+        UI a1 = sysbp_old->a1;
+        UI a2 = sysbp_old->a2;
+        UI a3 = sysbp_old->a3;
+        UI a4 = sysbp_old->a4;
+
+        if (sysbp_old->CP15_Cause == EXC_SYSCALL) {
+            switch (a1) {
+                case CREATEPROCESS:
+                    curProc->p_s.a1 = createProcess((state_t *)a2);
+                    break;
+                case TERMINATEPROCESS:
+                    terminateProcess(a2);
+                    break;
+                case SEMOP:
+                    semaphoreOperation((int *)a2, a3);
+                    break;
+                case SPECSYSHDL:
+                    specifySysBp(a2, a3, a4);
+                    break;
+                case SPECTLBHDL:
+                    specifyTlb(a2, a3, a4);
+                    break;
+                case SPECPGMTHDL:
+                    specifyPgm(a2, a3, a4);
+                    break;
+                case EXITTRAP:
+                    exitTrap(a2, a3);
+                    break;
+                case GETCPUTIME:
+                    getCpuTime((cputime_t *)a2, (cputime_t *)a3);
+                    break;
+                case WAITCLOCK:
+                    waitForClock();
+                    break;
+                case IODEVOP:
+                    curProc->p_s.a1 = iodevop(a2, a3, a4);
+                    break;
+                case GETPID:
+                    curProc->p_s.a1 = getPid();
+                    break;
+                default:
+                    PANIC();
+            }
+        }
+    }
+    else PANIC();
+
+    if (new != SYS) {
+        saveCurState(&curProc->excp_state_vector[old], state);
+        curProc->excp_state_vector[new].a1 = state->CP15_Cause;
+        curProc->excp_state_vector[new].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[new].cpsr);
+        LDST(&(curProc->excp_state_vector[new]));
+    }
 }
 
 /***************************************************************
@@ -47,57 +107,16 @@ void sysHandler(){
   /* processo in kernel mode? */
   if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
     STST(sysbp_old);
-    UI cause = sysbp_old->CP15_Cause;
-    UI a1 = sysbp_old->a1;
-    UI a2 = sysbp_old->a2;
-    UI a3 = sysbp_old->a3;
-    UI a4 = sysbp_old->a4;
     kernelStart=getTODLO();
     /* Se l'eccezione è di tipo System call */
-    if(cause==EXC_SYSCALL){
-      /* Se è fra SYS1 e SYS8 richiama le funzioni adeguate */
-      switch(a1){
-        case CREATEPROCESS:
-          curProc->p_s.a1 = createProcess((state_t *)a2);
-        break;
-        case TERMINATEPROCESS:
-          terminateProcess(a2);
-        break;
-        case SEMOP:
-          semaphoreOperation((int*)a2, a3);
-        break;
-        case SPECSYSHDL:
-          specifySysBp(a2, a3, a4);
-          break;
-        case SPECTLBHDL:
-          specifyTlb(a2, a3, a4);
-          break;
-        case SPECPGMTHDL:
-          specifyPgm(a2, a3, a4);
-          break;
-        case EXITTRAP:
-          exitTrap(a2, a3);
-          break;
-        case GETCPUTIME:
-          getCpuTime((cputime_t*)a2, (cputime_t*)a3);
-        break;
-        case WAITCLOCK:
-          waitForClock();
-          break;
-        case IODEVOP:
-          curProc->p_s.a1 = iodevop(a2, a3, a4);
-          break;
-        case GETPID:
-          curProc->p_s.a1 = getPid();
-          break;
-        default:
-          PANIC();
-      }
-    }else PANIC(); //non necessario insieme al controllo su cause
+    handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */
-    scheduler(SCHED_CONTINUE);//non è detto che sia continue il flag, se chiamo la terminate sul processo stesso devo fare reset
+    if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == curProc)
+        scheduler(SCHED_RESET);
+    else
+        scheduler(SCHED_CONTINUE);
     /* Altrimenti se è in user-mode */
   } else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
     /* Gestisco come fosse una program trap */

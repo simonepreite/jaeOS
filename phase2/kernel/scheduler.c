@@ -1,7 +1,7 @@
 #include <scheduler.h>
 
 void scheduler(sched_t status) {
-	if (status != SCHED_START && status != SCHED_RUNNING && status != SCHED_RESET && status != SCHED_CONTINUE)
+	if (status != SCHED_START && status != SCHED_NEXT && status != SCHED_RESET && status != SCHED_CONTINUE)
 		PANIC();
 
     if (status == SCHED_START) {
@@ -26,5 +26,5 @@ void scheduler(sched_t status) {
 	    }
 	}
 	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr); // davvero necessario?
-  LDST(&(curProc->p_s));
+	LDST(&(curProc->p_s));
 }
