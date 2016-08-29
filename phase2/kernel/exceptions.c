@@ -113,7 +113,7 @@ void sysHandler(){
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */
-    if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == curProc)
+    if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int *)curProc)
         scheduler(SCHED_RESET);
     else
         scheduler(SCHED_CONTINUE);
