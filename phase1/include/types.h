@@ -40,4 +40,11 @@ typedef enum sched_t{
 	SCHED_CONTINUE		// scheduler code to let current process continue execution
 }sched_t;
 
+/* custom type to describe interrupt acknowledgements */
+typedef enum ack_type {
+	ACK_GEN_DEVICE,
+	ACK_TERM_TRANSMIT,
+	ACK_TERM_RECEIVE
+} ack_type;
+
 #endif
