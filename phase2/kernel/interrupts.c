@@ -8,7 +8,7 @@ void intHandler(){
 	state_t *oldState = (state_t *)INT_OLDAREA;
 	if (curProc) {
 		(*oldState).pc -= WORD_SIZE;
-		saveCurState(oldState, curProc->p_s);
+		saveCurState(oldState, &curProc->p_s);
 	}
 
 	UI cause = getCAUSE();
