@@ -163,9 +163,7 @@ void terminateProcess(pid_t p){
 	pcb_t *save = NULL;
 
 	if(p == 0 || curProc->pid == p){
-    tprint("ok process\n");
 		terminator(curProc);
-    tprint("terminator finish\n");
 		outChild(curProc);
 		outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
@@ -174,9 +172,7 @@ void terminateProcess(pid_t p){
 		//scheduler(SCHED_NEXT);		// approfondire se si può fare
 	}
 	else{
-    tprint("searchPid finish\n");
 		if(!(save=searchPid(curProc, p))){
-			tprint("save NULL\n");
 			PANIC();
 		}
 		terminator(save);

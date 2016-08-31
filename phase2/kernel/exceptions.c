@@ -13,7 +13,7 @@ state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
 
 void handlerSYSTLBPGM(UI old, UI new, state_t* state){
 
-    if (new == TLB) {
+    if (old == TLB) {
         switch (curProc->tags) {
             case 1:
             case 4:
@@ -25,7 +25,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
                 break;
         }
     }
-    else if (new == PGMT) {
+    else if (old == PGMT) {
         switch (curProc->tags) {
             case 1:
             case 2:
@@ -37,7 +37,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
                 break;
         }
     }
-    else if (new == SYS) {
+    else if (old == SYS) {
         UI a1 = sysbp_old->a1;
         UI a2 = sysbp_old->a2;
         UI a3 = sysbp_old->a3;
@@ -113,7 +113,7 @@ void sysHandler(){
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */
-    if (sysbp_old->a1 == TERMINATEPROCESS && (pcb_t *)sysbp_old->a2 == curProc)
+    if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int *)curProc)
         scheduler(SCHED_RESET);
     else
         scheduler(SCHED_CONTINUE);
