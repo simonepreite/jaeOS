@@ -125,9 +125,9 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	}
 	else PANIC();
 
-	STST(&(curProc->excp_state_vector[old])); // old o new?
+	//STST(&(curProc->excp_state_vector[old])); // old o new?
 
-	//saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]); // istruzione probabilmente molto inutile, che differenza c'è tra questa e STST?
+	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]); // istruzione probabilmente molto inutile, che differenza c'è tra questa e STST?
 
 	curProc->excp_state_vector[new].pc = handler;
 	curProc->excp_state_vector[new].sp = stack;

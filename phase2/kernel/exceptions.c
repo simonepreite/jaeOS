@@ -42,7 +42,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
         UI a2 = sysbp_old->a2;
         UI a3 = sysbp_old->a3;
         UI a4 = sysbp_old->a4;
-
+        //if(a1==3) HALT();
         if (sysbp_old->CP15_Cause == EXC_SYSCALL) {
             switch (a1) {
                 case CREATEPROCESS:
@@ -85,7 +85,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
     }
     else PANIC();
 
-    if (new != SYS) {
+    if (old != SYS) {
         saveCurState(&curProc->excp_state_vector[old], state);
         curProc->excp_state_vector[new].a1 = state->CP15_Cause;
         curProc->excp_state_vector[new].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[new].cpsr);
@@ -106,14 +106,15 @@ void tlbHandler(){
 void sysHandler(){
   /* processo in kernel mode? */
   if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
-    STST(sysbp_old);
+    saveCurState(sysbp_old, &curProc->p_s);
+    //STST(sysbp_old);
     kernelStart=getTODLO();
     /* Se l'eccezione è di tipo System call */
     handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */
-    if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int *)curProc)
+    if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int)curProc)
         scheduler(SCHED_RESET);
     else
         scheduler(SCHED_CONTINUE);
