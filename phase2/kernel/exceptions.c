@@ -103,11 +103,11 @@ void tlbHandler(){
 }
 
 void sysHandler(){
+  kernelStart=getTODLO();
   /* processo in kernel mode? */
   if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
     saveCurState(sysbp_old, &curProc->p_s);
     //STST(sysbp_old);
-    kernelStart=getTODLO();
     /* Se l'eccezione è di tipo System call */
     handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
     //processo corrente, ricalcolare tempi
@@ -124,6 +124,7 @@ void sysHandler(){
     pgmtrap_old=sysbp_old;
     /* Setto il registro cause a Reserved Instruction */
     pgmtrap_old->CP15_Cause=EXC_RESERVEDINSTR;
+    curProc->kernel_mode = getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
     /* Richiamo l'handler per le pgmtrap */
     pgmHandler();
   }

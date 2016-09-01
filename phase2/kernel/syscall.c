@@ -4,7 +4,7 @@
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
 
-// c'è la STST che fa la stessa cosa
+// c'è la STST che fa la stessa cosa, forse!
 
 void saveCurState(state_t *state, state_t *newState){
 	newState->a1 = state->a1;

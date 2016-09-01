@@ -178,7 +178,7 @@ void test() {
 	pid_t	fpid;
 
 	SYSCALL(SEMOP, (int)&testsem, 1, 0);					/* V(testsem)   */
-	
+
 	if (testsem != 1) { print("error: p1 v(testsem) with no effects\n"); PANIC(); }
 
 	print("p1 v(testsem)\n");
