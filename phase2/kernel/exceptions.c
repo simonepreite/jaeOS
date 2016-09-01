@@ -38,12 +38,11 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
         }
     }
     else if (old == SYS) {
-        UI a1 = sysbp_old->a1;
-        UI a2 = sysbp_old->a2;
-        UI a3 = sysbp_old->a3;
-        UI a4 = sysbp_old->a4;
-        //if(a1==3) HALT();
-        if (sysbp_old->CP15_Cause == EXC_SYSCALL) {
+        UI a1 = state->a1;
+        UI a2 = state->a2;
+        UI a3 = state->a3;
+        UI a4 = state->a4;
+        if (state->CP15_Cause == EXC_SYSCALL) {
             switch (a1) {
                 case CREATEPROCESS:
                     curProc->p_s.a1 = createProcess((state_t *)a2);
@@ -86,7 +85,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
     else PANIC();
 
     if (old != SYS) {
-        saveCurState(&curProc->excp_state_vector[old], state);
+        saveCurState(state, &curProc->excp_state_vector[old]);
         curProc->excp_state_vector[new].a1 = state->CP15_Cause;
         curProc->excp_state_vector[new].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[new].cpsr);
         LDST(&(curProc->excp_state_vector[new]));
@@ -118,8 +117,9 @@ void sysHandler(){
         scheduler(SCHED_RESET);
     else
         scheduler(SCHED_CONTINUE);
-    /* Altrimenti se è in user-mode */
-  } else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
+  }
+  /* Altrimenti se è in user-mode */
+  else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
     /* Gestisco come fosse una program trap */
     pgmtrap_old=sysbp_old;
     /* Setto il registro cause a Reserved Instruction */

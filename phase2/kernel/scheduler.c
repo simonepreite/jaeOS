@@ -1,15 +1,13 @@
 #include <scheduler.h>
 
 void scheduler(sched_t status) {
-	if (status != SCHED_START && status != SCHED_NEXT && status != SCHED_RESET && status != SCHED_CONTINUE){
+	if (status != SCHED_START && status != SCHED_NEXT && status != SCHED_RESET && status != SCHED_CONTINUE)
 		PANIC();
-}
+
     if (status == SCHED_START) {
     	setTIMER(SCHED_TIME_SLICE);		// dico ad uARM che il time slice è di 5ms
     }
-
     // Manca la gestione dei tempi
-
     if (status != SCHED_CONTINUE) {		// codice eseguito sempre, tranne nel caso in cui lo scheduler deve ricaricare il processo interrotto
 	    if (curProc) {
 	    	insertProcQ(&readyQueue, curProc);

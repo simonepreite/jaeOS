@@ -146,9 +146,9 @@ int createProcess(state_t *stato){
 
 	if(newProc == NULL) return -1; // fail
 
-	//saveCurState(stato, &(newProc->p_s));
+	saveCurState(stato, &(newProc->p_s));
 
-	STST(newProc);
+	//STST(newProc);
 
 	processCounter++;
 
