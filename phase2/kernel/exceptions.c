@@ -115,7 +115,9 @@ void sysHandler(){
     /* Se l'eccezione è di tipo System call */
     handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
     if(debug_a1==10){
-        if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE) HALT();
+      curProc->p_s.cpsr = STATUS_NULL;
+      curProc->p_s.cpsr = curProc->p_s.cpsr | STATUS_SYS_MODE;
+      if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE) HALT();
     }
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
