@@ -1,9 +1,9 @@
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 
-#include <initial.h> 
+#include <initial.h>
 
-
+EXTERN void testfun();
 EXTERN void intHandler();
 EXTERN void deviceHandler(int type);
 EXTERN void terminalHandler();

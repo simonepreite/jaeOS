@@ -19,11 +19,13 @@ void scheduler(sched_t status) {
 	    	if (clist_empty(readyQueue)) {//!readyQueue
 	    		if (processCounter == 0) HALT();
 	    		if (processCounter > 0 && softBlockCounter == 0) PANIC();
-	    		if (processCounter > 0 && softBlockCounter > 0) WAIT();
+	    		if (processCounter > 0 && softBlockCounter > 0) {
+						setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
+						WAIT();
+					}
 	    	}
 	    }
 	}
-	//if(debug_a1==10) HALT();
-	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr); // davvero necessario?
+	//(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr); // davvero necessario?
 	LDST(&(curProc->p_s));
 }

@@ -9,6 +9,7 @@ int debug_a1; //debug variable
 
 // auxiliary prototype
 
+EXTERN void testfun();
 EXTERN void saveCurState(state_t *state, state_t *newState);
 void handlerSYSTLBPGM(UI old, UI new, state_t* state);
 

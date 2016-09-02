@@ -114,18 +114,13 @@ void sysHandler(){
     //STST(sysbp_old);
     /* Se l'eccezione è di tipo System call */
     handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
-    if(debug_a1==10){
-      curProc->p_s.cpsr = STATUS_NULL;
-      curProc->p_s.cpsr = curProc->p_s.cpsr | STATUS_SYS_MODE;
-      if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE) HALT();
-    }
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */
     if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int)curProc)
         scheduler(SCHED_RESET);
     else
-        scheduler(SCHED_CONTINUE);
+        scheduler(SCHED_NEXT);
   }
   /* Altrimenti se è in user-mode */
   else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){

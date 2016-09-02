@@ -67,7 +67,7 @@ void deviceHandler(int type) {
 	UI *bitmapForLine = (UI *)CDEV_BITMAP_ADDR(type);								// ottengo la bitmap delle linee in base al tipo di device
 	UI deviceNumber = getDeviceNumberFromLineBitmap(bitmapForLine);					// ottengo il numero del device in base alla bitmap (vedere funzione ausiliaria)
 	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(type, deviceNumber);		// ottengo il device register per il device da gestire
-	
+
 	UI index = EXT_IL_INDEX(type) * N_DEV_PER_IL + deviceNumber;					// calcolo l'indice del semaforo associato al dispositivo
 	acknowledge(index, deviceRegister, ACK_GEN_DEVICE);
 }
@@ -77,14 +77,13 @@ void terminalHandler() {
 	UI terminalNumber = getDeviceNumberFromLineBitmap(bitmapForLine);
 	devreg_t *terminalRegister = (devreg_t *)DEV_REG_ADDR(INT_TERMINAL, terminalNumber);
 	UI index = 0;
-
 	// Trasmissione Carattere, operazione a proprità più elevata rispetto alla ricezione
-	if ((terminalRegister->term.transm_status & 0x0000000F) == DEV_TTRS_S_CHARTRSM) {
+	if ((terminalRegister->term.transm_status & 0x000000FF) == DEV_TTRS_S_CHARTRSM) {
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_TRANSMIT);
 	}
 	// Ricezione Carattere
-	else if ((terminalRegister->term.recv_status & 0x0000000F) == DEV_TRCV_S_CHARRECV) {
+	else if ((terminalRegister->term.recv_status & 0x000000FF) == DEV_TRCV_S_CHARRECV) {
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_RECEIVE);
 	}
