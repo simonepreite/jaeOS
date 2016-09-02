@@ -201,6 +201,7 @@ void semaphoreOperation(int *sem, int weight){
 	else if (weight <= -1){		// resources to be allocated
 		(*sem) += weight;
 		if(*sem < 0){
+			//testfun();
 			//inserire kernel time su nuovi elementi della struttura
 			curProc->waitingResCount = weight;		// il processo ha bisogno di weight risorse
 
