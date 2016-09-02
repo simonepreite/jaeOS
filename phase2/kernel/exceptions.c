@@ -2,6 +2,7 @@
 
 // assegno i puntatori alle aree di memoria
 
+int debug_a1;
 state_t *tlb_old = (state_t*)TLB_OLDAREA;
 state_t *pgmtrap_old = (state_t*)PGMTRAP_OLDAREA;
 state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
@@ -42,6 +43,9 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
         UI a2 = state->a2;
         UI a3 = state->a3;
         UI a4 = state->a4;
+
+        debug_a1 = state->a1; //debug istruction
+
         if (state->CP15_Cause == EXC_SYSCALL) {
             switch (a1) {
                 case CREATEPROCESS:
@@ -110,6 +114,9 @@ void sysHandler(){
     //STST(sysbp_old);
     /* Se l'eccezione è di tipo System call */
     handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
+    if(debug_a1==10){
+        if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE) HALT();
+    }
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
     /* Richiamo lo scheduler */

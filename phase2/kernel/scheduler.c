@@ -23,6 +23,7 @@ void scheduler(sched_t status) {
 	    	}
 	    }
 	}
+	//if(debug_a1==10) HALT();
 	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr); // davvero necessario?
 	LDST(&(curProc->p_s));
 }

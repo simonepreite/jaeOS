@@ -5,6 +5,7 @@
 #include <initial.h>
 
 EXTERN cputime_t kernelStart;
+int debug_a1; //debug variable
 
 // auxiliary prototype
 
