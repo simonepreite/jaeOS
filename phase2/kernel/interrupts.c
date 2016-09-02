@@ -23,7 +23,8 @@ void intHandler(){
 	if (curProc)
 		curProc->kernel_mode = getTODLO() - kernelStart;
 
-	setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
+	//setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS())); probabilemnte non serve
+	//testfun();
 	scheduler(SCHED_NEXT);
 }
 
@@ -79,11 +80,14 @@ void terminalHandler() {
 	UI index = 0;
 	// Trasmissione Carattere, operazione a proprità più elevata rispetto alla ricezione
 	if ((terminalRegister->term.transm_status & 0x000000FF) == DEV_TTRS_S_CHARTRSM) {
+		testfun();
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_TRANSMIT);
 	}
 	// Ricezione Carattere
 	else if ((terminalRegister->term.recv_status & 0x000000FF) == DEV_TRCV_S_CHARRECV) {
+		testfun();
+
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_RECEIVE);
 	}
