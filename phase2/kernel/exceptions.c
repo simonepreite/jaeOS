@@ -116,11 +116,12 @@ void sysHandler(){
     handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
     //processo corrente, ricalcolare tempi
     curProc->kernel_mode = getTODLO() - kernelStart;
-    /* Richiamo lo scheduler */
+    /* Richiamo lo scheduler
     if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int)curProc)
         scheduler(SCHED_RESET);
     else
-        scheduler(SCHED_NEXT);
+        scheduler(SCHED_NEXT);*/
+        scheduler();
   }
   /* Altrimenti se è in user-mode */
   else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){

@@ -5,6 +5,7 @@
 EXTERN int debug_a1;
 EXTERN void testfun();
 
-void scheduler(sched_t status);
+//void scheduler(sched_t status);
+void scheduler();
 
 #endif

@@ -136,13 +136,14 @@ pid_t p8pid, leaf1pid, leaf2pid, leaf3pid, leaf4pid;	/* p8 and it's grandchilds'
 
 void	p2(),p3(),p4(),p5(),p5a(),p5b(),p5c(),p6(),p7(),p7a(),p5prog(),p5mm();
 void	p5sys(),p6a(),p6b(),p6c(),p8root(),child1(),child2(),p8leaf();
-
+void testfun();
 /* a procedure to print on terminal 0 */
 void print(char *msg) {
 
 	char * s = msg;
 	devregtr command;
 	devregtr status;
+	int i=0;
 
 	SYSCALL(SEMOP, (int)&term_mut, -1, 0);				/* get term_mut lock */
 
@@ -153,7 +154,6 @@ void print(char *msg) {
 
 		/* Wait for I/O completion (SYS8) */
 		status = SYSCALL(IODEVOP, command, INT_TERMINAL, 0);
-
 		if ((status & TERMSTATMASK) != TRANSM){
 			PANIC();
 		}
@@ -161,7 +161,7 @@ void print(char *msg) {
 		if (((status & TERMCHARMASK) >> BYTELEN) != *s){
 			PANIC();
 		}
-
+		i++;
 		s++;
 	}
 

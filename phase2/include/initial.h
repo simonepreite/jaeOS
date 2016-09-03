@@ -18,7 +18,7 @@ pcb_t *curProc;
 cputime_t kernelStart;
 
 EXTERN void test();
-EXTERN void scheduler(sched_t status);
+EXTERN void scheduler();
 EXTERN pid_t genPid(UI a);
 void initArea(memaddr area, memaddr handler);
 
