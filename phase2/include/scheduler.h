@@ -2,6 +2,9 @@
 #define SCHEDULER_H
 
 #include <initial.h>
+
+// debub
+
 EXTERN int debug_a1;
 EXTERN void testfun();
 

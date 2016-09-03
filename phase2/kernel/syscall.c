@@ -77,11 +77,6 @@ void terminator(pcb_t* proc){
 // azioni ripetitive syscall 4,5,6
 
 void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
-
-	/* domanda aperta: come fare senza specificare un nuovo array nella struttura dati?
-	 idea utilizzo la maschera di bit che usa similmente a linux per rwx permettendo così
-	 di utilizzare un solo intero invece di un array */
-
 	if (old == SYS) {
 		switch (curProc->tags) {
 			case 1:
@@ -123,9 +118,9 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	}
 	else PANIC();
 
-	//STST(&(curProc->excp_state_vector[old])); // old o new?
+	STST(&(curProc->excp_state_vector[old]));
 
-	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]); // istruzione probabilmente molto inutile, che differenza c'è tra questa e STST?
+	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]);
 
 	curProc->excp_state_vector[new].pc = handler;
 	curProc->excp_state_vector[new].sp = stack;
@@ -164,16 +159,12 @@ void terminateProcess(pid_t p){
 		outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
     curProc=NULL;
-		// bisogna dire allo scheduler di caricare il processo successivo
-		//scheduler(SCHED_NEXT);		// approfondire se si può fare
 	}
 	else{
 		if(!(save=searchPid(curProc, p))){
 			PANIC();
 		}
 		terminator(save);
-		// lo scheduler deve ricaricare curProc
-		//scheduler(SCHED_CONTINUE);
 	}
 }
 
@@ -191,13 +182,12 @@ void semaphoreOperation(int *sem, int weight){
 				firstBlocked->p_cursem = NULL;					// annullo il collegamento tra il processo ed il semaforo
 				firstBlocked->waitingResCount = 0;				// il processo non è più in attesa di risorse
 				insertProcQ(&readyQueue, firstBlocked);			// inserisco il processo nella coda ready
-			//}
+			//} questa parte è da riguardare perchè bisognerebbe liberare tutte le risorse possibili
 		}
 	}
 	else if (weight <= -1){		// resources to be allocated
 		(*sem) += weight;
 		if(*sem < 0){
-			//inserire kernel time su nuovi elementi della struttura
 			curProc->waitingResCount = weight;		// il processo ha bisogno di weight risorse
 
 			curProc->kernel_mode += getTODLO() - kernelStart;

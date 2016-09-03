@@ -18,10 +18,15 @@ pcb_t *curProc;
 cputime_t kernelStart;
 cputime_t procInit;
 
+// auxiliary function
+
+void initArea(memaddr area, memaddr handler);
+
+// extern modules function
+
 EXTERN void test();
 EXTERN void scheduler();
 EXTERN pid_t genPid(UI a);
-void initArea(memaddr area, memaddr handler);
 
 
 #endif

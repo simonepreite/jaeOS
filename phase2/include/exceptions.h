@@ -19,7 +19,7 @@ void tlbHandler();
 void sysHandler();
 void pgmHandler();
 
-// SYSTEM CALL
+// SYSTEM CALL (extern module)
 
 EXTERN int createProcess(state_t *stato);
 EXTERN void terminateProcess(pid_t p);
