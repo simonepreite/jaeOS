@@ -16,6 +16,7 @@ EXTERN struct clist readyQueue;
 int semDevices[MAX_DEVICES];
 pcb_t *curProc;
 cputime_t kernelStart;
+cputime_t procInit;
 
 EXTERN void test();
 EXTERN void scheduler();

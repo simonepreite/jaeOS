@@ -63,9 +63,7 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid){
 }
 
 void terminator(pcb_t* proc){
-  tprint("terminator\n");
 	while(!emptyChild(proc)){
-    tprint("recursion\n");
 		terminator(removeChild(proc));
   }
 	//controllare se il processo è bloccato ad un semaforo
@@ -148,15 +146,13 @@ int createProcess(state_t *stato){
 
 	saveCurState(stato, &(newProc->p_s));
 
-	//STST(newProc);
-
 	processCounter++;
 
 	insertChild(curProc, newProc);
 	newProc->pid = genPid(newProc->pid);
 	insertProcQ(&readyQueue, newProc);
 
-	return 0; // Success
+	return newProc->pid; // Success
 }
 
 void terminateProcess(pid_t p){
@@ -204,11 +200,13 @@ void semaphoreOperation(int *sem, int weight){
 			//inserire kernel time su nuovi elementi della struttura
 			curProc->waitingResCount = weight;		// il processo ha bisogno di weight risorse
 
+			curProc->kernel_mode += getTODLO() - kernelStart;
+			curProc->global_time += getTODLO() - procInit;
+
 			if(insertBlocked(sem, curProc))
 				PANIC();
 
 			softBlockCounter++;
-			//dire allo scheduler di caricare il processo successivo
 			curProc = NULL;
 		}
 	}

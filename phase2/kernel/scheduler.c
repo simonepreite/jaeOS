@@ -1,10 +1,10 @@
 #include <scheduler.h>
 
-void scheduler()
-{
-	/* [Case 1] There is a running process */
-	if (curProc)
-	{
+void scheduler(){
+	/* There is a running process */
+	if (curProc){
+		curProc->global_time += getTODLO() - procInit;
+
 		/* Set process start time in the CPU
 		curProc->p_cpu_time += getTODLO() - ProcessTOD ;
 		ProcessTOD  = getTODLO();
@@ -20,22 +20,17 @@ void scheduler()
 		LDST(&(curProc->p_s));
 	}
 	/* [Case 2] There is not a running process*/
-	else
-	{
+	else{
 		/* If Ready Queue is empty*/
-		if (clist_empty(readyQueue))
-		{
-			/* [Case 2.1] There are no more processes*/
+		if (clist_empty(readyQueue)){
+			/* no more processes*/
 			if (processCounter == 0) HALT();
-			/* [Case 2.2] Deadlock Detection*/
+			/* Deadlock Detection*/
 			if (processCounter > 0 && softBlockCounter == 0) PANIC();
-			/* [Case 2.3] At least one process is blocked*/
-			if (processCounter > 0 && softBlockCounter > 0)
-			{
+			/* wait for interrupts */
+			if (processCounter > 0 && softBlockCounter > 0){
 				/* Enable interrupts*/
 				setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
-
-				/* Set the machine in idle state waiting for interrupts*/
 				WAIT();
 			}
 			PANIC(); /* Anomaly*/
@@ -48,9 +43,8 @@ void scheduler()
 		TimerTick  += getTODLO() - StartTimerTick;
 		StartTimerTick = getTODLO();
 
-		/* Initialize CPU time
-		curProc->p_cpu_time = 0;
-		ProcessTOD = getTODLO();
+		/* Initialize global time */
+		procInit = getTODLO();
 
 		/* Set Interval Timer as the smallest between Time Slice and Pseudo-Clock tick
 		setTIMER(MIN(SCHED_TIME_SLICE, (SCHED_PSEUDO_CLOCK - TimerTick )));
