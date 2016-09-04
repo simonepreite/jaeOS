@@ -66,8 +66,13 @@ void terminator(pcb_t* proc){
 	while(!emptyChild(proc)){
 		terminator(removeChild(proc));
   }
-	//controllare se il processo è bloccato ad un semaforo
-	//altrimenti toglierlo dalla lista dei processi pronti
+	if(proc->p_cursem!=NULL){
+		if((proc->p_cursem->s_semAdd) < (int*)semDevices[0] && (proc->p_cursem->s_semAdd) > (int*)semDevices[MAXPROC-1]){
+			*proc->p_cursem->s_semAdd += proc->waitingResCount;
+			outBlocked(proc);
+			softBlockCounter--;
+		}
+	}
 	processCounter--;
 	if (proc != curProc)
     outChild(proc);
@@ -183,6 +188,7 @@ void semaphoreOperation(int *sem, int weight){
 				firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
 				softBlockCounter--;								// decremento il contatore dei processi bloccati soft
 				insertProcQ(&readyQueue, firstBlocked);
+				weight -= firstBlocked->waitingResCount;
 		}
 	}
 	else if (weight <= -1){		// resources to be allocated
