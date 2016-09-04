@@ -67,7 +67,7 @@ void terminator(pcb_t* proc){
 		terminator(removeChild(proc));
   }
 	if(proc->p_cursem!=NULL){
-		if((proc->p_cursem->s_semAdd) < (int*)semDevices[0] && (proc->p_cursem->s_semAdd) > (int*)semDevices[MAXPROC-1]){
+		if((proc->p_cursem) < (semd_t*)semDevices[0] && (proc->p_cursem) > (semd_t*)semDevices[MAXPROC-1]){
 			*proc->p_cursem->s_semAdd += proc->waitingResCount;
 			outBlocked(proc);
 			softBlockCounter--;
