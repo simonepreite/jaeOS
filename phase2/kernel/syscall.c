@@ -180,15 +180,15 @@ void semaphoreOperation(int *sem, int weight){
 		(*sem) += weight;
 
 		pcb_t *firstBlocked = headBlocked(sem);
-		if(firstBlocked->waitingResCount < weight){
-			firstBlocked->waitingResCount -= weight;
-		}
-		while((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight){
-				testfun();
-				firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
-				softBlockCounter--;								// decremento il contatore dei processi bloccati soft
-				insertProcQ(&readyQueue, firstBlocked);
-				weight -= firstBlocked->waitingResCount;
+		firstBlocked->waitingResCount -= weight;
+
+		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
+			testfun();
+			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
+			softBlockCounter--;								// decremento il contatore dei processi bloccati sof
+			weight -= firstBlocked->waitingResCount;
+			firstBlocked->waitingResCount = 0;
+			insertProcQ(&readyQueue, firstBlocked);
 		}
 	}
 	else if (weight <= -1){		// resources to be allocated
