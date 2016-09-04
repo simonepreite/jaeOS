@@ -174,28 +174,21 @@ void semaphoreOperation(int *sem, int weight){
 	if(weight >= 1){	// resources to be freed
 		(*sem) += weight;
 
-		pcb_t *firstBlocked;// = headBlocked(sem);
-		while((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= (*sem)){
+		pcb_t *firstBlocked = headBlocked(sem);
+		if(firstBlocked->waitingResCount < weight){
+			firstBlocked->waitingResCount -= weight;
+		}
+		while((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight){
 				testfun();
 				firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
 				softBlockCounter--;								// decremento il contatore dei processi bloccati soft
-				*sem -= firstBlocked->waitingResCount;
 				insertProcQ(&readyQueue, firstBlocked);
 		}
-		/*if(firstBlocked != NULL){		// c'è un processo bloccato sul semaforo
-			//if (firstBlocked->waitingResCount <= (*sem)){		// si sono liberate abbastanza risorse per liberarlo
-				firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
-				softBlockCounter--;								// decremento il contatore dei processi bloccati soft
-				firstBlocked->p_cursem = NULL;					// annullo il collegamento tra il processo ed il semaforo
-				firstBlocked->waitingResCount = 0;				// il processo non è più in attesa di risorse
-				insertProcQ(&readyQueue, firstBlocked);			// inserisco il processo nella coda ready
-			//} questa parte è da riguardare perchè bisognerebbe liberare tutte le risorse possibili
-		}*/
 	}
 	else if (weight <= -1){		// resources to be allocated
 		(*sem) += weight;
 		if(*sem < 0){
-			curProc->waitingResCount = weight;		// il processo ha bisogno di weight risorse
+			curProc->waitingResCount = -weight;		// il processo ha bisogno di weight risorse
 
 			curProc->kernel_mode += getTODLO() - kernelStart;
 			curProc->global_time += getTODLO() - procInit;
