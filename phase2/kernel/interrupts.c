@@ -90,4 +90,14 @@ void terminalHandler() {
 
 void timerHandler() {
 	// Bisogna capire la gestione dei tempi e dello pseudoclock -.-"
+	if (control100ms == TRUE){
+		/* unlock all processes blocked on the pseudoclock timer semaphore */
+		while (semDevices[CLOCK_SEM] < 0){
+			semaphoreOperation(&semDevices[CLOCK_SEM], 1);
+		}
+		control100ms = FALSE;
+		curProc=NULL;
+	}
+	/* sending ack to the pseudoclock */
+	setTIMER(SCHED_TIME_SLICE);
 }

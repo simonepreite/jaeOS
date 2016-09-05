@@ -1,10 +1,23 @@
 #include <scheduler.h>
 
+UI control100ms = FALSE;
+
 void scheduler(){
+	HIDDEN cputime_t pseudoClock = 0;
+	pseudoClock = getTODLO();
+	testfun();
+	if ((getTODLO() - pseudoClock) > (SCHED_PSEUDO_CLOCK - SCHED_TIME_SLICE)){
+
+		setTIMER(SCHED_PSEUDO_CLOCK - (getTODLO() - pseudoClock));
+		control100ms = TRUE;
+		/* to be sure the timer handler will treat the next timer interrupt as a pseudoclock tick */
+		pseudoClock = getTODLO();
+	}
+
 	/* There is a running process */
 	if (curProc){
 		curProc->global_time += getTODLO() - procInit;
-
+		procInit = getTODLO();
 		/* Set process start time in the CPU
 		curProc->p_cpu_time += getTODLO() - ProcessTOD ;
 		ProcessTOD  = getTODLO();
@@ -30,6 +43,7 @@ void scheduler(){
 			/* wait for interrupts */
 			if (processCounter > 0 && softBlockCounter > 0){
 				/* Enable interrupts*/
+				setTIMER(SCHED_TIME_SLICE);
 				setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
 				WAIT();
 			}
@@ -38,7 +52,7 @@ void scheduler(){
 
 		/* Otherwise extract first ready process*/
 		if (!(curProc = removeProcQ(&readyQueue))) PANIC(); /* Anomaly */
-
+		setTIMER(SCHED_TIME_SLICE);
 		/* Compute elapsed time from the Pseudo-Clock tick
 		TimerTick  += getTODLO() - StartTimerTick;
 		StartTimerTick = getTODLO();

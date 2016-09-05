@@ -130,9 +130,10 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 
 	curProc->excp_state_vector[new].pc = handler;
 	curProc->excp_state_vector[new].sp = stack;
-	flags &= (0x80000007); // 3 bit meno significativi a 1 per settare VM
-	curProc->excp_state_vector[new].cpsr &= (0x7FFFFFF8); // 3 bit più significativi essendo 7 non sono sicuro della faccenda, APPROFONDIRE
+	curProc->p_s.cpsr &= STATUS_CLEAR_MODE;
+	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr);
 	curProc->excp_state_vector[new].cpsr |= flags;
+	curProc->excp_state_vector[new].CP15_Control = CP15_ENABLE_VM(curProc->excp_state_vector[new].CP15_Control);
 	curProc->excp_state_vector[new].CP15_EntryHi = setEntryHi(getEntryHi());
 }
 
@@ -248,6 +249,9 @@ void exitTrap(UI exType, UI ret){
 }
 
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
+	curProc->global_time = getTODLO() - procInit;
+	curProc->kernel_mode = getTODLO() - kernelStart;
+	
 	*global_time = curProc->global_time;
 	*user_time = curProc->global_time - curProc->kernel_mode;
 }

@@ -17,6 +17,7 @@ int semDevices[MAX_DEVICES];
 pcb_t *curProc;
 cputime_t kernelStart;
 cputime_t procInit;
+//UI control100ms = FALSE;
 
 // auxiliary function
 

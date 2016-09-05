@@ -99,6 +99,7 @@ SEMAPHORE term_mut=1,		/* for mutual exclusion on terminal */
 	testsem=0,		/* for a simple test */
 	startp2=0,		/* used to start p2 */
 	endp2=0,		/* used to signal p2's demise */
+	startp3=0,		/* used to start p3 */
 	endp3=0,		/* used to signal p3's demise */
 	blkp4=1,		/* used to block second incaration of p4 */
 	synp4=0,		/* used to allow p4 incarnations to synhronize */
@@ -136,14 +137,13 @@ pid_t p8pid, leaf1pid, leaf2pid, leaf3pid, leaf4pid;	/* p8 and it's grandchilds'
 
 void	p2(),p3(),p4(),p5(),p5a(),p5b(),p5c(),p6(),p7(),p7a(),p5prog(),p5mm();
 void	p5sys(),p6a(),p6b(),p6c(),p8root(),child1(),child2(),p8leaf();
-void testfun();
+
 /* a procedure to print on terminal 0 */
 void print(char *msg) {
 
 	char * s = msg;
 	devregtr command;
 	devregtr status;
-	int i=0;
 
 	SYSCALL(SEMOP, (int)&term_mut, -1, 0);				/* get term_mut lock */
 
@@ -154,6 +154,7 @@ void print(char *msg) {
 
 		/* Wait for I/O completion (SYS8) */
 		status = SYSCALL(IODEVOP, command, INT_TERMINAL, 0);
+
 		if ((status & TERMSTATMASK) != TRANSM){
 			PANIC();
 		}
@@ -161,7 +162,7 @@ void print(char *msg) {
 		if (((status & TERMCHARMASK) >> BYTELEN) != *s){
 			PANIC();
 		}
-		i++;
+
 		s++;
 	}
 
@@ -292,6 +293,7 @@ void test() {
 
 	p3pid = SYSCALL(CREATEPROCESS, (int)&p3state, 0, 0);				/* start p3  */
 
+	SYSCALL(SEMOP, (int)&startp3, 1, 0);
 	print("p3 is started\n");
 
   /* P1 blocks until p3 ends */
@@ -430,6 +432,8 @@ void p3() {
 
 	time1 = 0;
 	time2 = 0;
+
+	SYSCALL(SEMOP, (int)&startp3, -1, 0);
 
 	ppid = SYSCALL(GETPID, 0, 0, 0);
 	if(ppid != p3pid)
@@ -659,6 +663,46 @@ void p5b(){
 	PANIC();
 }
 
+/*void p5d(){
+	char *msg, c;
+	int mode;
+	unsigned int call;
+
+	SYSCALL(SPECSYSHDL, (memaddr)p5sys, p5hdlstack, p5hdlflags);
+	SYSCALL(SPECPGMTHDL, (memaddr)p5prog, p5hdlstack, p5hdlflags);
+
+	//first incarnation runs in user mode
+	SYSCALL(SEMOP, (int)&blkp5cint, -1, 0);
+	mode = p5dmode;
+	if(!mode){
+		p5dmode++;
+		setSTATUS((getSTATUS() & STATUS_CLEAR_MODE) | STATUS_USER_MODE);
+	}
+
+	if(mode){
+		print("p5d - try to call SYS14 in kernel mode\n");
+		call = SYSQUESTION;
+	} else {
+		print("p5d - try to call SYS14 in user mode\n");
+		call = 42;
+	}
+
+	msg = (char *) SYSCALL(call, 0, 0, 0);
+
+	if(mode){
+		print("p5d - accessing syscall return value\n");
+		print(msg);
+		SYSCALL(SEMOP, (int)&blkp5c, 1, 0);
+		SYSCALL(TERMINATEPROCESS, 0, 0, 0);
+	} else {
+		print("p5d - try to access kernel segment in user mode\n");
+		c = *msg;
+	}
+
+	print("error - p5d still executing\n");
+	PANIC();
+}*/
+
 void p5c(){
 	char *msg, c;
 	int mode;
@@ -671,10 +715,10 @@ void p5c(){
 	mode = p5dmode;
 	if(!mode){
 		p5dmode++;
-		print("p5d - try to call SYS14 in user mode\n");
+		print("p5c - try to call SYS14 in user mode\n");
 		setSTATUS((getSTATUS() & STATUS_CLEAR_MODE) | STATUS_USER_MODE);
 	} else {
-		print("p5d - try to call SYS14 in kernel mode\n");
+		print("p5c - try to call SYS14 in kernel mode\n");
 	}
 
 	msg = (char *) SYSCALL(SYSQUESTION, 0, 0, 0);
