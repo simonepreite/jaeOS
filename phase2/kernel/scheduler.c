@@ -4,13 +4,12 @@ UI control100ms = FALSE;
 
 void scheduler(){
 	HIDDEN cputime_t pseudoClock = 0;
-	pseudoClock = getTODLO();
-	testfun();
+	pseudoClock += getTODLO();
 	if ((getTODLO() - pseudoClock) > (SCHED_PSEUDO_CLOCK - SCHED_TIME_SLICE)){
 
 		setTIMER(SCHED_PSEUDO_CLOCK - (getTODLO() - pseudoClock));
 		control100ms = TRUE;
-		/* to be sure the timer handler will treat the next timer interrupt as a pseudoclock tick */
+		/* to be sure the timer handler will treat the next timer interrupt as a pseudoclock tick*/
 		pseudoClock = getTODLO();
 	}
 
@@ -43,7 +42,7 @@ void scheduler(){
 			/* wait for interrupts */
 			if (processCounter > 0 && softBlockCounter > 0){
 				/* Enable interrupts*/
-				setTIMER(SCHED_TIME_SLICE);
+				//setTIMER(SCHED_TIME_SLICE);
 				setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
 				WAIT();
 			}

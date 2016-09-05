@@ -452,8 +452,11 @@ void p3() {
 	   time correctly */
 	SYSCALL(GETCPUTIME, (int)&glob_t1, (int)&usr_t1, 0);		/* process time */
 
-	for (i = 0; i < CLOCKLOOP; i++)
+	for (i = 0; i < 1; i++){
+		testfun();
+
 		SYSCALL(WAITCLOCK, 0, 0, 0);
+	}
 
 	SYSCALL(GETCPUTIME, (int)&glob_t2, (int)&usr_t2, 0);		/* process time */
 

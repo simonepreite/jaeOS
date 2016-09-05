@@ -185,7 +185,6 @@ void semaphoreOperation(int *sem, int weight){
 		firstBlocked->waitingResCount -= weight;
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
-			testfun();
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
 			softBlockCounter--;								// decremento il contatore dei processi bloccati sof
 			weight -= firstBlocked->waitingResCount;
@@ -251,7 +250,7 @@ void exitTrap(UI exType, UI ret){
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
 	curProc->global_time = getTODLO() - procInit;
 	curProc->kernel_mode = getTODLO() - kernelStart;
-	
+
 	*global_time = curProc->global_time;
 	*user_time = curProc->global_time - curProc->kernel_mode;
 }
