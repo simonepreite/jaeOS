@@ -45,38 +45,39 @@ pid_t genPid(UI a){
 pcb_t* searchPid(pcb_t *parent, pid_t pid){
 	void* tmp = NULL;
 	pcb_t* scan;
-  pcb_t* save = NULL;
+ 	pcb_t* save = NULL;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
-      tprint("if searchPid\n");
+      		tprint("if searchPid\n");
 			return scan;
 		}
 		else {
-			if(!emptyChild(scan))
-      tprint("recursion searchPid\n");
+			if(!emptyChild(scan)) {
+      			tprint("recursion searchPid\n");
 				save = searchPid(headProcQ(&scan->p_children), pid);
+			}
 			if(save)
 				return save;
 		}
 	}
-  return NULL;
+ 	return NULL;
 }
 
-void terminator(pcb_t* proc){
-	while(!emptyChild(proc)){
+void terminator(pcb_t* proc) {
+	while(!emptyChild(proc)) {
 		terminator(removeChild(proc));
-  }
-	if(proc->p_cursem!=NULL){
-		if((proc->p_cursem) < (semd_t*)semDevices[0] && (proc->p_cursem) > (semd_t*)semDevices[MAXPROC-1]){
-			*proc->p_cursem->s_semAdd += proc->waitingResCount;
+  	}
+	if (proc->p_cursem!=NULL) {
+		if ((proc->p_cursem) < &semDevices[0] || (proc->p_cursem) > &semDevices[MAXPROC-1]) {
+			updateSemaphoreValue(proc->p_cursem, proc->waitingResCount);
 			outBlocked(proc);
 			softBlockCounter--;
 		}
 	}
 	processCounter--;
 	if (proc != curProc)
-    outChild(proc);
-		freePcb(proc);
+    	outChild(proc);
+	freePcb(proc);
 }
 
 // azioni ripetitive syscall 4,5,6
@@ -163,7 +164,7 @@ void terminateProcess(pid_t p){
 		outChild(curProc);
 		outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
-    curProc=NULL;
+    	curProc=NULL;
 	}
 	else{
 		if(!(save=searchPid(curProc, p))){

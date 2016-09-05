@@ -12,6 +12,7 @@ EXTERN pcb_t *headBlocked(int *semAdd); /*ritorna un puntatore al ProcBlk */
 /* funzioni ausiliarie */
 
 EXTERN struct semd_t *new_semaphore(struct semd_t *new_sem, pcb_t *p, int *semAdd); /* attiva un semaforo se è possibilie */
+EXTERN void updateSemaphoreValue(struct semd_t *sem, int delta);	/* aggiorna il valore del semaforo sem aggiungendo delta (usare valori negativi per diminuire il valore) */
 
 #endif
 

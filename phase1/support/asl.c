@@ -173,3 +173,9 @@ semd_t *new_semaphore(semd_t *new_sem, pcb_t *p, int *semAdd){
 	}
 	return new_sem;
 }
+
+void updateSemaphoreValue(struct semd_t *sem, int delta) {
+	if (!sem) PANIC();
+
+	*(sem->s_semAdd) += delta;
+}
