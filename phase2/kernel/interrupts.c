@@ -96,6 +96,7 @@ void timerHandler() {
 			semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
 		}
 		control100ms = FALSE;
+		insertProcQ(&readyQueue, curProc);
 		curProc=NULL;
 	}
 	/* sending ack to the pseudoclock*/
