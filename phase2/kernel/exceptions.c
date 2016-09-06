@@ -102,15 +102,15 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
 
 void tlbHandler(){
   kernelStart=getTODLO();
-  //curProc->global_time += getTODLO() - procInit;
+  curProc->global_time += getTODLO() - procInit;
   handlerSYSTLBPGM(TLB, EXCP_TLB_NEW, tlb_old);
-  curProc->kernel_mode = getTODLO() - kernelStart;
-  //curProc->global_time += getTODLO() - procInit;
+  curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
+  curProc->global_time += getTODLO() - kernelStart;
 }
 
 void sysHandler(){
   kernelStart=getTODLO();
-  //curProc->global_time += getTODLO() - procInit;
+  curProc->global_time += getTODLO() - procInit;
   /* processo in kernel mode? */
   if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
     saveCurState(sysbp_old, &curProc->p_s);
@@ -118,14 +118,14 @@ void sysHandler(){
     /* Se l'eccezione è di tipo System call */
     handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
     //processo corrente, ricalcolare tempi
-    curProc->kernel_mode = getTODLO() - kernelStart;
-    //curProc->global_time += getTODLO() - procInit;
+    curProc->kernel_mode += getTODLO() - kernelStart;
+    curProc->global_time += getTODLO() - kernelStart;
     /* Richiamo lo scheduler
     if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int)curProc)
         scheduler(SCHED_RESET);
     else
         scheduler(SCHED_NEXT);*/
-        scheduler();
+    scheduler();
   }
   /* Altrimenti se è in user-mode */
   else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
@@ -133,8 +133,8 @@ void sysHandler(){
     pgmtrap_old=sysbp_old;
     /* Setto il registro cause a Reserved Instruction */
     pgmtrap_old->CP15_Cause=EXC_RESERVEDINSTR;
-    curProc->kernel_mode = getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
-  //  curProc->global_time += curProc->kernel_mode;
+    curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
+    curProc->global_time += getTODLO() - kernelStart;
     /* Richiamo l'handler per le pgmtrap */
     pgmHandler();
   }
@@ -142,8 +142,8 @@ void sysHandler(){
 
 void pgmHandler(){
   kernelStart=getTODLO();
-  //curProc->global_time += getTODLO() - procInit;
+  curProc->global_time += getTODLO() - procInit;
   handlerSYSTLBPGM(PGMT, EXCP_PGMT_NEW, pgmtrap_old);
-  curProc->kernel_mode = getTODLO() - kernelStart;
-  //curProc->global_time += getTODLO() - procInit;
+  curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
+  curProc->global_time += getTODLO() - kernelStart;
 }

@@ -3,19 +3,16 @@
 UI control100ms = FALSE;
 
 void scheduler(){
-	//HIDDEN cputime_t pseudoClock = 0;
-	pseudoClock += getTODLO();
-
 	/* There is a running process */
 	if (curProc){
 		if ((getTODLO() - pseudoClock) > (SCHED_PSEUDO_CLOCK - SCHED_TIME_SLICE)){
 
-			setTIMER(SCHED_PSEUDO_CLOCK - (getTODLO() - pseudoClock));
+			setTIMER(SCHED_TIME_SLICE);//SCHED_PSEUDO_CLOCK - (getTODLO() - pseudoClock)
 			control100ms = TRUE;
 			/* to be sure the timer handler will treat the next timer interrupt as a pseudoclock tick*/
 			pseudoClock = getTODLO();
 		}
-		curProc->global_time += getTODLO() - procInit;
+		//curProc->global_time += getTODLO() - procInit;
 		procInit = getTODLO();
 		/* Set process start time in the CPU
 		curProc->p_cpu_time += getTODLO() - ProcessTOD ;
@@ -56,6 +53,7 @@ void scheduler(){
 		StartTimerTick = getTODLO();
 
 		/* Initialize global time */
+		pseudoClock = getTODLO();
 		setTIMER(SCHED_TIME_SLICE);
 		procInit = getTODLO();
 

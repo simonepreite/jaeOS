@@ -53,7 +53,7 @@ int main(){
     // Process put in ready queue
     insertProcQ(&readyQueue, firstProcess);
     processCounter++;
-    //pseudoClock = getTODLO();
+    pseudoClock = getTODLO();
     scheduler();
 
 	return 0;

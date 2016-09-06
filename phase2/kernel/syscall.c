@@ -182,7 +182,6 @@ void semaphoreOperation(int *sem, int weight){
 		(*sem) += weight;
 
 		pcb_t *firstBlocked = headBlocked(sem);
-		firstBlocked->waitingResCount -= weight;
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
@@ -191,6 +190,7 @@ void semaphoreOperation(int *sem, int weight){
 			firstBlocked->waitingResCount = 0;
 			insertProcQ(&readyQueue, firstBlocked);
 		}
+		firstBlocked->waitingResCount -= weight; //guardare bene il discorso pesi potrebbe non funzionare sempre
 	}
 	else if (weight <= -1){		// resources to be allocated
 		(*sem) += weight;
@@ -198,7 +198,7 @@ void semaphoreOperation(int *sem, int weight){
 			curProc->waitingResCount = -weight;		// il processo ha bisogno di weight risorse
 
 			curProc->kernel_mode += getTODLO() - kernelStart;
-			curProc->global_time += getTODLO() - procInit;
+			curProc->global_time += getTODLO() - kernelStart;
 
 			if(insertBlocked(sem, curProc))
 				PANIC();
@@ -248,8 +248,8 @@ void exitTrap(UI exType, UI ret){
 }
 
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
-	curProc->global_time = getTODLO() - procInit;
-	curProc->kernel_mode = getTODLO() - kernelStart;
+	//curProc->global_time += getTODLO() - procInit;
+	//curProc->kernel_mode += getTODLO() - kernelStart;
 
 	*global_time = curProc->global_time;
 	*user_time = curProc->global_time - curProc->kernel_mode;
