@@ -2,7 +2,7 @@
 
 
 void intHandler(){
-	kernelStart=getTODLO();
+	// kernelStart=getTODLO();
 
 	state_t *oldState = (state_t *)INT_OLDAREA;
 	if (curProc) {
@@ -19,8 +19,8 @@ void intHandler(){
 	else if (CAUSE_IP_GET(cause, IL_PRINTER)) deviceHandler(IL_PRINTER);
 	else if (CAUSE_IP_GET(cause, IL_TERMINAL)) terminalHandler();
 
-	if (curProc)
-		curProc->kernel_mode = getTODLO() - kernelStart;
+	// if (curProc)
+	// 	curProc->kernel_mode = getTODLO() - kernelStart;
 
 	//setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS())); probabilemnte non serve
 	scheduler();
@@ -90,16 +90,37 @@ void terminalHandler() {
 
 void timerHandler() {
 	// Bisogna capire la gestione dei tempi e dello pseudoclock -.-"
-	if (control100ms == TRUE){
-		/* unlock all processes blocked on the pseudoclock timer semaphore*/
-		while (semDevices[MAX_DEVICES-1] < 0){
+	// if (control100ms == TRUE){
+	// 	/* unlock all processes blocked on the pseudoclock timer semaphore*/
+	// 	while (semDevices[MAX_DEVICES-1] < 0){
+	// 		semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
+	// 	}
+	// 	control100ms = FALSE;
+	// 	curProc->global_time += getTODLO() - procInit;
+	// 	insertProcQ(&readyQueue, curProc);
+	// 	curProc=NULL;
+	// }
+	// /* sending ack to the pseudoclock*/
+	// setTIMER(SCHED_TIME_SLICE);
+	//testfun();
+	clock += getTODLO() - clockTick;
+	clockTick = getTODLO();
+
+	if (clock >= SCHED_PSEUDO_CLOCK) {
+		while (semDevices[MAX_DEVICES-1] < 0) {
 			semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
 		}
-		control100ms = FALSE;
-		curProc->global_time += getTODLO() - procInit;
-		insertProcQ(&readyQueue, curProc);
-		curProc=NULL;
+
+		clock = 0;
+		clockTick = getTODLO();
 	}
-	/* sending ack to the pseudoclock*/
-	setTIMER(SCHED_TIME_SLICE);
+	if (curProc) {
+		curProc->global_time += getTODLO() - processStart;
+		insertProcQ(&readyQueue, curProc);
+		curProc = NULL;
+
+		clock += getTODLO() - clockTick;
+		clockTick = getTODLO();
+	}
+	 setTIMER(SCHED_TIME_SLICE);
 }

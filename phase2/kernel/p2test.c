@@ -309,6 +309,7 @@ void test() {
 
 	SYSCALL(CREATEPROCESS, (int)&p7state, 0, 0);		/* start p7	*/
 
+	testfun();
 	SYSCALL(SEMOP, (int)&endp5, -1, 0);
 
 	print("p1 knows p5 ended\n");

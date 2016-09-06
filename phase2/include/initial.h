@@ -16,8 +16,12 @@ EXTERN struct clist readyQueue;
 int semDevices[MAX_DEVICES];
 pcb_t *curProc;
 cputime_t kernelStart;
-cputime_t procInit;
-cputime_t pseudoClock;
+//cputime_t procInit;
+//cputime_t pseudoClock;
+
+cputime_t clock;
+cputime_t clockTick;
+cputime_t processStart;
 
 //UI control100ms = FALSE;
 

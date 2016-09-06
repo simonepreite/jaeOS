@@ -69,7 +69,7 @@ void terminator(pcb_t* proc) {
   	}
 	if (proc->p_cursem!=NULL) {
 		if ((int*)(proc->p_cursem) < &semDevices[0] || (int*)(proc->p_cursem) > &semDevices[MAXPROC-1]) {
-			updateSemaphoreValue(proc->p_cursem, proc->waitingResCount);
+			updateSemaphoreValue(proc->p_cursem, -proc->waitingResCount);
 			outBlocked(proc);
 			softBlockCounter--;
 		}
@@ -181,7 +181,7 @@ void semaphoreOperation(int *sem, int weight){
 	if(weight >= 1){	// resources to be freed
 		(*sem) += weight;
 
-		pcb_t *firstBlocked = headBlocked(sem);
+		pcb_t *firstBlocked;// = headBlocked(sem);
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
@@ -197,8 +197,8 @@ void semaphoreOperation(int *sem, int weight){
 		if(*sem < 0){
 			curProc->waitingResCount = -weight;		// il processo ha bisogno di weight risorse
 
-			curProc->kernel_mode += getTODLO() - kernelStart;
-			curProc->global_time += getTODLO() - kernelStart;
+			 curProc->kernel_mode += getTODLO() - kernelStart;
+			 curProc->global_time += getTODLO() - processStart;
 
 			if(insertBlocked(sem, curProc))
 				PANIC();
@@ -250,6 +250,9 @@ void exitTrap(UI exType, UI ret){
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
 	//curProc->global_time += getTODLO() - procInit;
 	//curProc->kernel_mode += getTODLO() - kernelStart;
+
+	//curProc->global_time += getTODLO() - processStart;
+	//processStart = getTODLO();
 
 	*global_time = curProc->global_time;
 	*user_time = curProc->global_time - curProc->kernel_mode;

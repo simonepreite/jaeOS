@@ -4,7 +4,7 @@
 #include <initial.h>
 // debug
 
-EXTERN UI control100ms;
+//EXTERN UI control100ms;
 
 EXTERN void testfun();
 

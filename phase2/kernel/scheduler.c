@@ -5,15 +5,25 @@ UI control100ms = FALSE;
 void scheduler(){
 	/* There is a running process */
 	if (curProc){
-		if ((getTODLO() - pseudoClock) > (SCHED_PSEUDO_CLOCK - SCHED_TIME_SLICE)){
+		//testfun();
 
-			setTIMER(SCHED_TIME_SLICE);//SCHED_PSEUDO_CLOCK - (getTODLO() - pseudoClock)
-			control100ms = TRUE;
-			/* to be sure the timer handler will treat the next timer interrupt as a pseudoclock tick*/
-			pseudoClock = getTODLO();
-		}
+		//curProc->global_time += getTODLO() - processStart;
+		//processStart = getTODLO();
+
+		clock += getTODLO() - clockTick;
+		clockTick = getTODLO();
+		//setTIMER(MIN(SCHED_TIME_SLICE - (curProc->global_time - processStart), SCHED_PSEUDO_CLOCK - clock));
+		//setTIMER(3000);
+
+		// if ((getTODLO() - pseudoClock) > (SCHED_PSEUDO_CLOCK - SCHED_TIME_SLICE)){
+
+		// 	setTIMER(SCHED_TIME_SLICE);//SCHED_PSEUDO_CLOCK - (getTODLO() - pseudoClock)
+		// 	control100ms = TRUE;
+		// 	/* to be sure the timer handler will treat the next timer interrupt as a pseudoclock tick*/
+		// 	pseudoClock = getTODLO();
+		// }
 		//curProc->global_time += getTODLO() - procInit;
-		procInit = getTODLO();
+		// procInit = getTODLO();
 		/* Set process start time in the CPU
 		curProc->p_cpu_time += getTODLO() - ProcessTOD ;
 		ProcessTOD  = getTODLO();
@@ -32,6 +42,7 @@ void scheduler(){
 	else{
 		/* If Ready Queue is empty*/
 		if (clist_empty(readyQueue)){
+			testfun();
 			/* no more processes*/
 			if (processCounter == 0) HALT();
 			/* Deadlock Detection*/
@@ -39,7 +50,7 @@ void scheduler(){
 			/* wait for interrupts */
 			if (processCounter > 0 && softBlockCounter > 0){
 				/* Enable interrupts*/
-				setTIMER(SCHED_TIME_SLICE);
+				// setTIMER(SCHED_TIME_SLICE);
 				setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
 				WAIT();
 			}
@@ -48,14 +59,25 @@ void scheduler(){
 
 		/* Otherwise extract first ready process*/
 		if (!(curProc = removeProcQ(&readyQueue))) PANIC(); /* Anomaly */
+
+		clock += getTODLO() - clockTick;
+		clockTick = getTODLO();
+
+		//curProc->global_time = 0;
+		//curProc->lastTimeSlice = getTODLO();
+		processStart = getTODLO();
+
+		//setTIMER(MIN(SCHED_TIME_SLICE, SCHED_PSEUDO_CLOCK - clock));
+		setTIMER(SCHED_TIME_SLICE);
 		/* Compute elapsed time from the Pseudo-Clock tick
 		TimerTick  += getTODLO() - StartTimerTick;
 		StartTimerTick = getTODLO();
 
+
 		/* Initialize global time */
-		pseudoClock = getTODLO();
-		setTIMER(SCHED_TIME_SLICE);
-		procInit = getTODLO();
+		// pseudoClock = getTODLO();
+		// setTIMER(SCHED_TIME_SLICE);
+		// procInit = getTODLO();
 
 		/* Set Interval Timer as the smallest between Time Slice and Pseudo-Clock tick
 		setTIMER(MIN(SCHED_TIME_SLICE, (SCHED_PSEUDO_CLOCK - TimerTick )));

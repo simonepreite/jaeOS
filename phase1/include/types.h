@@ -28,6 +28,7 @@ typedef struct pcb_t {
 	struct clist p_siblings; /* children list: links to the siblings */
 	cputime_t kernel_mode;
 	cputime_t global_time;
+	cputime_t lastTimeSlice;
 	UI waitingResCount;
 	UI tags;
 } pcb_t;

@@ -163,6 +163,7 @@ void init_proc(pcb_t *pcb){
 	pcb->p_siblings.next = NULL;
 	pcb->kernel_mode = 0;
 	pcb->global_time = 0;
+	pcb->lastTimeSlice = 0;
 	pcb->waitingResCount = 0;
 	pcb->tags = 0;
 }
