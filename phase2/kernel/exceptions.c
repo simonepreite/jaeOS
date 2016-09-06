@@ -112,33 +112,45 @@ void sysHandler(){
    kernelStart=getTODLO();
    //curProc->global_time += getTODLO() - procInit;
   /* processo in kernel mode? */
-  if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
-    saveCurState(sysbp_old, &curProc->p_s);
-    //STST(sysbp_old);
-    /* Se l'eccezione è di tipo System call */
-    handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
-    //processo corrente, ricalcolare tempi
-     cputime_t end = getTODLO();
-      curProc->kernel_mode += end - kernelStart;
-    //  curProc->global_time += end - kernelStart;
-     /* Richiamo lo scheduler
-    if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int)curProc)
+  if(CAUSE_EXCCODE_GET(sysbp_old->CP15_Cause) == EXC_SYSCALL && sysbp_old->a1 >= 1 && sysbp_old->a1 <= 11){
+
+    if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
+      saveCurState(sysbp_old, &curProc->p_s);
+      //STST(sysbp_old);
+      /* Se l'eccezione è di tipo System call */
+      handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
+      //processo corrente, ricalcolare tempi
+      cputime_t end = getTODLO();
+        curProc->kernel_mode += end - kernelStart;
+        //  curProc->global_time += end - kernelStart;
+        /* Richiamo lo scheduler
+        if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int)curProc)
         scheduler(SCHED_RESET);
-    else
-        scheduler(SCHED_NEXT);*/
-    scheduler();
-  }
-  /* Altrimenti se è in user-mode */
-  else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
-    /* Gestisco come fosse una program trap */
-    pgmtrap_old=sysbp_old;
-    /* Setto il registro cause a Reserved Instruction */
-    pgmtrap_old->CP15_Cause=EXC_RESERVEDINSTR;
-     cputime_t end = getTODLO();
+        else
+          scheduler(SCHED_NEXT);*/
+          scheduler();
+        }
+    /* Altrimenti se è in user-mode */
+    else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
+      /* Gestisco come fosse una program trap */
+      pgmtrap_old=sysbp_old; //fare copy state e non assegnare il puntatore
+      /* Setto il registro cause a Reserved Instruction */
+      pgmtrap_old->CP15_Cause=EXC_RESERVEDINSTR;
+      cputime_t end = getTODLO();
       curProc->kernel_mode += end - kernelStart;
-    //  curProc->global_time += end - kernelStart;
-    /* Richiamo l'handler per le pgmtrap */
-    pgmHandler();
+      //  curProc->global_time += end - kernelStart;
+      /* Richiamo l'handler per le pgmtrap */
+      pgmHandler();
+    }
+
+  }
+  else{// significa che è una syscall qualsiasi
+    if (curProc->tags != 1 || curProc->tags != 3 || curProc->tags != 5 || curProc->tags != 7){
+        terminateProcess(curProc->pid);
+        testfun();
+        scheduler();
+    }
+
   }
 }
 

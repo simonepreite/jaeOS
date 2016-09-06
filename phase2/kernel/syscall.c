@@ -1,5 +1,5 @@
 #include <syscall.h>
-
+EXTERN synp4;
 /***************************************************************
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
@@ -75,9 +75,10 @@ void terminator(pcb_t* proc) {
 		}
 	}
 	processCounter--;
-	if (proc != curProc)
+	if (proc != curProc){
     	outChild(proc);
-	freePcb(proc);
+			freePcb(proc);
+	}
 }
 
 // azioni ripetitive syscall 4,5,6
@@ -177,7 +178,6 @@ void terminateProcess(pid_t p){
 
 void semaphoreOperation(int *sem, int weight){
 	if (!sem) PANIC();
-
 	if(weight >= 1){	// resources to be freed
 		(*sem) += weight;
 
@@ -193,6 +193,7 @@ void semaphoreOperation(int *sem, int weight){
 		firstBlocked->waitingResCount -= weight; //guardare bene il discorso pesi potrebbe non funzionare sempre
 	}
 	else if (weight <= -1){		// resources to be allocated
+		//if(sem == &synp4) testfun();
 		(*sem) += weight;
 		if(*sem < 0){
 			curProc->waitingResCount = -weight;		// il processo ha bisogno di weight risorse

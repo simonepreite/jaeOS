@@ -42,7 +42,7 @@ void scheduler(){
 	else{
 		/* If Ready Queue is empty*/
 		if (clist_empty(readyQueue)){
-			testfun();
+			//testfun();
 			/* no more processes*/
 			if (processCounter == 0) HALT();
 			/* Deadlock Detection*/
