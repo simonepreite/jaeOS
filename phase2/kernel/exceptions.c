@@ -16,11 +16,12 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
 
     if (old == TLB) {
         switch (curProc->tags) {
+            case 0:
             case 1:
             case 4:
             case 5:
                 terminateProcess(0);
-                scheduler(SCHED_NEXT);
+                scheduler();
                 break;
             default:
                 break;
@@ -28,11 +29,12 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
     }
     else if (old == PGMT) {
         switch (curProc->tags) {
+            case 0:
             case 1:
             case 2:
             case 3:
                 terminateProcess(0);
-                scheduler(SCHED_NEXT);
+                scheduler();
                 break;
             default:
                 break;
@@ -101,10 +103,10 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
 ***************************************************************/
 
 void tlbHandler(){
-  //kernelStart=getTODLO();
+  kernelStart=getTODLO();
   //curProc->global_time += getTODLO() - procInit;
   handlerSYSTLBPGM(TLB, EXCP_TLB_NEW, tlb_old);
- // curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
+  curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
   //curProc->global_time += getTODLO() - kernelStart;
 }
 
@@ -147,7 +149,6 @@ void sysHandler(){
   else{// significa che è una syscall qualsiasi
     if (curProc->tags != 1 || curProc->tags != 3 || curProc->tags != 5 || curProc->tags != 7){
         terminateProcess(curProc->pid);
-        testfun();
         scheduler();
     }
 

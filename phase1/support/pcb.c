@@ -124,6 +124,7 @@ pcb_t *removeChild(pcb_t *p){
 
 		if(p->p_children.next != NULL){
 			pcb_temp = clist_head(pcb_temp, (*q), p_children);
+			pcb_temp->p_parent = NULL;
 			clist_dequeue(q);
 		}
 	return pcb_temp;

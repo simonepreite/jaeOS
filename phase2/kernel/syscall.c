@@ -35,8 +35,8 @@ void saveCurState(state_t *state, state_t *newState){
 
 pid_t genPid(UI a){
 	HIDDEN UI count = 0;
-
-	count++;
+	count = getTODLO();  //pseudo random generator
+	count &= 0x0000FFFF;
 	return a + count;
 }
 
@@ -65,6 +65,7 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid){
 
 void terminator(pcb_t* proc) {
 	while(!emptyChild(proc)) {
+		testfun();
 		terminator(removeChild(proc));
   	}
 	if (proc->p_cursem!=NULL) {
@@ -76,7 +77,7 @@ void terminator(pcb_t* proc) {
 	}
 	processCounter--;
 	if (proc != curProc){
-    	outChild(proc);
+    	//outChild(proc);
 			freePcb(proc);
 	}
 }
@@ -164,7 +165,7 @@ void terminateProcess(pid_t p){
 	if(p == 0 || curProc->pid == p){
 		terminator(curProc);
 		outChild(curProc);
-		outProcQ(&readyQueue, curProc);
+		//outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
     	curProc=NULL;
 	}
