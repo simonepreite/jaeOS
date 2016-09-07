@@ -135,9 +135,9 @@ void sysHandler(){
     /* Altrimenti se è in user-mode */
     else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
       /* Gestisco come fosse una program trap */
-      pgmtrap_old=sysbp_old; //fare copy state e non assegnare il puntatore
+      saveCurState(sysbp_old, pgmtrap_old); //fare copy state e non assegnare il puntatore
       /* Setto il registro cause a Reserved Instruction */
-      pgmtrap_old->CP15_Cause=EXC_RESERVEDINSTR;
+      CAUSE_EXCCODE_SET(pgmtrap_old->CP15_Cause, EXC_RESERVEDINSTR);
       cputime_t end = getTODLO();
       curProc->kernel_mode += end - kernelStart;
       //  curProc->global_time += end - kernelStart;
@@ -147,18 +147,29 @@ void sysHandler(){
 
   }
   else{// significa che è una syscall qualsiasi
-    if (curProc->tags != 1 || curProc->tags != 3 || curProc->tags != 5 || curProc->tags != 7){
+    if (curProc->tags != 1 && curProc->tags != 3 && curProc->tags != 5 && curProc->tags != 7){
         terminateProcess(curProc->pid);
         scheduler();
     }
-
+    saveCurState(sysbp_old, &curProc->excp_state_vector[EXCP_SYS_OLD]);
+    curProc->excp_state_vector[EXCP_SYS_NEW].a1 = sysbp_old->a1;
+    curProc->excp_state_vector[EXCP_SYS_NEW].a2 = sysbp_old->a2;
+    curProc->excp_state_vector[EXCP_SYS_NEW].a3 = sysbp_old->a3;
+    curProc->excp_state_vector[EXCP_SYS_NEW].a4 = sysbp_old->a4;
+    UI temp = sysbp_old->cpsr & 0x0000000F;
+    temp = temp << 28;
+    curProc->excp_state_vector[EXCP_SYS_NEW].a1 &= 0x0FFFFFFF;
+    curProc->excp_state_vector[EXCP_SYS_NEW].a1 |= temp;
+    curProc->excp_state_vector[EXCP_SYS_NEW].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[EXCP_SYS_NEW].cpsr);
+    curProc->kernel_mode += getTODLO() - kernelStart;
+    LDST(&(curProc->excp_state_vector[EXCP_SYS_NEW]));
   }
 }
 
 void pgmHandler(){
-  // kernelStart=getTODLO();
+  kernelStart=getTODLO();
   // curProc->global_time += getTODLO() - procInit;
   handlerSYSTLBPGM(PGMT, EXCP_PGMT_NEW, pgmtrap_old);
-  // curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
+  curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
   // curProc->global_time += getTODLO() - kernelStart;
 }

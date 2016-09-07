@@ -1,10 +1,8 @@
 #include <syscall.h>
-EXTERN synp4;
+
 /***************************************************************
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
-
-// c'è la STST che fa la stessa cosa, forse!
 
 void saveCurState(state_t *state, state_t *newState){
 	newState->a1 = state->a1;
@@ -187,7 +185,8 @@ void semaphoreOperation(int *sem, int weight){
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
-			softBlockCounter--;								// decremento il contatore dei processi bloccati sof
+			if(sem>=&(semDevices[0]) && sem<=&(semDevices[MAX_DEVICES]))
+				softBlockCounter--;								// decremento il contatore dei processi bloccati sof
 			weight -= firstBlocked->waitingResCount;
 			firstBlocked->waitingResCount = 0;
 			insertProcQ(&readyQueue, firstBlocked);
@@ -205,8 +204,8 @@ void semaphoreOperation(int *sem, int weight){
 
 			if(insertBlocked(sem, curProc))
 				PANIC();
-
-			softBlockCounter++;
+				if(sem>=&(semDevices[0]) && sem<=&(semDevices[MAX_DEVICES]))
+					softBlockCounter++;								// decremento il contatore dei processi bloccati sof
 			curProc = NULL;
 		}
 	}
