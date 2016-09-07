@@ -93,7 +93,6 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
     if (old != SYS) {
         saveCurState(state, &curProc->excp_state_vector[old]);
         curProc->excp_state_vector[new].a1 = state->CP15_Cause;
-        curProc->excp_state_vector[new].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[new].cpsr);
         LDST(&(curProc->excp_state_vector[new]));
     }
 }

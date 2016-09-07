@@ -92,7 +92,8 @@ typedef unsigned int cpu_t;
 #define NOLEAVES		4	/* number of leaves of p8 process tree */
 #define MAXSEM			20
 
-
+void testfun();
+EXTERN void sysspec();
 
 SEMAPHORE term_mut=1,		/* for mutual exclusion on terminal */
 	s[MAXSEM+1],		/* semaphore array */
@@ -144,9 +145,9 @@ void print(char *msg) {
 	char * s = msg;
 	devregtr command;
 	devregtr status;
-
+	testfun();
 	SYSCALL(SEMOP, (int)&term_mut, -1, 0);				/* get term_mut lock */
-
+	testfun();
 	while (*s != '\0') {
 	  /* Put "transmit char" command+char in term0 register (3rd word). This
 		   actually starts the operation on the device! */
@@ -636,9 +637,7 @@ void p5() {
 }
 
 void p5a(){
-	testfun();
 	SYSCALL(SPECPGMTHDL, (memaddr)p5prog, p5hdlstack, p5hdlflags);
-
 	print("p5a - try to cause a pgm trap accessing some non-existent memory\n");
 	/* to cause a pgm trap access some non-existent memory */
 	*p5MemLocation = *p5MemLocation + 1;		 /* Should cause a program trap */

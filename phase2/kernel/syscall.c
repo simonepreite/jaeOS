@@ -1,5 +1,6 @@
 #include <syscall.h>
 
+void sysspec(){}
 /***************************************************************
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
@@ -64,7 +65,7 @@ void terminator(pcb_t* proc) {
 		terminator(removeChild(proc));
   	}
 	if (proc->p_cursem!=NULL) {
-		if ((int*)(proc->p_cursem) < &semDevices[0] || (int*)(proc->p_cursem) > &semDevices[MAXPROC-1]) {
+		if ((int*)(proc->p_cursem) < &(semDevices[0]) || (int*)(proc->p_cursem) > &(semDevices[MAXPROC-1])) {
 			updateSemaphoreValue(proc->p_cursem, -proc->waitingResCount);
 			outBlocked(proc);
 			softBlockCounter--;
@@ -121,17 +122,18 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	}
 	else PANIC();
 
-	//STST(&(curProc->excp_state_vector[old]));
-	saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
+	STST(&(curProc->excp_state_vector[old]));
+	//saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
 	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]);
 
 	curProc->excp_state_vector[new].pc = handler;
 	curProc->excp_state_vector[new].sp = stack;
-	curProc->p_s.cpsr &= STATUS_CLEAR_MODE;
+	//curProc->p_s.cpsr &= STATUS_CLEAR_MODE; //sbagliavamo a cancellare tutto lo stato
 	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr);
 	curProc->excp_state_vector[new].cpsr |= flags;
 	curProc->excp_state_vector[new].CP15_Control = CP15_ENABLE_VM(curProc->excp_state_vector[new].CP15_Control);
 	curProc->excp_state_vector[new].CP15_EntryHi = setEntryHi(getEntryHi());
+	//sysspec();
 }
 
 /***************************************************************
@@ -230,7 +232,7 @@ void semaphoreOperation(int *sem, int weight){
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
-			if(sem>=&(semDevices[0]) && sem<=&(semDevices[MAX_DEVICES]))
+			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES])
 				softBlockCounter--;								// decremento il contatore dei processi bloccati sof
 			weight -= firstBlocked->waitingResCount;
 			firstBlocked->waitingResCount = 0;
@@ -249,7 +251,7 @@ void semaphoreOperation(int *sem, int weight){
 
 			if(insertBlocked(sem, curProc))
 				PANIC();
-				if(sem>=&(semDevices[0]) && sem<=&(semDevices[MAX_DEVICES]))
+				if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES])
 					softBlockCounter++;								// decremento il contatore dei processi bloccati sof
 			curProc = NULL;
 		}
