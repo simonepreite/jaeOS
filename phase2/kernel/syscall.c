@@ -46,12 +46,10 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid){
  	pcb_t* save = NULL;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
-      		tprint("if searchPid\n");
 			return scan;
 		}
 		else {
 			if(!emptyChild(scan)) {
-      			tprint("recursion searchPid\n");
 				save = searchPid(headProcQ(&scan->p_children), pid);
 			}
 			if(save)
@@ -63,7 +61,6 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid){
 
 void terminator(pcb_t* proc) {
 	while(!emptyChild(proc)) {
-		testfun();
 		terminator(removeChild(proc));
   	}
 	if (proc->p_cursem!=NULL) {
@@ -124,8 +121,8 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	}
 	else PANIC();
 
-	STST(&(curProc->excp_state_vector[old]));
-
+	//STST(&(curProc->excp_state_vector[old]));
+	saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
 	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]);
 
 	curProc->excp_state_vector[new].pc = handler;
@@ -175,6 +172,54 @@ void terminateProcess(pid_t p){
 		terminator(save);
 	}
 }
+
+/*void semaphoreOperation(int *semaphore, int weight)
+{
+  /* Error
+  if (!weight)
+  {
+    terminateProcess(curProc->pid);
+  }
+  /* Allocating resources, passeren
+  else if (weight<0)
+  {
+    *semaphore += weight;
+
+    /* if the value became negative, block the process on the sem
+    if (*semaphore<0)
+    {
+      softBlockCounter++;
+      curProc->waitingResCount=weight;
+      insertBlocked(semaphore,curProc);
+			curProc->kernel_mode += getTODLO() - kernelStart;
+			curProc->global_time += getTODLO() - processStart;
+      curProc=NULL;
+    }
+  }
+  else // weight>0, verhogen
+  {
+    pcb_t *first;
+    int available=0;
+
+    *semaphore += weight;
+        available = -weight;
+        /* unblock processes until there are enough resources
+        while((first=headBlocked(semaphore)) && (first->waitingResCount>=available))
+        {
+          available -= first->waitingResCount;
+          first=outBlocked(first);
+          first->p_cursem=NULL;
+          first->waitingResCount=0;
+          softBlockCounter--;
+          insertProcQ(&readyQueue,first);
+        }
+        if (available<0) {
+          first=headBlocked(semaphore);
+          first->waitingResCount -= available;
+        }
+  }
+}*/
+
 
 void semaphoreOperation(int *sem, int weight){
 	if (!sem) PANIC();

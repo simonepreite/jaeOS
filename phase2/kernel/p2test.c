@@ -636,6 +636,7 @@ void p5() {
 }
 
 void p5a(){
+	testfun();
 	SYSCALL(SPECPGMTHDL, (memaddr)p5prog, p5hdlstack, p5hdlflags);
 
 	print("p5a - try to cause a pgm trap accessing some non-existent memory\n");
