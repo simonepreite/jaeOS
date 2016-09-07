@@ -44,7 +44,7 @@ pid_t genPid(UI a){
 pcb_t* searchPid(pcb_t *parent, pid_t pid){
 	void* tmp = NULL;
 	pcb_t* scan;
- 	pcb_t* save = NULL;
+	pcb_t* save = NULL;
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
 		if(scan->pid==pid){
 			return scan;
@@ -54,16 +54,16 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid){
 				save = searchPid(headProcQ(&scan->p_children), pid);
 			}
 			if(save)
-				return save;
+			return save;
 		}
 	}
- 	return NULL;
+	return NULL;
 }
 
 void terminator(pcb_t* proc) {
 	while(!emptyChild(proc)) {
 		terminator(removeChild(proc));
-  	}
+	}
 	if (proc->p_cursem!=NULL) {
 		if ((int*)(proc->p_cursem) < &(semDevices[0]) || (int*)(proc->p_cursem) > &(semDevices[MAXPROC-1])) {
 			updateSemaphoreValue(proc->p_cursem, -proc->waitingResCount);
@@ -73,14 +73,16 @@ void terminator(pcb_t* proc) {
 	}
 	processCounter--;
 	if (proc != curProc){
-    	//outChild(proc);
-			freePcb(proc);
+		outProcQ(&readyQueue, proc);
+		//outChild(proc);
+		freePcb(proc);
 	}
 }
 
 // azioni ripetitive syscall 4,5,6
 
 void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
+	unsigned int asid;
 	if (old == SYS) {
 		switch (curProc->tags) {
 			case 1:
@@ -124,15 +126,18 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 
 	STST(&(curProc->excp_state_vector[old]));
 	//saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
+	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr);
+
 	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]);
 
 	curProc->excp_state_vector[new].pc = handler;
 	curProc->excp_state_vector[new].sp = stack;
 	//curProc->p_s.cpsr &= STATUS_CLEAR_MODE; //sbagliavamo a cancellare tutto lo stato
-	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr);
 	curProc->excp_state_vector[new].cpsr |= flags;
 	curProc->excp_state_vector[new].CP15_Control = CP15_ENABLE_VM(curProc->excp_state_vector[new].CP15_Control);
-	curProc->excp_state_vector[new].CP15_EntryHi = setEntryHi(getEntryHi());
+	asid = ENTRYHI_ASID_GET((curProc->excp_state_vector[new].CP15_EntryHi));
+	ENTRYHI_ASID_SET(curProc->excp_state_vector[new].CP15_EntryHi, asid);
+	//curProc->excp_state_vector[new].CP15_EntryHi = setEntryHi(getEntryHi());
 	//sysspec();
 }
 
@@ -161,11 +166,9 @@ void terminateProcess(pid_t p){
 
 	if(p == 0 || curProc->pid == p){
 		terminator(curProc);
-		//outChild(curProc);
-		removeChild(curProc);
-		//outProcQ(&readyQueue, curProc);
+		outChild(curProc);
 		freePcb(curProc);
-    	curProc=NULL;
+		curProc=NULL;
 	}
 	else{
 		if(!(save=searchPid(curProc, p))){
@@ -177,49 +180,49 @@ void terminateProcess(pid_t p){
 
 /*void semaphoreOperation(int *semaphore, int weight)
 {
-  /* Error
-  if (!weight)
-  {
-    terminateProcess(curProc->pid);
-  }
-  /* Allocating resources, passeren
-  else if (weight<0)
-  {
-    *semaphore += weight;
+/* Error
+if (!weight)
+{
+terminateProcess(curProc->pid);
+}
+/* Allocating resources, passeren
+else if (weight<0)
+{
+*semaphore += weight;
 
-    /* if the value became negative, block the process on the sem
-    if (*semaphore<0)
-    {
-      softBlockCounter++;
-      curProc->waitingResCount=weight;
-      insertBlocked(semaphore,curProc);
-			curProc->kernel_mode += getTODLO() - kernelStart;
-			curProc->global_time += getTODLO() - processStart;
-      curProc=NULL;
-    }
-  }
-  else // weight>0, verhogen
-  {
-    pcb_t *first;
-    int available=0;
+/* if the value became negative, block the process on the sem
+if (*semaphore<0)
+{
+softBlockCounter++;
+curProc->waitingResCount=weight;
+insertBlocked(semaphore,curProc);
+curProc->kernel_mode += getTODLO() - kernelStart;
+curProc->global_time += getTODLO() - processStart;
+curProc=NULL;
+}
+}
+else // weight>0, verhogen
+{
+pcb_t *first;
+int available=0;
 
-    *semaphore += weight;
-        available = -weight;
-        /* unblock processes until there are enough resources
-        while((first=headBlocked(semaphore)) && (first->waitingResCount>=available))
-        {
-          available -= first->waitingResCount;
-          first=outBlocked(first);
-          first->p_cursem=NULL;
-          first->waitingResCount=0;
-          softBlockCounter--;
-          insertProcQ(&readyQueue,first);
-        }
-        if (available<0) {
-          first=headBlocked(semaphore);
-          first->waitingResCount -= available;
-        }
-  }
+*semaphore += weight;
+available = -weight;
+/* unblock processes until there are enough resources
+while((first=headBlocked(semaphore)) && (first->waitingResCount>=available))
+{
+available -= first->waitingResCount;
+first=outBlocked(first);
+first->p_cursem=NULL;
+first->waitingResCount=0;
+softBlockCounter--;
+insertProcQ(&readyQueue,first);
+}
+if (available<0) {
+first=headBlocked(semaphore);
+first->waitingResCount -= available;
+}
+}
 }*/
 
 
@@ -233,7 +236,7 @@ void semaphoreOperation(int *sem, int weight){
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
 			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES])
-				softBlockCounter--;								// decremento il contatore dei processi bloccati sof
+			softBlockCounter--;								// decremento il contatore dei processi bloccati sof
 			weight -= firstBlocked->waitingResCount;
 			firstBlocked->waitingResCount = 0;
 			insertProcQ(&readyQueue, firstBlocked);
@@ -246,18 +249,18 @@ void semaphoreOperation(int *sem, int weight){
 		if(*sem < 0){
 			curProc->waitingResCount = -weight;		// il processo ha bisogno di weight risorse
 
-			 curProc->kernel_mode += getTODLO() - kernelStart;
-			 curProc->global_time += getTODLO() - processStart;
+			curProc->kernel_mode += getTODLO() - kernelStart;
+			curProc->global_time += getTODLO() - processStart;
 
 			if(insertBlocked(sem, curProc))
-				PANIC();
-				if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES])
-					softBlockCounter++;								// decremento il contatore dei processi bloccati sof
+			PANIC();
+			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES])
+			softBlockCounter++;								// decremento il contatore dei processi bloccati sof
 			curProc = NULL;
 		}
 	}
 	else
-		terminateProcess(curProc->pid);
+	terminateProcess(curProc->pid);
 }
 
 void specifySysBp(memaddr handler, memaddr stack, UI flags){

@@ -641,7 +641,6 @@ void p5a(){
 	print("p5a - try to cause a pgm trap accessing some non-existent memory\n");
 	/* to cause a pgm trap access some non-existent memory */
 	*p5MemLocation = *p5MemLocation + 1;		 /* Should cause a program trap */
-
 	print("error - p5a still executing\n");
 	PANIC();
 }
