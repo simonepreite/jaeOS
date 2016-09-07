@@ -16,15 +16,11 @@ struct clist {
 
 #define CLIST_INIT {NULL}
 
-#define clist_enqueue(elem, clistp, member) ({\
-	if((clistp)->next == NULL) {\
-		(clistp)->next=&elem->member;\
-		elem->member.next=&elem->member;\
-	} else {\
-		elem->member.next = (clistp)->next->next; \
-    	(clistp)->next->next = &elem->member;  \
-   		(clistp)->next = &elem->member;  \
-	}\
+#define clist_enqueue(elem, clistp, member) ({ \
+	struct clist *oldTail = (clistp)->next; \
+	(clistp)->next = &elem->member; \
+	(clistp)->next->next = (oldTail==NULL) ? &elem->member : oldTail->next;	\
+	if (oldTail!=NULL) oldTail->next = (clistp)->next; \
 })
 
 #define clist_empty(clistx) (((clistx).next) == NULL)
@@ -41,52 +37,50 @@ struct clist {
 #define clist_head(elem, clistx, member)	\
 	(clistx.next == NULL) ? NULL : container_of(clistx.next->next, typeof(*elem), member);
 
-#define clist_push(elem, clistp, member) ({\
-	if((clistp)->next == NULL) {\
-		(clistp)->next = &elem->member;\
-		elem->member.next = &elem->member;\
-	} else { \
-		elem->member.next = (clistp)->next->next;	\
-		(clistp)->next->next = &elem->member;	\
-	}	\
+#define clist_push(elem, clistx, member) ({ \
+	struct clist *oldTail = (clistx)->next; \
+	(clistx)->next = &elem->member; \
+	(clistx)->next->next = (oldTail==NULL) ? &elem->member : oldTail->next; \
+	if (oldTail != NULL) { \
+		oldTail->next = (clistx)->next; \
+		(clistx)->next = oldTail; \
+	} \
 })
 
 #define clist_pop(clistp) clist_dequeue(clistp)
-#define clist_dequeue(clistp)	\
-		if((clistp)->next == (clistp)->next->next){	\
-			(clistp)->next = NULL;	\
-		} else {	\
-			(clistp)->next->next = (clistp)->next->next->next;	\
-		}	
+#define clist_dequeue(clistp) ({ \
+	if ((clistp)->next == (clistp)->next->next) (clistp)->next = NULL; \
+	else (clistp)->next->next = (clistp)->next->next->next; \
+})	
 
 #define clist_foreach_all(scan, clistp, member, tmp) ((tmp)==(clistp)->next) 
 
-#define clist_delete(elem, clistp, member)({\
-int ret=1;\
-struct clist *tmp1, *tmp2, *scan;\
-if((clistp)->next != NULL){\
-	if(container_of((clistp)->next, typeof(*elem),member) == elem && (clistp)->next->next == (clistp)->next){\
-		(clistp)->next = NULL;\
-		ret=0;\
-	}\
-else{\
-	for(tmp1=NULL, tmp2=(clistp)->next, scan=(clistp)->next->next; container_of(scan, typeof(*elem), member)!=elem && scan!=tmp1; tmp2=scan, scan=scan->next, tmp1=(clistp)->next);\
-  		if(container_of(scan, typeof(*elem), member)==elem){\
-			if (tmp2->next==(clistp)->next){\
-  				tmp2->next=(clistp)->next->next;\
-  				(clistp)->next=tmp2;\
-  				scan->next=NULL;\
-  				ret=0;\
-    		}\
-    		else{\
-				tmp2->next=scan->next;\
-     			scan->next=NULL;\
-     			ret=0;\
-     		}\
-  		}\
-}\
-}\
-ret;\
+#define clist_delete(elem, clistp, member) ({ \
+	int retVal = 1; \
+	if ((clistp)->next != NULL) { \
+		struct clist *scanner = (clistp)->next; \
+		while (scanner->next != &elem->member && scanner->next != (clistp)->next) scanner = scanner->next; \
+		/* list with just one element */ \
+		if (scanner == &elem->member && scanner == (clistp)->next) { \
+			scanner->next = NULL; \
+			scanner = NULL; \
+			(clistp)->next = NULL; \
+			retVal = 0; \
+		} \
+		/* list with two or more elements and deleting tail */ \
+		else if (scanner->next == &elem->member && scanner->next == (clistp)->next) { \
+			scanner->next = scanner->next->next; \
+			(clistp)->next->next = NULL; \
+			(clistp)->next = scanner; \
+			retVal = 0; \
+		} \
+		/* list with two or more elements and deleting any one of them but tail */ \
+		else if (scanner->next == &elem->member) { \
+			scanner->next = scanner->next->next; \
+			retVal = 0; \
+		} \
+	} \
+	retVal; \
 })
 
 #define clist_foreach_delete(scan, clistp, member, tmp)\

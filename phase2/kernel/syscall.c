@@ -164,7 +164,8 @@ void terminateProcess(pid_t p){
 
 	if(p == 0 || curProc->pid == p){
 		terminator(curProc);
-		outChild(curProc);
+		//outChild(curProc);
+		removeChild(curProc);
 		//outProcQ(&readyQueue, curProc);
 		freePcb(curProc);
     	curProc=NULL;
