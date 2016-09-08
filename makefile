@@ -59,31 +59,31 @@ $(P0)p0test: $(P0)p0test.c $(P0)clist.h
 	gcc $(P0)p0test.c -o $(P0)p0test
 
 $(SRC_SUP)pcb.o: $(SRC_SUP)pcb.c $(HEAD_SUP)
-	$(CC) $(FLAG_CC_P1) $(SRC_SUP)pcb.o $(SRC_SUP)pcb.c
-
+	$(CC) $(FLAG_CC_P1) $@ $(SRC_SUP)pcb.c
+	
 $(SRC_SUP)asl.o: $(SRC_SUP)asl.c $(HEAD_SUP)
-	$(CC) $(FLAG_CC_P1) $(SRC_SUP)asl.o $(SRC_SUP)asl.c
+	$(CC) $(FLAG_CC_P1) $@ $(SRC_SUP)asl.c
 
 $(SRC_SUP)p1test.o: $(SRC_SUP)p1test.c $(HEAD_UARM) $(HEAD_SUP)
-	$(CC) $(FLAG_CC_P1) $(SRC_SUP)p1test.o $(SRC_SUP)p1test.c
+	$(CC) $(FLAG_CC_P1) $@ $(SRC_SUP)p1test.c
 
 $(SRC_KER)initial.o: $(SRC_KER)initial.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $(SRC_KER)initial.o $(SRC_KER)initial.c
+	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)initial.c
 
 $(SRC_KER)syscall.o: $(SRC_KER)syscall.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $(SRC_KER)syscall.o $(SRC_KER)syscall.c
+	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)syscall.c
 
 $(SRC_KER)exceptions.o: $(SRC_KER)exceptions.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $(SRC_KER)exceptions.o $(SRC_KER)exceptions.c
+	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)exceptions.c
 
 $(SRC_KER)scheduler.o: $(SRC_KER)scheduler.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $(SRC_KER)scheduler.o $(SRC_KER)scheduler.c
+	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)scheduler.c
 
 $(SRC_KER)interrupts.o: $(SRC_KER)interrupts.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $(SRC_KER)interrupts.o $(SRC_KER)interrupts.c
+	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)interrupts.c
 
 $(SRC_KER)p2test.o: $(SRC_KER)p2test.c $(HEAD_UARM) $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $(SRC_KER)p2test.o $(SRC_KER)p2test.c
+	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)p2test.c
 
 clean_p0:
 	rm -rf $(P0)p0test
