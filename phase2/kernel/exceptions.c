@@ -37,7 +37,6 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
       scheduler();
       break;
       default:
-      testfun();
       break;
     }
   }
@@ -138,7 +137,7 @@ void sysHandler(){
       /* Gestisco come fosse una program trap */
       saveCurState(sysbp_old, pgmtrap_old); //fare copy state e non assegnare il puntatore
       /* Setto il registro cause a Reserved Instruction */
-      CAUSE_EXCCODE_SET(pgmtrap_old->CP15_Cause, EXC_RESERVEDINSTR);
+      pgmtrap_old->CP15_Cause = CAUSE_EXCCODE_SET(pgmtrap_old->CP15_Cause, EXC_RESERVEDINSTR);
       cputime_t end = getTODLO();
       curProc->kernel_mode += end - kernelStart;
       //  curProc->global_time += end - kernelStart;
@@ -169,7 +168,6 @@ void sysHandler(){
 
 void pgmHandler(){
   kernelStart=getTODLO();
-  sysspec();
   // curProc->global_time += getTODLO() - procInit;
   handlerSYSTLBPGM(PGMT, EXCP_PGMT_NEW, pgmtrap_old);
   // curProc->global_time += getTODLO() - kernelStart;

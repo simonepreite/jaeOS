@@ -145,9 +145,7 @@ void print(char *msg) {
 	char * s = msg;
 	devregtr command;
 	devregtr status;
-	testfun();
 	SYSCALL(SEMOP, (int)&term_mut, -1, 0);				/* get term_mut lock */
-	testfun();
 	while (*s != '\0') {
 	  /* Put "transmit char" command+char in term0 register (3rd word). This
 		   actually starts the operation on the device! */
@@ -352,7 +350,6 @@ void test() {
 			SYSCALL(WAITCLOCK, 0, 0, 0);
 			time2 = getTODLO();
 		}
-
 		SYSCALL(SEMOP, (int)&blkp8, 1, 0);
 	}
 
@@ -456,7 +453,7 @@ void p3() {
 	for (i = 0; i < CLOCKLOOP; i++)
 		SYSCALL(WAITCLOCK, 0, 0, 0);
 
-	SYSCALL(GETCPUTIME, (int)&glob_t2, (int)&usr_t2, 0);		/* process time */
+	SYSCALL(GETCPUTIME, (int)&glob_t2, (int)&usr_t2, 0);		/* process time*/
 
 	if (((usr_t2 - usr_t1) > MINCLOCKLOOP) || ((glob_t2 - glob_t1) < MINCLOCKLOOP))
 		print("error: p3 - CPU time incorrectly maintained\n");
@@ -576,9 +573,7 @@ void p5sys(unsigned int a1, unsigned int a2, unsigned int a3, unsigned int a4) {
 		}
 		print("High level SYS call from kernel mode process\n");
 	}
-
 	SYSCALL(EXITTRAP, 0, retval, 0);
-
 	print("error - high level syscall handler did not return\n");
 	PANIC();
 }
@@ -719,7 +714,6 @@ void p5c(){
 	} else {
 		print("p5c - try to call SYS14 in kernel mode\n");
 	}
-
 	msg = (char *) SYSCALL(SYSQUESTION, 0, 0, 0);
 
 	if(mode){

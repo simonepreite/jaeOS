@@ -8,6 +8,7 @@
 void saveCurState(state_t *state, state_t *newState);
 pid_t genPid(UI a);
 pcb_t* searchPid(pcb_t *parent, pid_t pid);
+//struct pcb_t* searchPid(struct pcb_t *node, int pid);
 void terminator(pcb_t* proc);
 void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags);
 

@@ -1,20 +1,58 @@
 #include <scheduler.h>
 
 UI control100ms = FALSE;
+UI executed;
 
 void scheduler(){
-	/* There is a running process */
-	if (curProc){
-		//testfun();
-
-		//curProc->global_time += getTODLO() - processStart;
+	if(!curProc){
+		if (clist_empty(readyQueue)){
+			/* no more processes*/
+			if (processCounter == 0) HALT();
+			/* Deadlock Detection*/
+			if (processCounter > 0 && softBlockCounter == 0) PANIC();
+			/* wait for interrupts */
+			if (processCounter > 0 && softBlockCounter > 0){
+				setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
+				WAIT();
+			}
+			PANIC(); /* Anomaly*/
+		}
+		if (!(curProc = removeProcQ(&readyQueue))) PANIC(); /* Anomaly */
+		clock += getTODLO() - clockTick;
+		clockTick = getTODLO();
+		processStart = getTODLO();
+		setTIMER(SCHED_TIME_SLICE);
+	}
+	else{
+		//executed = curProc->global_time - processStart;
 		//processStart = getTODLO();
 
 		clock += getTODLO() - clockTick;
 		clockTick = getTODLO();
-		//setTIMER(MIN(SCHED_TIME_SLICE - (curProc->global_time - processStart), SCHED_PSEUDO_CLOCK - clock));
+		//setTIMER(0x09C4);
+	}
+	LDST(&(curProc->p_s));
+}
+
+
+
+
+
+
+
+/*void scheduler(){
+	/* There is a running process
+	if (curProc){
+		//testfun();
+
+		executed = curProc->global_time - processStart;
+		processStart = getTODLO();
+
+		clock += getTODLO() - clockTick;
+		clockTick = getTODLO();
+		setTIMER(SCHED_TIME_SLICE - executed);
 		//setTIMER(3000);
-		
+
 		// if ((getTODLO() - pseudoClock) > (SCHED_PSEUDO_CLOCK - SCHED_TIME_SLICE)){
 
 		// 	setTIMER(SCHED_TIME_SLICE);//SCHED_PSEUDO_CLOCK - (getTODLO() - pseudoClock)
@@ -35,30 +73,30 @@ void scheduler(){
 		/* Set Interval Timer as the smallest between Time Slice and Pseudo-Clock tick
 		setTIMER(MIN((SCHED_TIME_SLICE - curProc->p_cpu_time), (SCHED_PSEUDO_CLOCK - TimerTick )));
 
-		/* Load the processor state in order to start execution*/
+		/* Load the processor state in order to start execution
 		LDST(&(curProc->p_s));
 	}
-	/* [Case 2] There is not a running process*/
+	/* [Case 2] There is not a running process
 	else{
-		/* If Ready Queue is empty*/
+		/* If Ready Queue is empty
 		if (clist_empty(readyQueue)){
 			//testfun();
-			/* no more processes*/
+			/* no more processes
 			if (processCounter == 0) HALT();
-			/* Deadlock Detection*/
+			/* Deadlock Detection
 			if (processCounter > 0 && softBlockCounter == 0) PANIC();
-			/* wait for interrupts */
+			/* wait for interrupts
 			if (processCounter > 0 && softBlockCounter > 0){
-				/* Enable interrupts*/
+				/* Enable interrupts
 				// setTIMER(SCHED_TIME_SLICE);
 				setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS()));
 				WAIT();
 			}
-			PANIC(); /* Anomaly*/
+			PANIC(); /* Anomaly
 		}
 
-		/* Otherwise extract first ready process*/
-		if (!(curProc = removeProcQ(&readyQueue))) PANIC(); /* Anomaly */
+		/* Otherwise extract first ready process
+		if (!(curProc = removeProcQ(&readyQueue))) PANIC(); /* Anomaly
 
 		clock += getTODLO() - clockTick;
 		clockTick = getTODLO();
@@ -82,11 +120,10 @@ void scheduler(){
 		/* Set Interval Timer as the smallest between Time Slice and Pseudo-Clock tick
 		setTIMER(MIN(SCHED_TIME_SLICE, (SCHED_PSEUDO_CLOCK - TimerTick )));
 
-		/* Load the processor state in order to start execution*/
+		/* Load the processor state in order to start execution
 		LDST(&(curProc->p_s));
 	}
 }
-
 
 /*void scheduler(sched_t status) {
 if (status != SCHED_START && status != SCHED_NEXT && status != SCHED_RESET && status != SCHED_CONTINUE)

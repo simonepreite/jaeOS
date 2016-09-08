@@ -1,6 +1,7 @@
 #include <syscall.h>
 
 void sysspec(){}
+void term(){}
 /***************************************************************
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
@@ -41,7 +42,7 @@ pid_t genPid(UI a){
 
 // supporto alla terminate process
 
-pcb_t* searchPid(pcb_t *parent, pid_t pid){
+pcb_t* searchPid(pcb_t *parent, const pid_t pid){
 	void* tmp = NULL;
 	pcb_t* scan;
 	pcb_t* save = NULL;
@@ -54,22 +55,42 @@ pcb_t* searchPid(pcb_t *parent, pid_t pid){
 				save = searchPid(headProcQ(&scan->p_children), pid);
 			}
 			if(save)
-			return save;
+				return save;
 		}
 	}
 	return NULL;
 }
+
+/*struct pcb_t* searchPid(struct pcb_t *node, int pid){
+  pcb_t *scan, *finder;
+  void *tmp_p;
+
+  if (node->pid == pid) return node; /* found !
+  else if(clist_empty(node->p_children)) return NULL;
+  else
+  {
+    clist_foreach(scan,(&node->p_children), p_siblings,tmp_p) //oppure basta node->p_children ?
+    {
+      finder = searchPid(scan, pid);
+      /* contiue if not found it yet, return the node otherwise
+      if (finder != NULL) {
+        return finder;
+      }
+    }
+  }
+}*/
 
 void terminator(pcb_t* proc) {
 	while(!emptyChild(proc)) {
 		terminator(removeChild(proc));
 	}
 	if (proc->p_cursem!=NULL) {
-		if ((int*)(proc->p_cursem) < &(semDevices[0]) || (int*)(proc->p_cursem) > &(semDevices[MAXPROC-1])) {
-			updateSemaphoreValue(proc->p_cursem, -proc->waitingResCount);
-			outBlocked(proc);
+		if ((int*)(proc->p_cursem) >= &(semDevices[0]) && (int*)(proc->p_cursem) <= &(semDevices[MAXPROC-1])) {
 			softBlockCounter--;
 		}
+		else
+			updateSemaphoreValue(proc->p_cursem, proc->waitingResCount);
+		outBlocked(proc);
 	}
 	processCounter--;
 	if (proc != curProc){
@@ -124,21 +145,23 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	}
 	else PANIC();
 
-	STST(&(curProc->excp_state_vector[old]));
-	//saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
-	(curProc->p_s).cpsr = STATUS_ALL_INT_ENABLE((curProc->p_s).cpsr);
-
+	//STST(&(curProc->excp_state_vector[old]));
+if(curProc){
+	saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
 	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]);
 
 	curProc->excp_state_vector[new].pc = handler;
 	curProc->excp_state_vector[new].sp = stack;
 	//curProc->p_s.cpsr &= STATUS_CLEAR_MODE; //sbagliavamo a cancellare tutto lo stato
+	flags = flags & (0x80000007);
+	//curProc->excp_state_vector[new].cpsr &= (0x7FFFFFF8);
 	curProc->excp_state_vector[new].cpsr |= flags;
-	curProc->excp_state_vector[new].CP15_Control = CP15_ENABLE_VM(curProc->excp_state_vector[new].CP15_Control);
+	//curProc->excp_state_vector[new].CP15_Control = CP15_ENABLE_VM(curProc->excp_state_vector[new].CP15_Control);
 	asid = ENTRYHI_ASID_GET((curProc->excp_state_vector[new].CP15_EntryHi));
 	ENTRYHI_ASID_SET(curProc->excp_state_vector[new].CP15_EntryHi, asid);
 	//curProc->excp_state_vector[new].CP15_EntryHi = setEntryHi(getEntryHi());
 	//sysspec();
+}
 }
 
 /***************************************************************
@@ -171,6 +194,7 @@ void terminateProcess(pid_t p){
 		curProc=NULL;
 	}
 	else{
+		sysspec();
 		if(!(save=searchPid(curProc, p))){
 			PANIC();
 		}
@@ -235,8 +259,8 @@ void semaphoreOperation(int *sem, int weight){
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
-			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES])
-			softBlockCounter--;								// decremento il contatore dei processi bloccati sof
+			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES-1])
+				softBlockCounter--;								// decremento il contatore dei processi bloccati sof
 			weight -= firstBlocked->waitingResCount;
 			firstBlocked->waitingResCount = 0;
 			insertProcQ(&readyQueue, firstBlocked);
@@ -244,7 +268,6 @@ void semaphoreOperation(int *sem, int weight){
 		firstBlocked->waitingResCount -= weight; //guardare bene il discorso pesi potrebbe non funzionare sempre
 	}
 	else if (weight <= -1){		// resources to be allocated
-		//if(sem == &synp4) testfun();
 		(*sem) += weight;
 		if(*sem < 0){
 			curProc->waitingResCount = -weight;		// il processo ha bisogno di weight risorse
@@ -254,7 +277,7 @@ void semaphoreOperation(int *sem, int weight){
 
 			if(insertBlocked(sem, curProc))
 			PANIC();
-			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES])
+			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES-1])
 			softBlockCounter++;								// decremento il contatore dei processi bloccati sof
 			curProc = NULL;
 		}

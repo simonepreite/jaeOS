@@ -4,6 +4,7 @@
 #include <const.h>
 #include <initial.h>
 
+EXTERN void sysspec();
 EXTERN cputime_t kernelStart;
 int debug_a1; //debug variable
 

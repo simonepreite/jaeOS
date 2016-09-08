@@ -3,7 +3,7 @@
 
 void intHandler(){
 	// kernelStart=getTODLO();
-
+	//curProc->global_time += getTODLO() - processStart;
 	state_t *oldState = (state_t *)INT_OLDAREA;
 	if (curProc) {
 		(*oldState).pc -= WORD_SIZE;
