@@ -1,7 +1,7 @@
 #include <exceptions.h>
 
 // assegno i puntatori alle aree di memoria
-
+EXTERN UI p8Started;
 int debug_a1;
 state_t *tlb_old = (state_t*)TLB_OLDAREA;
 state_t *pgmtrap_old = (state_t*)PGMTRAP_OLDAREA;
@@ -118,6 +118,7 @@ void sysHandler(){
       cputime_t end = getTODLO();
       curProc->kernel_mode += end - kernelStart;
       /* Richiamo lo scheduler */
+      //if (p8Started) tprint("about to call scheduler...\n");
       scheduler();
     }
     /* Altrimenti se è in user-mode */

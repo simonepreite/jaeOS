@@ -1,9 +1,11 @@
 #include <scheduler.h>
-
-UI control100ms = FALSE;
+EXTERN UI p8Started;
 cputime_t executed=0;
+EXTERN void print(char *msg);
 void scheduler(){
+	//if (p8Started) print("scheduler called...\n");
 	if(!curProc){
+		//if (p8Started) tprint("curProc NULL...\n");
 		if (clist_empty(readyQueue)){
 			/* no more processes*/
 			if (processCounter == 0) HALT();
@@ -23,6 +25,7 @@ void scheduler(){
 		setTIMER(SCHED_TIME_SLICE);
 	}
 	else{
+		//if (p8Started) tprint("curProc NOT NULL...\n");
 		curProc->global_time += getTODLO()-processStart;
 		processStart = getTODLO();
 
@@ -30,6 +33,7 @@ void scheduler(){
 		clockTick = getTODLO();
 		setTIMER(SCHED_TIME_SLICE - (getTODLO()-processStart));
 	}
+	//if (p8Started) tprint("prima di LDST...\n");
 	LDST(&(curProc->p_s));
 }
 
