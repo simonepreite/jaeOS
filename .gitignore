@@ -33,8 +33,7 @@ phase0/p0test
 *.dSYM/
 
 # Compiled folders
-exec_phase1/
-kernel/
+compiled/
 
 # uARM Compiled Tests
 *.uarm
