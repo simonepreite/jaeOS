@@ -12,39 +12,39 @@ state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
 
 void handlerSYSTLBPGM(hdl_type old, UI new, state_t* state){
   if (old == TLB_HDL) {
-    switch (curProc->tags) {
+    switch (curProc->tags){
       case 0:
       case 1:
       case 4:
       case 5:
-      terminateProcess(0);
-      scheduler();
-      break;
+        terminateProcess(0);
+        scheduler();
+        break;
       default:
-      break;
+        break;
     }
   }
-  else if (old == PGMT_HDL) {
-    switch (curProc->tags) {
+  else if (old == PGMT_HDL){
+    switch (curProc->tags){
       case 0:
       case 1:
       case 2:
       case 3:
-      terminateProcess(0);
-      scheduler();
-      break;
+        terminateProcess(0);
+        scheduler();
+        break;
       default:
-      break;
+        break;
     }
   }
-  else if (old == SYS_HDL) {
+  else if (old == SYS_HDL){
     UI a1 = state->a1;
     UI a2 = state->a2;
     UI a3 = state->a3;
     UI a4 = state->a4;
 
-    if (state->CP15_Cause == EXC_SYSCALL) {
-      switch (a1) {
+    if (state->CP15_Cause == EXC_SYSCALL){
+      switch (a1){
         case CREATEPROCESS:
           curProc->p_s.a1 = createProcess((state_t *)a2);
           break;
@@ -86,7 +86,7 @@ void handlerSYSTLBPGM(hdl_type old, UI new, state_t* state){
   }
   else PANIC();
 
-  if (old != SYS_HDL) {
+  if (old != SYS_HDL){
     saveCurState(state, &(curProc->excp_state_vector[old]));
     curProc->excp_state_vector[new].a1 = CAUSE_EXCCODE_GET(state->CP15_Cause);
     curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio

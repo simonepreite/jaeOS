@@ -49,7 +49,7 @@ pcb_t* searchPid(pcb_t *parent, const pid_t pid){
 			return scan;
 		}
 		else {
-			if(!emptyChild(scan)) {
+			if(!emptyChild(scan)){
 				save = searchPid(scan, pid);
 			}
 			if(save)
@@ -59,15 +59,15 @@ pcb_t* searchPid(pcb_t *parent, const pid_t pid){
 	return NULL;
 }
 
-void terminator(pcb_t* proc) {
+void terminator(pcb_t* proc){
 
-	while(!emptyChild(proc)) {
+	while(!emptyChild(proc)){
 		terminator(removeChild(proc));
 	}
 
-	if (proc->p_cursem!=NULL) {
+	if (proc->p_cursem!=NULL){
 		if ((int*)(proc->p_cursem) >= &(semDevices[0]) && (int*)(proc->p_cursem) <= &(semDevices[MAXPROC-1])) softBlockCounter--;
-		else 
+		else
 			updateSemaphoreValue(proc->p_cursem, proc->waitingResCount);
 		outBlocked(proc);
 	}
@@ -83,8 +83,8 @@ void terminator(pcb_t* proc) {
 
 void setSYSTLBPGMT(hdl_type old, UI new, memaddr handler, memaddr stack, UI flags){
 	unsigned int asid;
-	if (old == SYS_HDL) {
-		switch (curProc->tags) {
+	if (old == SYS_HDL){
+		switch (curProc->tags){
 			case 1:
 			case 3:
 			case 5:
@@ -96,8 +96,8 @@ void setSYSTLBPGMT(hdl_type old, UI new, memaddr handler, memaddr stack, UI flag
 				break;
 		}
 	}
-	else if (old == TLB_HDL) {
-		switch (curProc->tags) {
+	else if (old == TLB_HDL){
+		switch (curProc->tags){
 			case 2:
 			case 3:
 			case 6:
@@ -109,8 +109,8 @@ void setSYSTLBPGMT(hdl_type old, UI new, memaddr handler, memaddr stack, UI flag
 				break;
 		}
 	}
-	else if (old == PGMT_HDL) {
-		switch (curProc->tags) {
+	else if (old == PGMT_HDL){
+		switch (curProc->tags){
 			case 4:
 			case 5:
 			case 6:
@@ -181,7 +181,7 @@ void semaphoreOperation(int *sem, int weight){
 
 		pcb_t *firstBlocked;
 
-		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
+		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight){
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
 			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES-1]) softBlockCounter--;		// decremento il contatore dei processi bloccati sof
 			weight -= firstBlocked->waitingResCount;
@@ -256,7 +256,7 @@ void waitForClock(){
 	semaphoreOperation(&semDevices[index], -1);		// lock the current semaphore
 }
 
-UI iodevop(UI command, int lineNum, UI deviceNum) {
+UI iodevop(UI command, int lineNum, UI deviceNum){
 	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
 
 	UI terminalReading = (lineNum == INT_TERMINAL && deviceNum >> 31) ? N_DEV_PER_IL : 0;	// controllo se voglio ricevere o trasmettere dal terminale
@@ -268,8 +268,8 @@ UI iodevop(UI command, int lineNum, UI deviceNum) {
 
 	UI status = 0;
 	// Riprendo l'esecuzione dopo l'interrupt
-	if (lineNum == INT_TERMINAL) {
-		if (terminalReading > 0) {		// terminal in lettura
+	if (lineNum == INT_TERMINAL){
+		if (terminalReading > 0){		// terminal in lettura
 			deviceRegister->term.recv_command = command;
 			status = deviceRegister->term.recv_status;
 		}

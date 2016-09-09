@@ -11,25 +11,23 @@ HIDDEN struct clist pcbFree;
 ***************************************************************/
 
 
-void freePcb(struct pcb_t *p)
-{
+void freePcb(struct pcb_t *p){
 	// If the ProcBlk pointed to by p is not NULL, it gets deallocated
 	// by adding it to the pcbFree list. Fields don't get changed because
 	// they will be set next time the ProcBlk will be allocated and reused.
 	if (p != NULL) clist_enqueue(p, &pcbFree, p_list);
 }
 
-struct pcb_t* allocPcb()
-{
+struct pcb_t* allocPcb(){
 	struct pcb_t *head = NULL;
 
 	// If the pcbFree list is not empty
 	// a new ProcBlk can be allocated
-	if (!clist_empty(pcbFree)) {
+	if (!clist_empty(pcbFree)){
 		// Getting a pointer to the first free ProcBlk
 		head = clist_head(head, pcbFree, p_list);
 		clist_dequeue(&pcbFree);	// and removing it from the pcbFree list
-		
+
 		// Initializing ProcBlk fields
 		init_proc(head);
 	}
@@ -38,8 +36,7 @@ struct pcb_t* allocPcb()
 	return head;
 }
 
-void initPcbs(void)
-{
+void initPcbs(void){
 	// Initialization
 	pcbFree = (struct clist)CLIST_INIT;
 	static struct pcb_t procArray[MAXPROC];
@@ -56,8 +53,7 @@ void initPcbs(void)
 *                   PROCESS QUEUE MAINTENANCE                  *
 ***************************************************************/
 
-void insertProcQ(struct clist *q, struct pcb_t *p)
-{
+void insertProcQ(struct clist *q, struct pcb_t *p){
 	// If the ProcBlk pointed to by p is not NULL, it will be added to
 	// the process queue whose tail pointer is q. If the process queue
 	// pointed to by q is NULL, it will be set up when adding the
@@ -65,8 +61,7 @@ void insertProcQ(struct clist *q, struct pcb_t *p)
 	if (p != NULL) clist_enqueue(p, q, p_list);
 }
 
-struct pcb_t* headProcQ(struct clist *q)
-{
+struct pcb_t* headProcQ(struct clist *q){
 	// Getting a pointer to the first ProcBlk in the process queue
 	// whose tail pointer is q and returning it without removing it
 	struct pcb_t *first;
@@ -74,8 +69,7 @@ struct pcb_t* headProcQ(struct clist *q)
 	return first;
 }
 
-struct pcb_t* removeProcQ(struct clist *q)
-{
+struct pcb_t* removeProcQ(struct clist *q){
 	if (q->next == NULL) return NULL;
 
 	// Getting a pointer to the first ProcBlk in the process queue
@@ -88,8 +82,7 @@ struct pcb_t* removeProcQ(struct clist *q)
 	return head;
 }
 
-struct pcb_t* outProcQ(struct clist *q, struct pcb_t *p)
-{
+struct pcb_t* outProcQ(struct clist *q, struct pcb_t *p){
 	if (q->next == NULL || p == NULL) return NULL;
 
 	// Searching the ProcBlk pointed to by p in the process queue
@@ -103,14 +96,12 @@ struct pcb_t* outProcQ(struct clist *q, struct pcb_t *p)
 *                   PROCESS TREE MAINTENANCE                   *
 ***************************************************************/
 
-int emptyChild(struct pcb_t *p)
-{
+int emptyChild(struct pcb_t *p){
 	if (p != NULL && clist_empty(p->p_children)) return TRUE;
 	else return FALSE;
 }
 
-void insertChild(struct pcb_t *parent, struct pcb_t *p)
-{
+void insertChild(struct pcb_t *parent, struct pcb_t *p){
 	if (parent != NULL && p != NULL) {
 		p->p_parent = parent;	// Settings parent pointer of p
 
@@ -120,8 +111,7 @@ void insertChild(struct pcb_t *parent, struct pcb_t *p)
 	}
 }
 
-struct pcb_t* removeChild(struct pcb_t *p)
-{
+struct pcb_t* removeChild(struct pcb_t *p){
 	if (p == NULL || emptyChild(p)) return NULL;
 
 	// Getting a pointer to the first child of ProcBlk pointed
@@ -133,8 +123,7 @@ struct pcb_t* removeChild(struct pcb_t *p)
 	return head;
 }
 
-struct pcb_t* outChild(struct pcb_t *p)
-{
+struct pcb_t* outChild(struct pcb_t *p){
 	if (p == NULL || p->p_parent == NULL) return NULL;
 
 	// Getting the tail pointer to the list of children
