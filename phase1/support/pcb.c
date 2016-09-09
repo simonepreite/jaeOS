@@ -45,22 +45,22 @@ pcb_t *allocPcb(){
 struct pcb_t* allocPcb()
 {
 	struct pcb_t *head = NULL;
-	
+
 	// If the pcbFree list is not empty
 	// a new ProcBlk can be allocated
 	if (!clist_empty(pcbFree)) {
 		// Getting a pointer to the first free ProcBlk
 		head = clist_head(head, pcbFree, p_list);
 		clist_dequeue(&pcbFree);	// and removing it from the pcbFree list
-		
+
 		// Initializing ProcBlk fields
 		head->p_list = (struct clist)CLIST_INIT;
 		head->p_children = (struct clist)CLIST_INIT;
 		head->p_siblings = (struct clist)CLIST_INIT;
 		head->p_parent = NULL;
 		head->p_cursem = NULL;
-		
-		head->pid = (pid_t)&head;
+
+		head->pid = (int)head;
 		head->kernel_mode = 0;
 		head->global_time = 0;
 		head->lastTimeSlice = 0;
@@ -69,7 +69,7 @@ struct pcb_t* allocPcb()
 		int i;
 		for(i=0; i<EXCP_COUNT;i++)
 			init_state_t(head->excp_state_vector[i]);
-		
+
 		head->p_s.a1 = 0;
 		head->p_s.a2 = 0;
     	head->p_s.a3 = 0;
@@ -93,7 +93,7 @@ struct pcb_t* allocPcb()
     	head->p_s.TOD_Hi = 0;
     	head->p_s.TOD_Low = 0;
 	}
-	
+
 	// Returning pointer to the allocated ProcBlk
 	return head;
 }
@@ -114,7 +114,7 @@ void initPcbs(void)
 	// Initialization
 	pcbFree = (struct clist)CLIST_INIT;
 	static struct pcb_t procArray[MAXPROC];
-	
+
 	// Adding every ProcBlk to the pcbFree list
 	int i;
 	for (i = 0; i < MAXPROC; i++) {
@@ -175,13 +175,13 @@ struct pcb_t* headProcQ(struct clist *q)
 struct pcb_t* removeProcQ(struct clist *q)
 {
 	if (q->next == NULL) return NULL;
-	
+
 	// Getting a pointer to the first ProcBlk in the process queue
 	// whose tail pointer is q and returning it after removing it
 	// from the process queue
 	struct pcb_t *head;
 	head = clist_head(head, (*q), p_list);
-	
+
 	clist_dequeue(q);
 	return head;
 }
@@ -195,7 +195,7 @@ pcb_t *outProcQ(struct clist *q, pcb_t *p){
 struct pcb_t* outProcQ(struct clist *q, struct pcb_t *p)
 {
 	if (q->next == NULL || p == NULL) return NULL;
-	
+
 	// Searching the ProcBlk pointed to by p in the process queue
 	// whose tail pointer is q, removing it from the process queue
 	// and returning it.
@@ -239,7 +239,7 @@ void insertChild(struct pcb_t *parent, struct pcb_t *p)
 {
 	if (parent != NULL && p != NULL) {
 		p->p_parent = parent;	// Settings parent pointer of p
-		
+
 		// Adding the ProcBlk pointed to by p to the list of
 		// children of the ProcBlk pointed to by parent
 		clist_enqueue(p, &(parent->p_children), p_siblings);
@@ -262,7 +262,7 @@ pcb_t *removeChild(pcb_t *p){
 struct pcb_t* removeChild(struct pcb_t *p)
 {
 	if (p == NULL || emptyChild(p)) return NULL;
-	
+
 	// Getting a pointer to the first child of ProcBlk pointed
 	// to by p, removing it from the list of children and returning it
 	struct pcb_t *head;
@@ -289,10 +289,10 @@ pcb_t *outChild(pcb_t *p){
 struct pcb_t* outChild(struct pcb_t *p)
 {
 	if (p == NULL || p->p_parent == NULL) return NULL;
-	
+
 	// Getting the tail pointer to the list of children
 	struct clist *children = &(p->p_parent->p_children);
-	
+
 	// Searching the ProcBlk pointed to by p, removing it from
 	// the list of children and returning it
 	if (clist_delete(p, children, p_siblings) != 0) return NULL;
@@ -312,7 +312,7 @@ void init_proc(pcb_t *pcb){
 
 	pcb->p_parent = NULL;  // inizializzo la struttura per evitare resuidi di un vecchio utilizzo
 	pcb->p_cursem = NULL;
-	pcb->pid = (pid_t)&pcb;
+	pcb->pid = (int)pcb;
 	init_state_t(pcb->p_s);
 	for(i=0; i<EXCP_COUNT;i++)
 		init_state_t(pcb->excp_state_vector[i]);
