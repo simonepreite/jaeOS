@@ -1,7 +1,6 @@
 #include <interrupts.h>
-EXTERN cputime_t executed;
+
 void intHandler(){
-	// kernelStart=getTODLO();
 	executed = curProc->global_time - processStart;
 
 	state_t *oldState = (state_t *)INT_OLDAREA;
@@ -19,11 +18,6 @@ void intHandler(){
 	else if (CAUSE_IP_GET(cause, IL_PRINTER)) deviceHandler(IL_PRINTER);
 	else if (CAUSE_IP_GET(cause, IL_TERMINAL)) terminalHandler();
 
-	// if (curProc)
-	// 	curProc->kernel_mode = getTODLO() - kernelStart;
-	//curProc->global_time += getTODLO() - processStart;
-
-	//setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS())); probabilemnte non serve
 	scheduler();
 }
 

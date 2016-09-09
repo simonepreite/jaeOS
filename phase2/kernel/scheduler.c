@@ -23,13 +23,12 @@ void scheduler(){
 		setTIMER(SCHED_TIME_SLICE);
 	}
 	else{
-		//executed = curProc->global_time - processStart;
-		//curProc->global_time += executed;
+		curProc->global_time += getTODLO()-processStart;
 		processStart = getTODLO();
 
 		clock += getTODLO() - clockTick;
 		clockTick = getTODLO();
-		setTIMER(0x9C4);
+		setTIMER(SCHED_TIME_SLICE - (getTODLO()-processStart));
 	}
 	LDST(&(curProc->p_s));
 }

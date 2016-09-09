@@ -61,25 +61,6 @@ pcb_t* searchPid(pcb_t *parent, const pid_t pid){
 	return NULL;
 }
 
-/*struct pcb_t* searchPid(struct pcb_t *node, int pid){
-  pcb_t *scan, *finder;
-  void *tmp_p;
-
-  if (node->pid == pid) return node; /* found !
-  else if(clist_empty(node->p_children)) return NULL;
-  else
-  {
-    clist_foreach(scan,(&node->p_children), p_siblings,tmp_p) //oppure basta node->p_children ?
-    {
-      finder = searchPid(scan, pid);
-      /* contiue if not found it yet, return the node otherwise
-      if (finder != NULL) {
-        return finder;
-      }
-    }
-  }
-}*/
-
 void terminator(pcb_t* proc) {
 	while(!emptyChild(proc)) {
 		terminator(removeChild(proc));
@@ -95,7 +76,7 @@ void terminator(pcb_t* proc) {
 	processCounter--;
 	if (proc != curProc){
 		outProcQ(&readyQueue, proc);
-		//outChild(proc);
+		outChild(proc);
 		freePcb(proc);
 	}
 }
@@ -145,23 +126,17 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 	}
 	else PANIC();
 
-	//STST(&(curProc->excp_state_vector[old]));
-if(curProc){
-	saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
-	saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]);
+	if(curProc){
+		saveCurState(&curProc->p_s, &curProc->excp_state_vector[old]);
+		saveCurState(&curProc->p_s, &curProc->excp_state_vector[new]);
 
-	curProc->excp_state_vector[new].pc = handler;
-	curProc->excp_state_vector[new].sp = stack;
-	//curProc->p_s.cpsr &= STATUS_CLEAR_MODE; //sbagliavamo a cancellare tutto lo stato
-	flags = flags & (0x80000007);
-	//curProc->excp_state_vector[new].cpsr &= (0x7FFFFFF8);
-	curProc->excp_state_vector[new].cpsr |= flags;
-	//curProc->excp_state_vector[new].CP15_Control = CP15_ENABLE_VM(curProc->excp_state_vector[new].CP15_Control);
-	asid = ENTRYHI_ASID_GET((curProc->excp_state_vector[new].CP15_EntryHi));
-	ENTRYHI_ASID_SET(curProc->excp_state_vector[new].CP15_EntryHi, asid);
-	//curProc->excp_state_vector[new].CP15_EntryHi = setEntryHi(getEntryHi());
-	//sysspec();
-}
+		curProc->excp_state_vector[new].pc = handler;
+		curProc->excp_state_vector[new].sp = stack;
+		flags = flags & (0x80000007);
+		curProc->excp_state_vector[new].cpsr |= flags;
+		asid = ENTRYHI_ASID_GET((curProc->excp_state_vector[new].CP15_EntryHi));
+		ENTRYHI_ASID_SET(curProc->excp_state_vector[new].CP15_EntryHi, asid);
+	}
 }
 
 /***************************************************************
@@ -202,60 +177,12 @@ void terminateProcess(pid_t p){
 	}
 }
 
-/*void semaphoreOperation(int *semaphore, int weight)
-{
-/* Error
-if (!weight)
-{
-terminateProcess(curProc->pid);
-}
-/* Allocating resources, passeren
-else if (weight<0)
-{
-*semaphore += weight;
-
-/* if the value became negative, block the process on the sem
-if (*semaphore<0)
-{
-softBlockCounter++;
-curProc->waitingResCount=weight;
-insertBlocked(semaphore,curProc);
-curProc->kernel_mode += getTODLO() - kernelStart;
-curProc->global_time += getTODLO() - processStart;
-curProc=NULL;
-}
-}
-else // weight>0, verhogen
-{
-pcb_t *first;
-int available=0;
-
-*semaphore += weight;
-available = -weight;
-/* unblock processes until there are enough resources
-while((first=headBlocked(semaphore)) && (first->waitingResCount>=available))
-{
-available -= first->waitingResCount;
-first=outBlocked(first);
-first->p_cursem=NULL;
-first->waitingResCount=0;
-softBlockCounter--;
-insertProcQ(&readyQueue,first);
-}
-if (available<0) {
-first=headBlocked(semaphore);
-first->waitingResCount -= available;
-}
-}
-}*/
-
-
 void semaphoreOperation(int *sem, int weight){
 	if (!sem) PANIC();
 	if(weight >= 1){	// resources to be freed
 		(*sem) += weight;
 
-		pcb_t *firstBlocked;// = headBlocked(sem);
+		pcb_t *firstBlocked;
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
@@ -299,7 +226,6 @@ void specifyPgm(memaddr handler, memaddr stack, UI flags){
 }
 
 void exitTrap(UI exType, UI ret){
-
 	switch(exType){
 		case SYS:{
 			curProc->excp_state_vector[EXCP_SYS_OLD].a1 = ret;
@@ -323,18 +249,14 @@ void exitTrap(UI exType, UI ret){
 }
 
 void getCpuTime(cputime_t *global_time, cputime_t *user_time){
-	//curProc->global_time += getTODLO() - procInit;
-	//curProc->kernel_mode += getTODLO() - kernelStart;
-
 	curProc->global_time += getTODLO() - processStart;
-	//processStart = getTODLO();
+	curProc->kernel_mode += getTODLO() - kernelStart;
 
 	*global_time = curProc->global_time;
 	*user_time = curProc->global_time - curProc->kernel_mode;
 }
 
 void waitForClock(){
-	softBlockCounter++;			// there's one more blocked process
 	int index = MAX_DEVICES - 1;	// pseudo clock semaphore is the last one in the array
 	semaphoreOperation(&semDevices[index], -1);		// lock the current semaphore
 }

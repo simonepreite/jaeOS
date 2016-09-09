@@ -10,20 +10,21 @@
 #include <interrupts.h>
 #include <libuarm.h>
 
+// process needed
+
 UI processCounter;		// number of total processes
 UI softBlockCounter;	// number of processes waiting for an interrupt
 EXTERN struct clist readyQueue;
 int semDevices[MAX_DEVICES];
 pcb_t *curProc;
-cputime_t kernelStart;
-//cputime_t procInit;
-//cputime_t pseudoClock;
 
+// timing
+
+cputime_t kernelStart;
 cputime_t clock;
 cputime_t clockTick;
 cputime_t processStart;
 
-//UI control100ms = FALSE;
 
 // auxiliary function
 

@@ -2,11 +2,12 @@
 #define INTERRUPTS_H
 
 #include <initial.h>
-// debug
-
-//EXTERN UI control100ms;
 
 EXTERN void testfun();
+
+// auxiliary variables
+
+EXTERN cputime_t executed;
 
 // interrupts handler
 

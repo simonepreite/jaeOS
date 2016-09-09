@@ -13,7 +13,6 @@ state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
 
 
 void handlerSYSTLBPGM(UI old, UI new, state_t* state){
-
   if (old == TLB) {
     switch (curProc->tags) {
       case 0:
@@ -46,8 +45,6 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
     UI a3 = state->a3;
     UI a4 = state->a4;
 
-    debug_a1 = state->a1; //debug istruction
-
     if (state->CP15_Cause == EXC_SYSCALL) {
       switch (a1) {
         case CREATEPROCESS:
@@ -73,6 +70,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
           break;
         case GETCPUTIME:
           getCpuTime((cputime_t *)a2, (cputime_t *)a3);
+          kernelStart = getTODLO();
           break;
         case WAITCLOCK:
           waitForClock();
@@ -104,43 +102,32 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
 
 void tlbHandler(){
   kernelStart=getTODLO();
-  //curProc->global_time += getTODLO() - procInit;
   handlerSYSTLBPGM(TLB, EXCP_TLB_NEW, tlb_old);
-  //curProc->kernel_mode += getTODLO() - kernelStart; // non esce fino a qui perchè fa LDST
-  //curProc->global_time += getTODLO() - kernelStart;
 }
 
 void sysHandler(){
   kernelStart=getTODLO();
-  //curProc->global_time += getTODLO() - procInit;
   /* processo in kernel mode? */
   if(CAUSE_EXCCODE_GET(sysbp_old->CP15_Cause) == EXC_SYSCALL && sysbp_old->a1 >= 1 && sysbp_old->a1 <= 11){
 
     if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
       saveCurState(sysbp_old, &curProc->p_s);
-      //STST(sysbp_old);
       /* Se l'eccezione è di tipo System call */
       handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
       //processo corrente, ricalcolare tempi
       cputime_t end = getTODLO();
       curProc->kernel_mode += end - kernelStart;
-      //  curProc->global_time += end - kernelStart;
-      /* Richiamo lo scheduler
-      if (sysbp_old->a1 == TERMINATEPROCESS && sysbp_old->a2 == (int)curProc)
-      scheduler(SCHED_RESET);
-      else
-      scheduler(SCHED_NEXT);*/
+      /* Richiamo lo scheduler */
       scheduler();
     }
     /* Altrimenti se è in user-mode */
     else if((curProc->p_s.cpsr & STATUS_USER_MODE) == STATUS_USER_MODE){
       /* Gestisco come fosse una program trap */
-      saveCurState(sysbp_old, pgmtrap_old); //fare copy state e non assegnare il puntatore
+      saveCurState(sysbp_old, pgmtrap_old);
       /* Setto il registro cause a Reserved Instruction */
       pgmtrap_old->CP15_Cause = CAUSE_EXCCODE_SET(pgmtrap_old->CP15_Cause, EXC_RESERVEDINSTR);
       cputime_t end = getTODLO();
       curProc->kernel_mode += end - kernelStart;
-      //  curProc->global_time += end - kernelStart;
       /* Richiamo l'handler per le pgmtrap */
       pgmHandler();
     }
@@ -168,7 +155,5 @@ void sysHandler(){
 
 void pgmHandler(){
   kernelStart=getTODLO();
-  // curProc->global_time += getTODLO() - procInit;
   handlerSYSTLBPGM(PGMT, EXCP_PGMT_NEW, pgmtrap_old);
-  // curProc->global_time += getTODLO() - kernelStart;
 }
