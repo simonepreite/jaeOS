@@ -10,11 +10,7 @@ HIDDEN struct clist pcbFree;
 *           ALLOCATION AND DEALLOCATION PROCKBLKS'S            *
 ***************************************************************/
 
-//inserisce il pcb passato come parametro in coda alla lista
-/*
-void freePcb(pcb_t *p){
-	clist_enqueue(p, &(pcbFree), p_list);
-}*/
+
 void freePcb(struct pcb_t *p)
 {
 	// If the ProcBlk pointed to by p is not NULL, it gets deallocated
@@ -22,25 +18,6 @@ void freePcb(struct pcb_t *p)
 	// they will be set next time the ProcBlk will be allocated and reused.
 	if (p != NULL) clist_enqueue(p, &pcbFree, p_list);
 }
-
-/*
-
-  toglie dalla lista dei processi liberi il primo e lo alloca
-  inizializza la struttura in modo che non vi siano residui della
-  vecchia allocazione
-
-*/
-/*
-pcb_t *allocPcb(){
-	pcb_t *p = NULL;
-
-		if(!(clist_empty(pcbFree))){
-			p = clist_head(p, pcbFree, p_list);
-			clist_dequeue(&pcbFree);
-			init_proc(p);
-		}
-	return p; // il puntatore resta NULL se non è possibile prelevare un processo
-}*/
 
 struct pcb_t* allocPcb()
 {
@@ -52,63 +29,15 @@ struct pcb_t* allocPcb()
 		// Getting a pointer to the first free ProcBlk
 		head = clist_head(head, pcbFree, p_list);
 		clist_dequeue(&pcbFree);	// and removing it from the pcbFree list
-
+		
 		// Initializing ProcBlk fields
-		head->p_list = (struct clist)CLIST_INIT;
-		head->p_children = (struct clist)CLIST_INIT;
-		head->p_siblings = (struct clist)CLIST_INIT;
-		head->p_parent = NULL;
-		head->p_cursem = NULL;
-
-		head->pid = (int)head;
-		head->kernel_mode = 0;
-		head->global_time = 0;
-		head->lastTimeSlice = 0;
-		head->waitingResCount = 0;
-		head->tags = 0;
-		int i;
-		for(i=0; i<EXCP_COUNT;i++)
-			init_state_t(head->excp_state_vector[i]);
-
-		head->p_s.a1 = 0;
-		head->p_s.a2 = 0;
-    	head->p_s.a3 = 0;
-    	head->p_s.a4 = 0;
-    	head->p_s.v1 = 0;
-    	head->p_s.v2 = 0;
-    	head->p_s.v3 = 0;
-    	head->p_s.v4 = 0;
-    	head->p_s.v5 = 0;
-    	head->p_s.v6 = 0;
-    	head->p_s.sl = 0;
-    	head->p_s.fp = 0;
-    	head->p_s.ip = 0;
-  		head->p_s.sp = 0;
-    	head->p_s.lr = 0;
-    	head->p_s.pc = 0;
-    	head->p_s.cpsr = 0;
-    	head->p_s.CP15_Control = 0;
-    	head->p_s.CP15_EntryHi = 0;
-    	head->p_s.CP15_Cause = 0;
-    	head->p_s.TOD_Hi = 0;
-    	head->p_s.TOD_Low = 0;
+		init_proc(head);
 	}
 
 	// Returning pointer to the allocated ProcBlk
 	return head;
 }
 
-// Inizializza la lista pcbFree, verrà chiamato solo una volta all'inizio
-/*
-void initPcbs(){
-	static pcb_t pcb_static[MAXPROC];
-  int i;
-
-	for(i = 0; i < (MAXPROC); i++){
-		pcb_t *q = &pcb_static[i];
-		clist_enqueue(q, &pcbFree, p_list);
-	}
-}*/
 void initPcbs(void)
 {
 	// Initialization
@@ -127,11 +56,6 @@ void initPcbs(void)
 *                   PROCESS QUEUE MAINTENANCE                  *
 ***************************************************************/
 
-//inserisce il processo puntato da p nella lista puntata in coda da q
-/*
-void insertProcQ(struct clist *q, pcb_t *p){
-	clist_enqueue(p, q, p_list);
-}*/
 void insertProcQ(struct clist *q, struct pcb_t *p)
 {
 	// If the ProcBlk pointed to by p is not NULL, it will be added to
@@ -141,17 +65,6 @@ void insertProcQ(struct clist *q, struct pcb_t *p)
 	if (p != NULL) clist_enqueue(p, q, p_list);
 }
 
-/*
-
-ritorna il puntatore alla testa della lista puntata in coda da q, se
-la lista risulta vuota ritorna NULL, non elimina alcun elemento
-
-*/
-/*
-pcb_t *headProcQ(struct clist *q){
-	pcb_t *pcb_temp = clist_head(pcb_temp, (*q), p_list); ;
-	return pcb_temp;
-}*/
 struct pcb_t* headProcQ(struct clist *q)
 {
 	// Getting a pointer to the first ProcBlk in the process queue
@@ -161,17 +74,6 @@ struct pcb_t* headProcQ(struct clist *q)
 	return first;
 }
 
-//rimuove l'elemento in testa alla lista puntata in coda da q
-/*
- pcb_t *removeProcQ(struct clist *q){
-	pcb_t *pcb_temp = NULL;
-
-		if(q->next != NULL){
-			pcb_temp = clist_head(pcb_temp, (*q), p_list);
-			clist_dequeue(q);
-		}
-	return pcb_temp;
-}*/
 struct pcb_t* removeProcQ(struct clist *q)
 {
 	if (q->next == NULL) return NULL;
@@ -186,12 +88,6 @@ struct pcb_t* removeProcQ(struct clist *q)
 	return head;
 }
 
-//rimuove il processo puntato da p nella lista puntata in coda da q
-/*
-pcb_t *outProcQ(struct clist *q, pcb_t *p){
-	if (clist_delete(p, q, p_list) == 0) return p;
-	else return NULL;
-}*/
 struct pcb_t* outProcQ(struct clist *q, struct pcb_t *p)
 {
 	if (q->next == NULL || p == NULL) return NULL;
@@ -207,34 +103,12 @@ struct pcb_t* outProcQ(struct clist *q, struct pcb_t *p)
 *                   PROCESS TREE MAINTENANCE                   *
 ***************************************************************/
 
-/*
-
-ritorna TRUE se il processo puntato da p ha figli altrimenti
-FALSE
-
-*/
-/*
-int emptyChild(pcb_t *p){
-	if(clist_empty(p->p_children)) return TRUE;
-	else return FALSE;
-}*/
 int emptyChild(struct pcb_t *p)
 {
 	if (p != NULL && clist_empty(p->p_children)) return TRUE;
 	else return FALSE;
 }
 
-/*
-
-inserisce il processo puntato da p in coda alla lista dei
-processi figli del processo puntato da parent
-
-*/
-/*
-void insertChild(pcb_t *parent, pcb_t *p){
-	clist_enqueue(p, &(parent->p_children), p_siblings);
-	p->p_parent = parent;
-}*/
 void insertChild(struct pcb_t *parent, struct pcb_t *p)
 {
 	if (parent != NULL && p != NULL) {
@@ -246,19 +120,6 @@ void insertChild(struct pcb_t *parent, struct pcb_t *p)
 	}
 }
 
-//decrementa la lista dei processi figli del processo puntato da p
-/*
-pcb_t *removeChild(pcb_t *p){
-	pcb_t *pcb_temp = NULL;
-	struct clist *q = &p->p_children;
-
-		if(p->p_children.next != NULL){
-			pcb_temp = clist_head(pcb_temp, (*q), p_children);
-			pcb_temp->p_parent = NULL;
-			clist_dequeue(q);
-		}
-	return pcb_temp;
-}*/
 struct pcb_t* removeChild(struct pcb_t *p)
 {
 	if (p == NULL || emptyChild(p)) return NULL;
@@ -272,20 +133,6 @@ struct pcb_t* removeChild(struct pcb_t *p)
 	return head;
 }
 
-/*
-
-toglie il processo puntato da p dalla lista dei processi del suo
-parent e ritorna il puntatore del processo eliminato,
-se il processo p non ha un parent torna NULL
-
-*/
-/*
-pcb_t *outChild(pcb_t *p){
-	if(p->p_parent != NULL){
-		if(clist_delete(p, &(p->p_parent->p_children) , p_siblings)==0) return p;
-	}
-	else return NULL;
-}*/
 struct pcb_t* outChild(struct pcb_t *p)
 {
 	if (p == NULL || p->p_parent == NULL) return NULL;
@@ -307,21 +154,21 @@ struct pcb_t* outChild(struct pcb_t *p)
 ***************************************************************/
 
 void init_proc(pcb_t *pcb){
-
-	int i = 0;
+	int i;
 
 	pcb->p_parent = NULL;  // inizializzo la struttura per evitare resuidi di un vecchio utilizzo
 	pcb->p_cursem = NULL;
 	pcb->pid = (int)pcb;
 	init_state_t(pcb->p_s);
+
 	for(i=0; i<EXCP_COUNT;i++)
 		init_state_t(pcb->excp_state_vector[i]);
-	pcb->p_list.next = NULL;
-	pcb->p_children.next = NULL;
-	pcb->p_siblings.next = NULL;
+
+	pcb->p_list = (struct clist)CLIST_INIT;
+	pcb->p_children = (struct clist)CLIST_INIT;
+	pcb->p_siblings = (struct clist)CLIST_INIT;
 	pcb->kernel_mode = 0;
 	pcb->global_time = 0;
-	pcb->lastTimeSlice = 0;
 	pcb->waitingResCount = 0;
 	pcb->tags = 0;
 }

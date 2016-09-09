@@ -1,16 +1,5 @@
 #include <syscall.h>
 
-UI flagsCheck;
-
-void shitfun() {
-
-}
-
-pid_t pidCheck;
-UI p8Started = 0;
-
-void sysspec(){}
-void term(){}
 /***************************************************************
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
@@ -43,81 +32,58 @@ void saveCurState(state_t *state, state_t *newState){
 // questa funziona si occupa di assegnare pid univoci ai processi
 
 pid_t genPid(UI a){
-	HIDDEN UI count = 0;
-	count = getTODLO();  //pseudo random generator
-	count &= 0xFFFFFFFF;
+	UI count = getTODLO();  //pseudo random generator
+	count &= 0x0000FFFF;
+	count <<= 4;
 	return a + count;
 }
 
 // supporto alla terminate process
 
-pid_t savedPid;
-
 pcb_t* searchPid(pcb_t *parent, const pid_t pid){
 	void* tmp = NULL;
 	pcb_t* scan = NULL;
 	pcb_t* save = NULL;
-	//tprint("searchPid\n");
 	clist_foreach(scan, &(parent->p_children), p_siblings, tmp){
-		//tprint("foreach\n");
-		//shitfun();
 		if(scan->pid==pid){
-			//tprint("if\n");
 			return scan;
 		}
 		else {
-			//tprint("else\n");
 			if(!emptyChild(scan)) {
-				//tprint("else if\n");
-				//pcb_t *head = clist_head(head, scan->p_children, p_siblings);
 				save = searchPid(scan, pid);
 			}
-			if(save){
-				//tprint("if save\n");
-				savedPid = save->pid;
-				//if (save->pid == pid) HALT();
+			if(save)
 				return save;
-			}
 		}
 	}
-	//tprint("fuori foreach, NULL found\n");
 	return NULL;
 }
-pid_t terminatorPID;
+
 void terminator(pcb_t* proc) {
-	if (p8Started) {
-		//tprint("terminator started\n");
-		terminatorPID = proc->pid;
-		shitfun();
-	}
+
 	while(!emptyChild(proc)) {
-		//if (p8Started) tprint("terminator while child\n");
 		terminator(removeChild(proc));
 	}
-	//if (p8Started) tprint("terminator while done\n");
+
 	if (proc->p_cursem!=NULL) {
-		//if (p8Started) tprint("terminator if cursem\n");
 		if ((int*)(proc->p_cursem) >= &(semDevices[0]) && (int*)(proc->p_cursem) <= &(semDevices[MAXPROC-1])) softBlockCounter--;
 		else 
 			updateSemaphoreValue(proc->p_cursem, proc->waitingResCount);
 		outBlocked(proc);
-		//insertProcQ(&readyQueue, removed);
 	}
 	processCounter--;
 	if (proc != curProc){
-		//if (p8Started) tprint("terminator proc != curProc\n");
 		outProcQ(&readyQueue, proc);
 		outChild(proc);
 		freePcb(proc);
 	}
-	//if (p8Started) tprint("terminator end\n");
 }
 
 // azioni ripetitive syscall 4,5,6
 
-void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
+void setSYSTLBPGMT(hdl_type old, UI new, memaddr handler, memaddr stack, UI flags){
 	unsigned int asid;
-	if (old == SYS) {
+	if (old == SYS_HDL) {
 		switch (curProc->tags) {
 			case 1:
 			case 3:
@@ -130,7 +96,7 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 				break;
 		}
 	}
-	else if (old == TLB) {
+	else if (old == TLB_HDL) {
 		switch (curProc->tags) {
 			case 2:
 			case 3:
@@ -143,7 +109,7 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 				break;
 		}
 	}
-	else if (old == PGMT) {
+	else if (old == PGMT_HDL) {
 		switch (curProc->tags) {
 			case 4:
 			case 5:
@@ -175,8 +141,6 @@ void setSYSTLBPGMT(UI old, UI new, memaddr handler, memaddr stack, UI flags){
 *                     SYSCALL KERNEL MODE                      *
 ***************************************************************/
 
-pid_t curProcPID, newProcPID, savePID;
-
 int createProcess(state_t *stato){
 	pcb_t *newProc = allocPcb();
 
@@ -189,12 +153,6 @@ int createProcess(state_t *stato){
 	newProc->pid = genPid(newProc->pid);
 	insertChild(curProc, newProc);
 	insertProcQ(&readyQueue, newProc);
-
-	if (p8Started) {
-		curProcPID = curProc->pid;
-		newProcPID = newProc->pid;
-		shitfun();
-	}
 
 	return newProc->pid; // Success
 }
@@ -209,19 +167,10 @@ void terminateProcess(pid_t p){
 		curProc=NULL;
 	}
 	else{
-		sysspec();
-		curProcPID = p;
-		if (p8Started) shitfun();
 		if(!(save=searchPid(curProc, p))){
-			//if (p8Started) tprint("going to panic...\n");
 			PANIC();
 		}
-		//if (p8Started) tprint("terminateProcess, searchPid done\n");
-		savePID = save->pid;
-		shitfun();
-		//if (p8Started) tprint("about to call terminator\n");
 		terminator(save);
-		//if (p8Started) tprint("tornata...\n");
 	}
 }
 
@@ -234,12 +183,12 @@ void semaphoreOperation(int *sem, int weight){
 
 		while ((firstBlocked=headBlocked(sem)) && firstBlocked->waitingResCount <= weight) {
 			firstBlocked = outBlocked(firstBlocked);		// rimuovo il processo dalla coda del semaforo
-			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES-1]) softBlockCounter--;								// decremento il contatore dei processi bloccati sof
+			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES-1]) softBlockCounter--;		// decremento il contatore dei processi bloccati sof
 			weight -= firstBlocked->waitingResCount;
 			firstBlocked->waitingResCount = 0;
 			insertProcQ(&readyQueue, firstBlocked);
 		}
-		firstBlocked->waitingResCount -= weight; //guardare bene il discorso pesi potrebbe non funzionare sempre
+		firstBlocked->waitingResCount -= weight;
 	}
 	else if (weight <= -1){		// resources to be allocated
 		(*sem) += weight;
@@ -250,9 +199,8 @@ void semaphoreOperation(int *sem, int weight){
 			curProc->global_time += getTODLO() - processStart;
 
 			if(insertBlocked(sem, curProc))
-			PANIC();
-			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES-1])
-			softBlockCounter++;								// decremento il contatore dei processi bloccati sof
+				PANIC();
+			if(sem>=&semDevices[0] && sem<=&semDevices[MAX_DEVICES-1]) softBlockCounter++;		// decremento il contatore dei processi bloccati sof
 			curProc = NULL;
 		}
 	}
@@ -261,30 +209,30 @@ void semaphoreOperation(int *sem, int weight){
 }
 
 void specifySysBp(memaddr handler, memaddr stack, UI flags){
-	setSYSTLBPGMT(SYS, EXCP_SYS_NEW, handler, stack, flags);
+	setSYSTLBPGMT(SYS_HDL, EXCP_SYS_NEW, handler, stack, flags);
 }
 
 void specifyTlb(memaddr handler, memaddr stack, UI flags){
-	setSYSTLBPGMT(TLB, EXCP_TLB_NEW, handler, stack, flags);
+	setSYSTLBPGMT(TLB_HDL, EXCP_TLB_NEW, handler, stack, flags);
 }
 
 void specifyPgm(memaddr handler, memaddr stack, UI flags){
-	setSYSTLBPGMT(PGMT, EXCP_PGMT_NEW, handler, stack, flags);
+	setSYSTLBPGMT(PGMT_HDL, EXCP_PGMT_NEW, handler, stack, flags);
 }
 
-void exitTrap(UI exType, UI ret){
+void exitTrap(hdl_type exType, UI ret){
 	switch(exType){
-		case SYS:{
+		case SYS_HDL:{
 			curProc->excp_state_vector[EXCP_SYS_OLD].a1 = ret;
 			LDST(&curProc->excp_state_vector[EXCP_SYS_OLD]);
 			break;
 		}
-		case TLB:{
+		case TLB_HDL:{
 			curProc->excp_state_vector[EXCP_TLB_OLD].a1 = ret;
 			LDST(&curProc->excp_state_vector[EXCP_TLB_OLD]);
 			break;
 		}
-		case PGMT:{
+		case PGMT_HDL:{
 			curProc->excp_state_vector[EXCP_PGMT_OLD].a1 = ret;
 			LDST(&curProc->excp_state_vector[EXCP_PGMT_OLD]);
 			break;

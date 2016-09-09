@@ -28,20 +28,9 @@ typedef struct pcb_t {
 	struct clist p_siblings; /* children list: links to the siblings */
 	cputime_t kernel_mode;
 	cputime_t global_time;
-	cputime_t executed;
-	cputime_t lastTimeSlice;
-	cputime_t processStart;
 	UI waitingResCount;
 	UI tags;
 } pcb_t;
-
-/* custom type to descride scheduler situations */
-typedef enum sched_t{
-	SCHED_START,		// scheduler code executed on launch
-	SCHED_RESET,		// scheduler code executed on reset
-	SCHED_NEXT,     	// scheduler code exevuted when we have to load the next ready process
-	SCHED_CONTINUE		// scheduler code to let current process continue execution
-}sched_t;
 
 /* custom type to describe interrupt acknowledgements */
 typedef enum ack_type {
@@ -49,5 +38,11 @@ typedef enum ack_type {
 	ACK_TERM_TRANSMIT,
 	ACK_TERM_RECEIVE
 } ack_type;
+
+typedef enum hdl_type {
+	SYS_HDL,
+	TLB_HDL,
+	PGMT_HDL
+} hdl_type;
 
 #endif

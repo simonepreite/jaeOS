@@ -1,8 +1,6 @@
 #include <exceptions.h>
 
 // assegno i puntatori alle aree di memoria
-EXTERN UI p8Started;
-int debug_a1;
 state_t *tlb_old = (state_t*)TLB_OLDAREA;
 state_t *pgmtrap_old = (state_t*)PGMTRAP_OLDAREA;
 state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
@@ -12,8 +10,8 @@ state_t *sysbp_old = (state_t*)SYSBK_OLDAREA;
 ***************************************************************/
 
 
-void handlerSYSTLBPGM(UI old, UI new, state_t* state){
-  if (old == TLB) {
+void handlerSYSTLBPGM(hdl_type old, UI new, state_t* state){
+  if (old == TLB_HDL) {
     switch (curProc->tags) {
       case 0:
       case 1:
@@ -26,7 +24,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
       break;
     }
   }
-  else if (old == PGMT) {
+  else if (old == PGMT_HDL) {
     switch (curProc->tags) {
       case 0:
       case 1:
@@ -39,7 +37,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
       break;
     }
   }
-  else if (old == SYS) {
+  else if (old == SYS_HDL) {
     UI a1 = state->a1;
     UI a2 = state->a2;
     UI a3 = state->a3;
@@ -88,7 +86,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
   }
   else PANIC();
 
-  if (old != SYS) {
+  if (old != SYS_HDL) {
     saveCurState(state, &(curProc->excp_state_vector[old]));
     curProc->excp_state_vector[new].a1 = CAUSE_EXCCODE_GET(state->CP15_Cause);
     curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
@@ -102,7 +100,7 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
 
 void tlbHandler(){
   kernelStart=getTODLO();
-  handlerSYSTLBPGM(TLB, EXCP_TLB_NEW, tlb_old);
+  handlerSYSTLBPGM(TLB_HDL, EXCP_TLB_NEW, tlb_old);
 }
 
 void sysHandler(){
@@ -113,12 +111,11 @@ void sysHandler(){
     if((curProc->p_s.cpsr & STATUS_SYS_MODE) == STATUS_SYS_MODE){
       saveCurState(sysbp_old, &curProc->p_s);
       /* Se l'eccezione è di tipo System call */
-      handlerSYSTLBPGM(SYS, EXCP_SYS_NEW, sysbp_old);
+      handlerSYSTLBPGM(SYS_HDL, EXCP_SYS_NEW, sysbp_old);
       //processo corrente, ricalcolare tempi
       cputime_t end = getTODLO();
       curProc->kernel_mode += end - kernelStart;
       /* Richiamo lo scheduler */
-      //if (p8Started) tprint("about to call scheduler...\n");
       scheduler();
     }
     /* Altrimenti se è in user-mode */
@@ -139,7 +136,6 @@ void sysHandler(){
       terminateProcess(curProc->pid);
       scheduler();
     }
-   // testfun();
     saveCurState(sysbp_old, &(curProc->excp_state_vector[EXCP_SYS_OLD]));
     curProc->excp_state_vector[EXCP_SYS_NEW].a1 = sysbp_old->a1;
     curProc->excp_state_vector[EXCP_SYS_NEW].a2 = sysbp_old->a2;
@@ -149,7 +145,6 @@ void sysHandler(){
     temp = temp << 28;
     curProc->excp_state_vector[EXCP_SYS_NEW].a1 &= 0x0FFFFFFF;
     curProc->excp_state_vector[EXCP_SYS_NEW].a1 |= temp;
-    //curProc->excp_state_vector[EXCP_SYS_NEW].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[EXCP_SYS_NEW].cpsr);
     curProc->kernel_mode += getTODLO() - kernelStart;
     LDST(&(curProc->excp_state_vector[EXCP_SYS_NEW]));
   }
@@ -157,5 +152,5 @@ void sysHandler(){
 
 void pgmHandler(){
   kernelStart=getTODLO();
-  handlerSYSTLBPGM(PGMT, EXCP_PGMT_NEW, pgmtrap_old);
+  handlerSYSTLBPGM(PGMT_HDL, EXCP_PGMT_NEW, pgmtrap_old);
 }

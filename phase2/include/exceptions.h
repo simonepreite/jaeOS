@@ -4,14 +4,12 @@
 #include <const.h>
 #include <initial.h>
 
-EXTERN void sysspec();
 EXTERN cputime_t kernelStart;
 
 // auxiliary prototype
 
-EXTERN void testfun();
 EXTERN void saveCurState(state_t *state, state_t *newState);
-void handlerSYSTLBPGM(UI old, UI new, state_t* state);
+void handlerSYSTLBPGM(hdl_type old, UI new, state_t* state);
 
 // handler prototype
 
@@ -27,7 +25,7 @@ EXTERN void semaphoreOperation(int *sem, int weight);
 EXTERN void specifySysBp(memaddr handler, memaddr stack, UI flags);
 EXTERN void specifyTlb(memaddr handler, memaddr stack, UI flags);
 EXTERN void specifyPgm(memaddr handler, memaddr stack, UI flags);
-EXTERN void exitTrap(UI exType, UI ret);
+EXTERN void exitTrap(hdl_type exType, UI ret);
 EXTERN void getCpuTime(cputime_t *global_time, cputime_t *user_time);
 EXTERN void waitForClock();
 EXTERN UI iodevop(UI command, int lineNum, UI deviceNum);

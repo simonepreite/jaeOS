@@ -3,8 +3,6 @@
 
 #include <initial.h>
 
-EXTERN void testfun();
-
 void scheduler();
 
 #endif

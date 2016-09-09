@@ -84,20 +84,6 @@ void terminalHandler() {
 }
 
 void timerHandler() {
-	// Bisogna capire la gestione dei tempi e dello pseudoclock -.-"
-	// if (control100ms == TRUE){
-	// 	/* unlock all processes blocked on the pseudoclock timer semaphore*/
-	// 	while (semDevices[MAX_DEVICES-1] < 0){
-	// 		semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
-	// 	}2\
-	// 	control100ms = FALSE;
-	// 	curProc->global_time += getTODLO() - procInit;
-	// 	insertProcQ(&readyQueue, curProc);
-	// 	curProc=NULL;
-	// }
-	// /* sending ack to the pseudoclock*/
-	// setTIMER(SCHED_TIME_SLICE);
-	//testfun();
 	clock += getTODLO() - clockTick;
 	clockTick = getTODLO();
 

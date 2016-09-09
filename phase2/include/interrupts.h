@@ -3,8 +3,6 @@
 
 #include <initial.h>
 
-EXTERN void testfun();
-
 // auxiliary variables
 
 EXTERN cputime_t executed;
