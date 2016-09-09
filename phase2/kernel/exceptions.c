@@ -89,8 +89,8 @@ void handlerSYSTLBPGM(UI old, UI new, state_t* state){
   else PANIC();
 
   if (old != SYS) {
-    saveCurState(state, &curProc->excp_state_vector[old]);
-    curProc->excp_state_vector[new].a1 = state->CP15_Cause;
+    saveCurState(state, &(curProc->excp_state_vector[old]));
+    curProc->excp_state_vector[new].a1 = CAUSE_EXCCODE_GET(state->CP15_Cause);
     curProc->kernel_mode += getTODLO() - kernelStart; // chiudo qui kernel time perchè in pgmHandler lo rifaccio
     LDST(&(curProc->excp_state_vector[new]));
   }
@@ -138,7 +138,8 @@ void sysHandler(){
       terminateProcess(curProc->pid);
       scheduler();
     }
-    saveCurState(sysbp_old, &curProc->excp_state_vector[EXCP_SYS_OLD]);
+   // testfun();
+    saveCurState(sysbp_old, &(curProc->excp_state_vector[EXCP_SYS_OLD]));
     curProc->excp_state_vector[EXCP_SYS_NEW].a1 = sysbp_old->a1;
     curProc->excp_state_vector[EXCP_SYS_NEW].a2 = sysbp_old->a2;
     curProc->excp_state_vector[EXCP_SYS_NEW].a3 = sysbp_old->a3;
@@ -147,7 +148,7 @@ void sysHandler(){
     temp = temp << 28;
     curProc->excp_state_vector[EXCP_SYS_NEW].a1 &= 0x0FFFFFFF;
     curProc->excp_state_vector[EXCP_SYS_NEW].a1 |= temp;
-    curProc->excp_state_vector[EXCP_SYS_NEW].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[EXCP_SYS_NEW].cpsr);
+    //curProc->excp_state_vector[EXCP_SYS_NEW].cpsr = STATUS_ALL_INT_ENABLE(curProc->excp_state_vector[EXCP_SYS_NEW].cpsr);
     curProc->kernel_mode += getTODLO() - kernelStart;
     LDST(&(curProc->excp_state_vector[EXCP_SYS_NEW]));
   }

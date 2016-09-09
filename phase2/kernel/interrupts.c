@@ -89,7 +89,7 @@ void timerHandler() {
 	// 	/* unlock all processes blocked on the pseudoclock timer semaphore*/
 	// 	while (semDevices[MAX_DEVICES-1] < 0){
 	// 		semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
-	// 	}
+	// 	}2\
 	// 	control100ms = FALSE;
 	// 	curProc->global_time += getTODLO() - procInit;
 	// 	insertProcQ(&readyQueue, curProc);

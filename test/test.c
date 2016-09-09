@@ -37,9 +37,9 @@ void saveCurState(state_t *state, state_t *newState){
 }
 
 pid_t genPid(unsigned int a){
-	HIDDEN unsigned int count = 0;
-
-	count++;
+	HIDDEN UI count = 0;
+	count = getTODLO();  //pseudo random generator
+	count &= 0x0000FFFF;
 	return a + count;
 }
 

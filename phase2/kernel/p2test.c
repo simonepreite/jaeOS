@@ -93,7 +93,9 @@ typedef unsigned int cpu_t;
 #define MAXSEM			20
 
 void testfun();
+EXTERN void shitfun();
 EXTERN void sysspec();
+EXTERN UI p8Started;
 
 SEMAPHORE term_mut=1,		/* for mutual exclusion on terminal */
 	s[MAXSEM+1],		/* semaphore array */
@@ -145,7 +147,9 @@ void print(char *msg) {
 	char * s = msg;
 	devregtr command;
 	devregtr status;
+
 	SYSCALL(SEMOP, (int)&term_mut, -1, 0);				/* get term_mut lock */
+
 	while (*s != '\0') {
 	  /* Put "transmit char" command+char in term0 register (3rd word). This
 		   actually starts the operation on the device! */
@@ -622,9 +626,12 @@ void p5() {
 	print("p5 - try to redefine PGMVECT, this will cause p5 termination\n");
 
 	SYSCALL(SEMOP, (int)&endp5, 1, 0);			/* V(endp5) */
+	//testfun();
 	/* should cause a termination       */
 	SYSCALL(SPECPGMTHDL, (memaddr)p5prog, p5hdlstack, p5hdlflags);
+	//testfun();
 	SYSCALL(SPECPGMTHDL, (memaddr)p5prog, p5hdlstack, p5hdlflags);
+	//testfun();
 
 	/* should have terminated, so should not get to this point */
 	print("error: p5 didn't terminate\n");
@@ -759,12 +766,14 @@ void p7() {
 	print("error: p7 alive after program trap with no trap vector\n");
 	PANIC();
 }
+void prova() {};
 
 /* p8root -- test of termination of subtree of processes              */
 /* create a subtree of processes, wait for the leaves to block, signal*/
 /* the root process, and then terminate                               */
 void p8root() {
 	int i;
+	p8Started = 1;
 
 	p8pid = SYSCALL(GETPID, 0, 0, 0);
 
@@ -775,26 +784,32 @@ void p8root() {
 	SYSCALL(CREATEPROCESS, (int)&child2state, 0, 0);
 
 	SYSCALL(SEMOP, (int)&endcreate, -(NOLEAVES), 0);
-
+	testfun();
 	SYSCALL(TERMINATEPROCESS, (int)leaf1pid, 0, 0);
+	prova();
 	SYSCALL(TERMINATEPROCESS, (int)leaf2pid, 0, 0);
+	prova();	// non arriva qua ma leaf1 e leaf2 vengono correttamente trovati dalla searchPid
 	SYSCALL(TERMINATEPROCESS, (int)leaf3pid, 0, 0);
+	testfun();
 	SYSCALL(TERMINATEPROCESS, (int)leaf4pid, 0, 0);
-
+	testfun();
 	SYSCALL(SEMOP, (int)&blkleaves, NOLEAVES, 0);
-
+	//testfun();
 	SYSCALL(SEMOP, (int)&endp8, 1, 0);
 
 	SYSCALL(SEMOP, (int)&blkp8, -1, 0);
 }
 
 /*child1 & child2 -- create two sub-processes each*/
+pid_t child1PID, child2PID;
 
 void child1() {
 	print("child1 starts\n");
 
-	leaf1pid = SYSCALL(CREATEPROCESS, (int)&gchild1state, 0, 0);
+	child1PID = SYSCALL(GETPID, 0, 0, 0);
 
+	leaf1pid = SYSCALL(CREATEPROCESS, (int)&gchild1state, 0, 0);
+	//testfun();
 	leaf2pid = SYSCALL(CREATEPROCESS, (int)&gchild2state, 0, 0);
 
 	SYSCALL(SEMOP, (int)&blkp8, -1, 0);
@@ -805,6 +820,8 @@ void child1() {
 
 void child2() {
 	print("child2 starts\n");
+
+	child2PID = SYSCALL(GETPID, 0, 0, 0);
 
 	leaf3pid = SYSCALL(CREATEPROCESS, (int)&gchild3state, 0, 0);
 
