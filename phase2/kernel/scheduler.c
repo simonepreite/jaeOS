@@ -1,8 +1,7 @@
 #include <scheduler.h>
 
 UI control100ms = FALSE;
-UI executed;
-
+cputime_t executed=0;
 void scheduler(){
 	if(!curProc){
 		if (clist_empty(readyQueue)){
@@ -25,11 +24,12 @@ void scheduler(){
 	}
 	else{
 		//executed = curProc->global_time - processStart;
-		//processStart = getTODLO();
+		//curProc->global_time += executed;
+		processStart = getTODLO();
 
 		clock += getTODLO() - clockTick;
 		clockTick = getTODLO();
-		//setTIMER(0x09C4);
+		setTIMER(0x9C4);
 	}
 	LDST(&(curProc->p_s));
 }

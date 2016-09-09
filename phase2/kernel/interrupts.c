@@ -1,9 +1,9 @@
 #include <interrupts.h>
-
-
+EXTERN cputime_t executed;
 void intHandler(){
 	// kernelStart=getTODLO();
-	//curProc->global_time += getTODLO() - processStart;
+	executed = curProc->global_time - processStart;
+
 	state_t *oldState = (state_t *)INT_OLDAREA;
 	if (curProc) {
 		(*oldState).pc -= WORD_SIZE;
@@ -21,6 +21,7 @@ void intHandler(){
 
 	// if (curProc)
 	// 	curProc->kernel_mode = getTODLO() - kernelStart;
+	//curProc->global_time += getTODLO() - processStart;
 
 	//setSTATUS(STATUS_ALL_INT_ENABLE(getSTATUS())); probabilemnte non serve
 	scheduler();

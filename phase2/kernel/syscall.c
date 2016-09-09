@@ -326,7 +326,7 @@ void getCpuTime(cputime_t *global_time, cputime_t *user_time){
 	//curProc->global_time += getTODLO() - procInit;
 	//curProc->kernel_mode += getTODLO() - kernelStart;
 
-	//curProc->global_time += getTODLO() - processStart;
+	curProc->global_time += getTODLO() - processStart;
 	//processStart = getTODLO();
 
 	*global_time = curProc->global_time;
