@@ -141,10 +141,8 @@ void sysHandler(){
     curProc->excp_state_vector[EXCP_SYS_NEW].a2 = sysbp_old->a2;
     curProc->excp_state_vector[EXCP_SYS_NEW].a3 = sysbp_old->a3;
     curProc->excp_state_vector[EXCP_SYS_NEW].a4 = sysbp_old->a4;
-    UI temp = sysbp_old->cpsr & 0x0000000F;
-    temp = temp << 28;
     curProc->excp_state_vector[EXCP_SYS_NEW].a1 &= 0x0FFFFFFF;
-    curProc->excp_state_vector[EXCP_SYS_NEW].a1 |= temp;
+    curProc->excp_state_vector[EXCP_SYS_NEW].a1 |= ((sysbp_old->cpsr & 0x0000000F) << 28);
     curProc->kernel_mode += getTODLO() - kernelStart;
     LDST(&(curProc->excp_state_vector[EXCP_SYS_NEW]));
   }
