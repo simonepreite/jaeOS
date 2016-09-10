@@ -56,7 +56,7 @@ jaeOS: compiledDir phase0 phase1 phase2
 
 phase0: $(P0)/p0test
 
-phase1: clean_p1 buildDir1 $(OBJECTS_SUP)	# clean_p1 da togliere dopo aver finito la phase2 perchè verrà usato clean_all nel target jaeos
+phase1: clean_p1 buildDir1 $(OBJECTS_SUP)
 	mkdir -p $(EXEC_P1)
 	$(UL) $(FLAG_UL) $(LIB_UARM_P1) $(OBJECTS_SUP)
 	$(UC) $(FLAG_UC) $(EXEC_P1)/phase1.elf

@@ -83,6 +83,8 @@ void terminalHandler() {
 	}
 }
 
+EXTERN void testfun();
+
 void timerHandler() {
 	clock += getTODLO() - clockTick;
 	clockTick = getTODLO();
@@ -91,8 +93,11 @@ void timerHandler() {
 		while (semDevices[MAX_DEVICES-1] < 0) {
 			semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
 		}
-
-		clock = 0;
+		testfun();
+		//clock = 0;
+		//clock = -(SCHED_PSEUDO_CLOCK - (clock % SCHED_PSEUDO_CLOCK));
+		clock = -(SCHED_PSEUDO_CLOCK - clock);
+		//testfun();
 		clockTick = getTODLO();
 	}
 	if (curProc) {

@@ -27,7 +27,7 @@
 *.i*86
 *.x86_64
 *.hex
-phase0/p0test
+source/phase0/p0test
 
 # Debug files
 *.dSYM/
