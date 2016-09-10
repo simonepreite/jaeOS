@@ -1,6 +1,15 @@
+/*
+ *	INTERRUPTS.C
+ *	Device Interrupt Exception Handlers Implementation File
+ *
+ *	Gruppo 28:
+ *	Del Vecchio Matteo
+ *	Preite Simone
+ */
+
 #include <interrupts.h>
 
-void intHandler(){
+void intHandler() {
 	executed = curProc->global_time - processStart;
 
 	state_t *oldState = (state_t *)INT_OLDAREA;
@@ -83,8 +92,6 @@ void terminalHandler() {
 	}
 }
 
-EXTERN void testfun();
-
 void timerHandler() {
 	clock += getTODLO() - clockTick;
 	clockTick = getTODLO();
@@ -93,11 +100,8 @@ void timerHandler() {
 		while (semDevices[MAX_DEVICES-1] < 0) {
 			semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
 		}
-		testfun();
-		//clock = 0;
-		//clock = -(SCHED_PSEUDO_CLOCK - (clock % SCHED_PSEUDO_CLOCK));
+
 		clock = -(SCHED_PSEUDO_CLOCK - clock);
-		//testfun();
 		clockTick = getTODLO();
 	}
 	if (curProc) {
@@ -108,5 +112,5 @@ void timerHandler() {
 		clock += getTODLO() - clockTick;
 		clockTick = getTODLO();
 	}
-	 setTIMER(SCHED_TIME_SLICE);
+	setTIMER(SCHED_TIME_SLICE);
 }

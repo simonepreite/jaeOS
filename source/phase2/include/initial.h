@@ -1,3 +1,12 @@
+/*
+ *	INITIAL.H
+ *	Kernel Entry Point Header File
+ *
+ *	Gruppo 28:
+ *	Del Vecchio Matteo
+ *	Preite Simone
+ */
+
 #ifndef INITIAL_H
 #define INITIAL_H
 
@@ -25,7 +34,6 @@ cputime_t clock;
 cputime_t clockTick;
 cputime_t processStart;
 
-
 // auxiliary function
 
 void initArea(memaddr area, memaddr handler);
@@ -35,6 +43,5 @@ void initArea(memaddr area, memaddr handler);
 EXTERN void test();
 EXTERN void scheduler();
 EXTERN pid_t genPid(UI a);
-
 
 #endif

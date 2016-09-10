@@ -1,5 +1,14 @@
+/*
+ *	TYPES.H
+ *	Shared Types Header File
+ *
+ *	Gruppo 28:
+ *	Del Vecchio Matteo
+ *	Preite Simone
+ */
+
 #ifndef TYPES_H
-#define TYPES_h
+#define TYPES_H
 
 #include "clist.h"
 #include <uARMtypes.h>

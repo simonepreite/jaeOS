@@ -1,3 +1,12 @@
+/*
+ *	ASL.H
+ *	Active Semaphore List Header File
+ *
+ *	Gruppo 28:
+ *	Del Vecchio Matteo
+ *	Preite Simone
+ */
+
 #ifndef ASL_H
 #define ASL_H
 

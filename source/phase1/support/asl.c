@@ -1,3 +1,12 @@
+/*
+ *	ASL.C
+ *	Active Semaphore List Implementation File
+ *
+ *	Gruppo 28:
+ *	Del Vecchio Matteo
+ *	Preite Simone
+ */
+
 #include "const.h"
 #include "clist.h"
 #include "pcb.h"
@@ -11,9 +20,7 @@ typedef struct semd_t{
 	struct clist s_procq;
 }semd_t;
 
-
 HIDDEN struct clist aslh, semdFree;
-
 
 /***************************************************************
 *                    ACTIVE SEMAPHORE LIST                     *
@@ -21,7 +28,7 @@ HIDDEN struct clist aslh, semdFree;
 
 //Inizializza la lista semdFree, verrà chiamato solo una volta
 
-void initASL(){
+void initASL() {
 	// Initialization
 	aslh = (struct clist)CLIST_INIT;
 	semdFree = (struct clist)CLIST_INIT;
@@ -35,8 +42,7 @@ void initASL(){
 	}
 }
 
-int insertBlocked(int *semAdd, struct pcb_t *p)
-{
+int insertBlocked(int *semAdd, struct pcb_t *p) {
 	struct semd_t *scan = NULL;
 	void *tmp = NULL;
 	
@@ -90,8 +96,7 @@ int insertBlocked(int *semAdd, struct pcb_t *p)
 	return FALSE;
 }
 
-struct pcb_t* removeBlocked(int *semAdd)
-{
+struct pcb_t* removeBlocked(int *semAdd) {
 	struct semd_t *scan = NULL;
 	void *tmp = NULL;
 	
@@ -124,8 +129,7 @@ struct pcb_t* removeBlocked(int *semAdd)
 	return proc;
 }
 
-struct pcb_t* outBlocked(struct pcb_t *p)
-{
+struct pcb_t* outBlocked(struct pcb_t *p) {
 	if (p->p_cursem == NULL) return NULL;
 	
 	// Getting a pointer to the process queue of the semaphore where
@@ -144,8 +148,7 @@ struct pcb_t* outBlocked(struct pcb_t *p)
 	return proc;
 }
 
-struct pcb_t* headBlocked(int *semAdd)
-{
+struct pcb_t* headBlocked(int *semAdd) {
 	struct semd_t *scan = NULL;
 	void *tmp = NULL;
 	
@@ -169,7 +172,6 @@ struct pcb_t* headBlocked(int *semAdd)
 		return head;
 	}
 }
-
 
 /***************************************************************
 *                      AUXILIARY FUNCTION                      *

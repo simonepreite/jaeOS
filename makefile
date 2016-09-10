@@ -1,6 +1,6 @@
 #
 #	Makefile
-#	Automatically compile and build Phase0/1 by using appropriate make command
+#	Automatically compile and build Phase0/1/2 by using appropriate make command
 #
 #	Gruppo 28:
 #	Del Vecchio Matteo

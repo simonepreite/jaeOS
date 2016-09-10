@@ -1,3 +1,11 @@
+/*
+ *	CONST.H
+ *
+ *	Gruppo 28:
+ *	Del Vecchio Matteo
+ *	Preite Simone
+ */
+
 /********************************
  * phase 2 constants definitions
  ********************************/
