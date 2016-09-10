@@ -47,29 +47,41 @@
 #                                                                          #
 #     jaeOS.elf jaeOS.elf.core.uarm jaeOS.elf.stab.uarm                    #
 #                                                                          #
-#     - il make file offre la possibilità di eliminare i file creati       #
-#	attraverso le opzioni:                                             #
+#     che compariranno nella cartella compiled/kernel                      #
 #                                                                          #
-#     & make clean  (che elimina il solo file eseguibile)                  #
-#     & make cleanall (che elimina anche gli altri file generati per uarm) #
+#     è possibile anche compilare solo phase 0 e phase 1 passando come     #
+#                                                                          #
+#     argomenti phase0 o phase1, i.e. make phase1                          #
+#                                                                          #
+#   - il make file offre la possibilità di eliminare i file creati         #
+#     attraverso le opzioni:                                               #
+#                                                                          #
+#     make clean_X  (elimina solo gli eseguibili della fase in questione)  #
+#                                                                          #
+#     dove ad X va sostituito p0, p1, p2 in base ai file oggetto ed        #
+#                                                                          #
+#     eseguibili che si vuole eliminare                                    #
+#                                                                          #
+#     make cleanall (che elimina anche gli altri file generati per uarm)   #
 #                                                                          #
 ############################################################################
 
-#####                          TEST P1TEST                             #####
+#####                          TEST P2TEST                             #####
 #                                                                          #
-#     - per verificare il p1test sulla macchina aprimo un terminale ed     #
-#       eseguiamo:                                                         #
+# - per verificare il p1test sulla macchina aprimo un terminale ed         #
+#   eseguiamo:                                                             #
 #                                                                          #
-#       $ uarm                                                             #
+#   $ uarm                                                                 #
 #                                                                          #
-#	che avvierà la macchina spenta.                                    #
+#   che avvierà la macchina spenta.                                        #
 #                                                                          #
-#	clicchiamo sul pulsante delle impostazioni e nella sezione "Boot"  #
-#	cerchiamo attraverso browse il file "jaeOS.elf.core.uarm".         #
-#       successivamente nella stessa finestra nella sezione "Symbol Table" #
-#	cerchiamo attraverso browse il file "jaeOS.elf.core.uarm".         #
-#   (che si troveranno nella directory exec creata in fase di compilazione)#
-#                                                                          #     
+#   clicchiamo sul pulsante delle impostazioni e nella sezione "Boot"      #
+#   cerchiamo attraverso browse il file "jaeOS.elf.core.uarm".             #
+#   successivamente nella stessa finestra nella sezione "Symbol Table"     #
+#   cerchiamo attraverso browse il file "jaeOS.elf.core.uarm".             #
+#   (che si troveranno nella directory compile/kernel creata in fase di    #
+#   compilazione)                                                          #
+#                                                                          #
 #   accendiamo l'emulatore attraverso il tasto power e apriamo un terminale#
 #   da terminals.                                                          #
 #                                                                          #
