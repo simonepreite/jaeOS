@@ -33,11 +33,11 @@ struct pcb_t* allocPcb() {
 
 	// If the pcbFree list is not empty
 	// a new ProcBlk can be allocated
-	if (!clist_empty(pcbFree)) {
+	if (!clist_empty(pcbFree)){
 		// Getting a pointer to the first free ProcBlk
 		head = clist_head(head, pcbFree, p_list);
 		clist_dequeue(&pcbFree);	// and removing it from the pcbFree list
-		
+
 		// Initializing ProcBlk fields
 		initPcbType(head);
 	}

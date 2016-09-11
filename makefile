@@ -76,34 +76,34 @@ buildDir2:
 	mkdir -p $(BUILD_P2)
 
 $(P0)/p0test: $(P0)/p0test.c $(P0)/clist.h
-	gcc $(P0)/p0test.c -o $(P0)/p0test
+	gcc $< -o $(P0)/p0test
 
 $(BUILD_P1)/pcb.o: $(SRC_SUP)/pcb.c $(HEAD_SUP)
-	$(CC) $(FLAG_CC_P1) $@ $(SRC_SUP)/pcb.c
+	$(CC) $(FLAG_CC_P1) $@ $<
 
 $(BUILD_P1)/asl.o: $(SRC_SUP)/asl.c $(HEAD_SUP)
-	$(CC) $(FLAG_CC_P1) $@ $(SRC_SUP)/asl.c
+	$(CC) $(FLAG_CC_P1) $@ $<
 
 $(BUILD_P1)/p1test.o: $(SRC_SUP)/p1test.c $(HEAD_UARM) $(HEAD_SUP)
-	$(CC) $(FLAG_CC_P1) $@ $(SRC_SUP)/p1test.c
+	$(CC) $(FLAG_CC_P1) $@ $<
 
 $(BUILD_P2)/initial.o: $(SRC_KER)/initial.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)/initial.c
+	$(CC) $(FLAG_CC_P2) $@ $<
 
 $(BUILD_P2)/syscall.o: $(SRC_KER)/syscall.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)/syscall.c
+	$(CC) $(FLAG_CC_P2) $@ $<
 
 $(BUILD_P2)/exceptions.o: $(SRC_KER)/exceptions.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)/exceptions.c
+	$(CC) $(FLAG_CC_P2) $@ $<
 
 $(BUILD_P2)/scheduler.o: $(SRC_KER)/scheduler.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)/scheduler.c
+	$(CC) $(FLAG_CC_P2) $@ $<
 
 $(BUILD_P2)/interrupts.o: $(SRC_KER)/interrupts.c $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)/interrupts.c
+	$(CC) $(FLAG_CC_P2) $@ $<
 
 $(BUILD_P2)/p2test.o: $(SRC_KER)/p2test.c $(HEAD_UARM) $(HEAD_KER)
-	$(CC) $(FLAG_CC_P2) $@ $(SRC_KER)/p2test.c
+	$(CC) $(FLAG_CC_P2) $@ $<
 
 clean_p0:
 	rm -rf $(P0)/p0test
@@ -116,4 +116,3 @@ clean_p2:
 
 cleanall: clean_p0
 	rm -rf $(COMPILED) $(BUILD_P1) $(BUILD_P2)
-
