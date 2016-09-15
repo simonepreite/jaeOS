@@ -9,7 +9,7 @@
 
 #include <scheduler.h>
 
-cputime_t executed = 0;
+//cputime_t executed = 0;
 
 void scheduler() {
 
@@ -28,21 +28,22 @@ void scheduler() {
 		}
 
 		if (!(curProc = removeProcQ(&readyQueue))) PANIC(); /* Anomaly */
-		
+
 		clock += getTODLO() - clockTick;
 		clockTick = getTODLO();
 		processStart = getTODLO();
-		
-		setTIMER(SCHED_TIME_SLICE);
+
+		if(curProc->remaining < 5000) setTIMER(curProc->remaining);
+		else setTIMER(SCHED_TIME_SLICE);
 	}
 	else {
 		curProc->global_time += getTODLO() - processStart;
-		processStart = getTODLO();
 
 		clock += getTODLO() - clockTick;
 		clockTick = getTODLO();
 
 		setTIMER(SCHED_TIME_SLICE - (getTODLO() - processStart));
+		processStart = getTODLO();
 	}
 
 	LDST(&(curProc->p_s));

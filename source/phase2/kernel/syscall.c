@@ -76,7 +76,7 @@ void terminator(pcb_t* proc) {
 	}
 
 	processCounter--;
-	
+
 	if (proc != curProc) {
 		outProcQ(&readyQueue, proc);
 		outChild(proc);
@@ -110,7 +110,7 @@ void setSYSTLBPGMT(hdl_type old, UI new, memaddr handler, memaddr stack, UI flag
 		curProc->excp_state_vector[new].pc = handler;
 		curProc->excp_state_vector[new].sp = stack;
 		curProc->excp_state_vector[new].cpsr |= (flags & 0x80000007);
-		
+
 		asid = ENTRYHI_ASID_GET(curProc->excp_state_vector[new].CP15_EntryHi);
 		ENTRYHI_ASID_SET(curProc->excp_state_vector[new].CP15_EntryHi, asid);
 	}
@@ -153,7 +153,7 @@ void terminateProcess(pid_t p) {
 
 void semaphoreOperation(int *sem, int weight) {
 	if (!sem) PANIC();
-	
+
 	if (weight >= 1) {	// resources to be freed
 		(*sem) += weight;
 
@@ -170,12 +170,13 @@ void semaphoreOperation(int *sem, int weight) {
 	}
 	else if (weight <= -1) {		// resources to be allocated
 		(*sem) += weight;
-		
+
 		if (*sem < 0) {
 			curProc->waitingResCount = -weight;		// il processo ha bisogno di weight risorse
 
 			curProc->kernel_mode += getTODLO() - kernelStart;
 			curProc->global_time += getTODLO() - processStart;
+			curProc->remaining -= getTODLO() -processStart;
 
 			if (insertBlocked(sem, curProc)) PANIC();
 			if (sem >= &semDevices[0] && sem <= &semDevices[MAX_DEVICES-1]) softBlockCounter++;		// decremento il contatore dei processi bloccati sof
@@ -229,7 +230,7 @@ void waitForClock() {
 	semaphoreOperation(&semDevices[index], -1);		// lock the current semaphore
 }
 
-UI iodevop(UI command, int lineNum, UI deviceNum){
+UI iodevop(UI command, int lineNum, UI deviceNum) {
 	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(lineNum, deviceNum);	// indirizzo al device register del dispositivo, sia esso terminale o altro
 
 	UI terminalReading = (lineNum == INT_TERMINAL && deviceNum >> 31) ? N_DEV_PER_IL : 0;	// controllo se voglio ricevere o trasmettere dal terminale

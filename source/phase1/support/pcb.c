@@ -33,7 +33,7 @@ struct pcb_t* allocPcb() {
 
 	// If the pcbFree list is not empty
 	// a new ProcBlk can be allocated
-	if (!clist_empty(pcbFree)){
+	if (!clist_empty(pcbFree)) {
 		// Getting a pointer to the first free ProcBlk
 		head = clist_head(head, pcbFree, p_list);
 		clist_dequeue(&pcbFree);	// and removing it from the pcbFree list
@@ -148,7 +148,7 @@ struct pcb_t* outChild(struct pcb_t *p) {
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
 
-void initPcbType(pcb_t *pcb){
+void initPcbType(pcb_t *pcb) {
 	int i;
 
 	pcb->p_list = (struct clist)CLIST_INIT;
@@ -165,6 +165,7 @@ void initPcbType(pcb_t *pcb){
 	pcb->pid = (int)pcb;
 	pcb->kernel_mode = 0;
 	pcb->global_time = 0;
+	pcb->remaining = 5000;
 	pcb->waitingResCount = 0;
 	pcb->tags = 0;
 }

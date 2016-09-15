@@ -36,7 +36,7 @@ void initASL() {
 
 	// Adding every sempahore to the semdFree list
 	int i;
-	for (i = 0; i < MAXPROC; i++){
+	for (i = 0; i < MAXPROC; i++) {
 		struct semd_t *elem = &(semdTable[i]);
 		clist_enqueue(elem, &semdFree, s_link);
 	}
@@ -48,17 +48,17 @@ int insertBlocked(int *semAdd, struct pcb_t *p) {
 
 	// Searching active sempahore whose identifier is semAdd
 	// This cycle won't be executed when the aslh list if empty
-	clist_foreach(scan, &aslh, s_link, tmp){
+	clist_foreach(scan, &aslh, s_link, tmp) {
 		if (semAdd == scan->s_semAdd) break;
 	}
 
 	int res = clist_foreach_all(scan, &aslh, s_link, tmp);
 
 	// The searched active semaphore doesn't exist (it may not be active)
-	if (res != 0){
+	if (res != 0) {
 		// If the semdFree list is not empty, there are free descriptors
 		// and a new semaphore can be allocated
-		if (!clist_empty(semdFree)){
+		if (!clist_empty(semdFree)) {
 			// Getting a pointer to the first free descriptor and making
 			// it active by dequeuing it from the semdFree list
 			struct semd_t *head = NULL;
@@ -68,8 +68,8 @@ int insertBlocked(int *semAdd, struct pcb_t *p) {
 			// Find the correct position where to insert the new semaphore
 			// in the aslh list to keep the ascending order, based on semAdd
 			// This cycle won't be executed when the aslh list is empty
-			clist_foreach(scan, &aslh, s_link, tmp){
-				if (semAdd < scan->s_semAdd){
+			clist_foreach(scan, &aslh, s_link, tmp) {
+				if (semAdd < scan->s_semAdd) {
 					clist_foreach_add(head, scan, &aslh, s_link, tmp);
 					break;
 				}
@@ -102,7 +102,7 @@ struct pcb_t* removeBlocked(int *semAdd) {
 
 	// Searching active sempahore whose identifier is semAdd
 	// This cycle won't be executed when the aslh list if empty
-	clist_foreach(scan, &aslh, s_link, tmp){
+	clist_foreach(scan, &aslh, s_link, tmp) {
 		if (semAdd == scan->s_semAdd) break;
 	}
 
@@ -120,8 +120,8 @@ struct pcb_t* removeBlocked(int *semAdd) {
 	// Checking if the process queue of the semaphore gets empty after removing
 	// a ProcBlk so that the entire sempahore can be deallocate and returned to
 	// the semdFree list
-	if (clist_empty(scan->s_procq)){
-		if (clist_delete(scan, &aslh, s_link) == 0){
+	if (clist_empty(scan->s_procq)) {
+		if (clist_delete(scan, &aslh, s_link) == 0) {
 			clist_enqueue(scan, &semdFree, s_link);
 		}
 	}
@@ -140,7 +140,7 @@ struct pcb_t* outBlocked(struct pcb_t *p) {
 	struct pcb_t *proc = outProcQ(procscan, p);
 
 	// Dealloc semaphore description if last blocked ProcBlk is removed
-	if (clist_empty(p->p_cursem->s_procq)){
+	if (clist_empty(p->p_cursem->s_procq)) {
 		clist_delete(p->p_cursem, &aslh, s_link);
 		clist_enqueue(p->p_cursem, &semdFree, s_link);
 	}
@@ -154,7 +154,7 @@ struct pcb_t* headBlocked(int *semAdd) {
 
 	// Searching active sempahore whose identifier is semAdd
 	// This cycle won't be executed when the aslh list if empty
-	clist_foreach(scan, &aslh, s_link, tmp){
+	clist_foreach(scan, &aslh, s_link, tmp) {
 		if (semAdd == scan->s_semAdd) break;
 	}
 
@@ -162,7 +162,7 @@ struct pcb_t* headBlocked(int *semAdd) {
 
 	// Return NULL if the searched semaphore is not found (it may not be active)
 	if (res != 0) return NULL;
-	else{
+	else {
 		// Return NULL is the semaphore is active but it has not processes
 		// in its process queue
 		if (clist_empty(scan->s_procq)) return NULL;
@@ -177,7 +177,7 @@ struct pcb_t* headBlocked(int *semAdd) {
 *                      AUXILIARY FUNCTION                      *
 ***************************************************************/
 
-void updateSemaphoreValue(struct semd_t *sem, int delta){
+void updateSemaphoreValue(struct semd_t *sem, int delta) {
 	if (!sem) PANIC();
 
 	*(sem->s_semAdd) += delta;

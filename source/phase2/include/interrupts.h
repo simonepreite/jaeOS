@@ -12,10 +12,6 @@
 
 #include <initial.h>
 
-// auxiliary variables
-
-EXTERN cputime_t executed;
-
 // interrupts handler
 
 void intHandler();

@@ -1,0 +1,7 @@
+- scrivere di aver utilizzato git.
+- gestione del tempo e dello pseudoclock
+- generazione pid con funzione pseudo random in base al tempo (siamo arrivati a questa conclusione perchè la somma di una variabile incrementale
+non era abbastanza casuale e non ci sembrava adeguato correre il rischio di causare overflow incrementando il numero in maniera esponenziale)
+- utilizzo di una variabile intera unica e maschera per accendere i bit dei sys/tlb/pgmt Handlers specificati
+- utilizzo di funzioni per evitare le ripetizioni di codice in (initial, exception, interrupts e syscall)
+- kernel time interrupt non addebitato al processo corrente perchè non legato ad una sua richiesta

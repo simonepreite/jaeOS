@@ -10,7 +10,7 @@
 #include <interrupts.h>
 
 void intHandler() {
-	executed = curProc->global_time - processStart;
+	//executed = curProc->global_time - processStart;
 
 	state_t *oldState = (state_t *)INT_OLDAREA;
 	if (curProc) {
@@ -30,11 +30,11 @@ void intHandler() {
 	scheduler();
 }
 
-UI getDeviceNumberFromLineBitmap(int *lineAddr){
+UI getDeviceNumberFromLineBitmap(int *lineAddr) {
 	int activeBit = 0x00000001;
 	int i;
 
-	for (i = 0; i < 8; i++){
+	for (i = 0; i < 8; i++) {
 		if ((*lineAddr & activeBit) == activeBit) break;
 		activeBit = activeBit << 1;
 	}
@@ -42,8 +42,8 @@ UI getDeviceNumberFromLineBitmap(int *lineAddr){
 	return i;
 }
 
-void acknowledge(UI semIndex, devreg_t *devRegister, ack_type type){
-	if (semDevices[semIndex] < 1){
+void acknowledge(UI semIndex, devreg_t *devRegister, ack_type type) {
+	if (semDevices[semIndex] < 1) {
 		pcb_t *process = headBlocked(&semDevices[semIndex]);
 		switch (type) {
 			case ACK_GEN_DEVICE:
@@ -66,7 +66,7 @@ void acknowledge(UI semIndex, devreg_t *devRegister, ack_type type){
 	}
 }
 
-void deviceHandler(int type){
+void deviceHandler(int type) {
 	UI *bitmapForLine = (UI *)CDEV_BITMAP_ADDR(type);								// ottengo la bitmap delle linee in base al tipo di device
 	UI deviceNumber = getDeviceNumberFromLineBitmap(bitmapForLine);					// ottengo il numero del device in base alla bitmap (vedere funzione ausiliaria)
 	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(type, deviceNumber);		// ottengo il device register per il device da gestire
@@ -75,38 +75,39 @@ void deviceHandler(int type){
 	acknowledge(index, deviceRegister, ACK_GEN_DEVICE);
 }
 
-void terminalHandler(){
+void terminalHandler() {
 	UI *bitmapForLine = (UI *)CDEV_BITMAP_ADDR(INT_TERMINAL);
 	UI terminalNumber = getDeviceNumberFromLineBitmap(bitmapForLine);
 	devreg_t *terminalRegister = (devreg_t *)DEV_REG_ADDR(INT_TERMINAL, terminalNumber);
 	UI index = 0;
 	// Trasmissione Carattere, operazione a proprità più elevata rispetto alla ricezione
-	if ((terminalRegister->term.transm_status & 0x000000FF) == DEV_TTRS_S_CHARTRSM){
+	if ((terminalRegister->term.transm_status & 0x000000FF) == DEV_TTRS_S_CHARTRSM) {
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_TRANSMIT);
 	}
 	// Ricezione Carattere
-	else if ((terminalRegister->term.recv_status & 0x000000FF) == DEV_TRCV_S_CHARRECV){
+	else if ((terminalRegister->term.recv_status & 0x000000FF) == DEV_TRCV_S_CHARRECV) {
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_RECEIVE);
 	}
 }
 
-void timerHandler(){
+void timerHandler() {
 	clock += getTODLO() - clockTick;
 	clockTick = getTODLO();
 
-	if (clock >= SCHED_PSEUDO_CLOCK){
-		while (semDevices[MAX_DEVICES-1] < 0){
+	if (clock >= SCHED_PSEUDO_CLOCK) {
+		while (semDevices[MAX_DEVICES-1] < 0) {
 			semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
 		}
 
 		clock = -(SCHED_PSEUDO_CLOCK - clock);
 		clockTick = getTODLO();
 	}
-	if (curProc){
+	if (curProc) {
 		curProc->global_time += getTODLO() - processStart;
 		insertProcQ(&readyQueue, curProc);
+		curProc->remaining = 5000;
 		curProc = NULL;
 
 		clock += getTODLO() - clockTick;
