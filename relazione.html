@@ -99,7 +99,6 @@ ul.sched_case{
             </li>
           </ul>
         </p>
-        <br><br><br><br><br><br><br>
       <li><span class="list_entry">interrupts.c</span>
         <p>questo file contiene i gestori degli interrupt per il terminale, il timer e gli altri device.
           Un handler centrale viene invocato quando avviene un interrupt, dopodichè la <span class="list_entry">getDeviceNumberFromLineBitmap</span>
@@ -152,15 +151,14 @@ ul.sched_case{
         <p>il tempo trascorso in <span class="bold">kernel time</span> a causa di un <span class="italic">interrupt</span> <span class="list_entry">non</span> viene addebitato al processo corrente
           perché l’interrupt non è stato causato di sicuro per una richiesta fatta da quest'ultimo ma da
           uno bloccato su un semaforo in attesa dell’interrupt.</p>
-      </li><br><br><br><br><br><br><br><br><br>
       <li><span class="list_entry">set del timer dopo il risveglio da un semaforo:</span>
         <p>può succedere che durante l’esecuzione un processo resti bloccato su un semaforo ed al suo ritorno in
-          esecuzione è giusto che il timer non venga reinizializzato a <span class="italic">5000 ms</span> ma che utilizzi il tempo restante
+          esecuzione è giusto che il timer non venga reinizializzato a <span class="italic">5 ms</span> ma che utilizzi il tempo restante
           che gli era stato concesso.<br>
           La tecnica utilizzata è quella di tenere traccia del time slice rimanente in una variabile all’interno
           della struttura del processo, <span class="italic">remainig</span>, che viene decrementata del tempo che ha già eseguito ogni volta che
           si ferma su un semaforo.
-          Questa variabile viene inizializzata a 5000 nel momento in cui il processo viene allocato e ogni volta che scade il suo time slice.</p>
+          Questa variabile viene inizializzata a 5000 (micro-secondi) nel momento in cui il processo viene allocato e ogni volta che scade il suo time slice.</p>
       </li>
     </ul>
   </div>
