@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>relazione</title>
+<style>
+div#title{
+  text-align: center;
+}
+</style>
+</head>
+<body>
+  <div id="title">
+    <h1>JaeOS</h1>
+    <p>progetto di sistemi operativi</p>
+    <p>prof: Renzo Davoli</p>
+    <p>anno: 2015/2016</p>
+    <p>Gruppo 28:</p>
+    <p>Matteo Del Vecchio</p>
+    <p>Simone Preite</p>
+  </div>
+  <div id="intro">
+    <h3>Intro</h3>
+    <p>Lo sviluppo del progetto si è composto di tre fasi che avevano come scopo ultimo
+      quello di scrivere un sistema operativo minimale ARM-based.
+      Si è dimostrato molto utile per lo sviluppo l’utilizzo del software git che ha
+      reso semplice e ordinata l’organizzazione e l’evoluzione del progetto.</p>
+  </div>
+  <div id="organisation">
+    <h3>Organisation</h3>
+    <p>Per la struttura organizzativa si è deciso di dividere I file in base alle fasi si cui è
+      composto ed il makefile è in grado di compilare tutto il progetto o singolarmente le varie fasi (vedi README.md).
+      L’albero dei sorgenti parte dalla directory “source” che contiene le directory “phase0, phase1 e phase2”,
+      che contengono rispettivamente una directory per gli header e una per I sorgenti.
+      Per la prima fase l’impostazione era dettata per lo più dalle specifiche mentre la seconda fase si compone di cinque file:
+    </p>
+    <ul>
+      <li><span>initial.c</span>
+        <p>main del programma è il punto di ingresso, questo file si occupa di
+          gestire le operazioni iniziali, popolare le aree di memoria, fornire i
+          punti di accesso agli handler per le eccezioni e gli interrupt, qui vengono
+          disabilitati gli interrupts per queste funzioni in modo tale che quando vi si
+          accede le operazioni non vengano interrotte appunto da interrupt.
+          Viene allocato il primo processo e inizializzato, quindi messo in readyQueue
+          per poi richiamare lo scheduler. Il controllo non tornerà mai più nel main.</p>
+        </li>
+      <li><span>scheduler.c</span>
+        <p>contiene, come si evince dal nome, lo scheduler che regola l’avvicendamento dei file.
+          È diviso in due casi; ovvero quando esiste un processo corrente, significa che è avvenuto
+          un interrupt o una system call che non ha bloccato il processo su di un semaforo e quindi
+          deve essere ricaricato, e quando il processo corrente è a null, questo è il caso in cui il
+          vecchio processo corrente si è bloccato su un semaforo.
+          Ora bisogna valutare due alternative:
+          <ul>
+            <li>c’è un processo in readyQueue quindi semplicemente viene prelevato e caricato.
+            </li>
+            <li>Non c’è un processo in readyQueue, qui bisogna controllare tre situazioni che
+              portano a stati della macchina diversi:
+              <ul>
+                <li>processCounter è a zero, significa che non ci
+                sono più processi e la macchina può essere arrestata</li>
+                <li>processCounter è maggiore di zero e
+                softBlockCounter è uguale a zero potrebbe significare che il sistema è in stato di deadlock
+                che viene gestito mandando il sistema in PANIC</li>
+                <li>L’ultimo caso è che programCounter sia a zero ma softBlockCounter sia maggiore di zero,
+                  significa che ci sono processi bloccati su semafori di device quindi il sistema vieme messo
+                  in stato di WAIT e aspetta per un interrupt in modo che un processo venga liberato e possa tornare
+                  ad essere eseguito.</li>
+              </ul>
+            </li>
+          </ul>
+        </p>
+      <li><span>interrupts.c</span>
+        <p>questo file contiene i gestori degli interrupt per il terminale, il timer e gli altri device.
+          Un handler centrale viene invocato quando avviene un interrupt, dopodichè la getDeviceNumberFromLineBitmap
+          si occupa di capire quale device lo ha provocato in modo da richiamare l’handler del device corretto.
+          La funzione acknowledge viene richiamata da tutti I gestori di device e si occupa di gestire le operazioni comuni
+          (opportunamente parametrizzate) a tutti i device.</p>
+      </li>
+      <li><span>syscall.c</span>
+        <p>l’implementazione delle system call é stata inserita in un file apposito,
+          qui sono state scritte tutte le funzioni che all’interno delle specifiche erano state
+          richieste come system call privilegiate.</p>
+      </li>
+      <li><span>exceptions.c</span>
+        <p>gli hander per le eccezioni sono sviluppati in questo modulo, qui ci sono I punti di accesso
+          in caso di invocazione di una syscall, programTrap o accessi a zone di memoria non autorizzati.
+          Anche in questo caso come nella gestione degli interrupt e delle system call una funzione,
+          la handlerSYSTLBPGM si occupa di gestire le operazioni comuni ai tre handler.</p>
+      </li>
+    <ul>
+  </div>
+  <div id="features">
+    <h3>Features</h3>
+    <p></p>
+    <ul>
+      <li><span>generazione di pid:</span>
+        <p>Per evitale la ripetizione di pid durante l’esecuzione viene utilizzato il timer, quindi la funzione
+          genPid funziona da pseudo random, il concetto base è quello di prendere i due byte inferiori ed utilizzarli
+          per modificare i primi due byte dell’indirizzo del processo ed assegnare il risultato al pid. Si noti infatti
+          che essendo i processi inizializzati in un array I loro indirizzi fisici sono contingui quindi la parte più
+          significativa dell’indirizzo è quella meno variabile.
+          Inoltre questo metodo evita di arrivare a situazioni di overflow a causa di variabili incrementali.</p>
+        <li>
+      <li><span>verifica chiamate system call 4, 5, 6:</span>
+        <p>all’interno della struttura del processo è stato aggiunto il campo tags dichiarato come unsigned int,
+          l’ispirazione è venuta dal modo in cui linux gestisce I permessi dei file.
+          Viene inizializzato a 0 e man mano che le system call vengono chiamate per specificare l’handler viene fatto
+          uno xor con il rispettivo valore, se la variabile ha già il bit corrispondente accesso significa che la system call
+          era stata chiamata in precedenza e il processo viene terminato.
+Lo stesso meccanismo è utilizzato per verificare se l’handler è stato specificato quando lo si controlla nelle eccezioni.</p><li>
+      <li><span>Utilizzo di funzioni per evitare ripetizioni di codice:</span>
+        <p>durante la stesura non si è potuto non notare che molte parti del codice erano comuni a più elementi
+          quindi sono stati raggruppati in funzioni ausiliare, questo ci ha permesso di evitare le ripetizioni
+          di codice rendendo tutto più compatto.</p>
+      <li>
+      <li><span>Kernel time per interrupt:</span>
+        <p>il tempo trascorso in kernel time a causa di un interrrupt non viene addebitato al processo corrente
+          perché l’interrupt non è stato causato di sicuro per una richiesta fatta dal processo corrente ma da
+          uno bloccato su un semaforo in attesa dell’interrupt.</p>
+      <li>
+      <li><span>set del timer dopo il risveglio da un semaforo:</span>
+        <p>può succedere che durante l’esecuzione un processo resti bloccato su un semaforo ed al suo ritorno in
+          esecuzione è giusto che il timer non venga reinizializzato a 5000 ms ma che utilizzi il tempo restante
+          che gli era stato concesso.
+          La tecnica utilizzata è quella di tenere traccia del time slice rimanente in una variabile all’interno
+          della struttura del processo, remainig, che viene decrementata del time slice utilizzato ogni volta che il
+          processo si ferma su un semaforo. Questa variabile viene inizializzata a 5000 nel momento in cui il processo
+          viene allocato e ogni volta che scade il suo time slice.</p>
+      <li>
+    </ul>
+  </div>
+</body>
+</html>
