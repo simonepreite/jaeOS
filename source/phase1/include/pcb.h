@@ -3,8 +3,8 @@
  *	Process Control Block Header File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #ifndef PCB_H

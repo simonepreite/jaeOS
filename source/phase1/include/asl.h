@@ -3,25 +3,24 @@
  *	Active Semaphore List Header File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #ifndef ASL_H
 #define ASL_H
 
-/* prototipi funzioni semafori */
+/* Sempahore Functions Prototypes */
 
 EXTERN void initASL();
-EXTERN int insertBlocked(int *semAdd, pcb_t *p); /*Inserisce il ProcBlk puntato da p*/
-EXTERN pcb_t *removeBlocked(int *semAdd); /* rimuove il primo ProcBlk, se trovato */
-EXTERN pcb_t *outBlocked(pcb_t *p); /* Rimuove il ProcBlk puntato da p */
-EXTERN pcb_t *headBlocked(int *semAdd); /*ritorna un puntatore al ProcBlk */
+EXTERN int insertBlocked(int *semAdd, pcb_t *p); 	/* Insert ProcBlk pointed to by p to the semaphore */
+EXTERN pcb_t *removeBlocked(int *semAdd); 			/* Remove first blocked ProcBlk on semAdd, if present */
+EXTERN pcb_t *outBlocked(pcb_t *p); 				/* Remove ProcBlk pointed to by p */
+EXTERN pcb_t *headBlocked(int *semAdd); 			/* Return a pointer to the first blocked ProcBlk to semAdd sempahore */
 
-/* funzioni ausiliarie */
+/* Auxiliary Functions */
 
-EXTERN struct semd_t *new_semaphore(struct semd_t *new_sem, pcb_t *p, int *semAdd); /* attiva un semaforo se è possibilie */
-EXTERN void updateSemaphoreValue(struct semd_t *sem, int delta);	/* aggiorna il valore del semaforo sem aggiungendo delta (usare valori negativi per diminuire il valore) */
+EXTERN void updateSemaphoreValue(struct semd_t *sem, int delta);	/* Use negative delta values to decrement */
 
 #endif
 

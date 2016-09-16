@@ -3,27 +3,27 @@
 #	Automatically compile and build Phase0/1/2 by using appropriate make command
 #
 #	Gruppo 28:
-#	Del Vecchio Matteo
-#	Preite Simone
+#	Matteo Del Vecchio
+#	Simone Preite
 #
 
-#compilatore
+# ARM Compiler
 CC = arm-none-eabi-gcc
-#flag compilatore
+# Compiler flags 
 FLAG_CC = -mcpu=arm7tdmi -I $(INCL_UARM) -I $(INCL_P1)
 FLAG_CC_P1 = $(FLAG_CC) -c -o
 FLAG_CC_P2 = $(FLAG_CC) -I $(INCL_P2) -c -o
-#linker
+# Linker
 UL = arm-none-eabi-ld
-#flag linker
+# Linker flags
 FLAG_UL = -T
-#converitore per uARM
+# uARM executable converter
 UC = elf2uarm
-#flag converter uARM
+# uARM executable converter flags
 FLAG_UC = -k
-#percorso librerie uARM
+# uARM library path
 INCL_UARM = /usr/include/uarm
-#directory progetto
+# Project paths
 P0 = source/phase0
 P1 = source/phase1
 P2 = source/phase2
@@ -36,18 +36,18 @@ EXEC_P1 = compiled/exec_phase1
 EXEC_P2 = compiled/kernel
 BUILD_P1 = $(P1)/build
 BUILD_P2 = $(P2)/build
-#librerie linker
+# Linker libraries
 LIB_UARM = $(INCL_UARM)/ldscripts/elf32ltsarm.h.uarmcore.x $(INCL_UARM)/crtso.o $(INCL_UARM)/libuarm.o
 LIB_UARM_P1 = $(LIB_UARM) -o $(EXEC_P1)/phase1.elf
 LIB_UARM_P2 = $(LIB_UARM) -o $(EXEC_P2)/jaeOS.elf
-#object file (probabilmente verranno separati in futuro)
+# Object files path
 OBJECTS_PCB = $(BUILD_P1)/pcb.o $(BUILD_P1)/asl.o
 OBJECTS_SUP = $(OBJECTS_PCB) $(BUILD_P1)/p1test.o
 OBJECTS_KER = $(OBJECTS_PCB) $(BUILD_P2)/initial.o $(BUILD_P2)/exceptions.o $(BUILD_P2)/syscall.o $(BUILD_P2)/scheduler.o $(BUILD_P2)/interrupts.o $(BUILD_P2)/p2test.o
-#header file (probabilmente verranno separati in futuro)
+# Header file path
 HEAD_SUP = $(INCL_P1)/const.h $(INCL_P1)/types.h $(INCL_P1)/clist.h $(INCL_P1)/pcb.h $(INCL_P1)/asl.h
 HEAD_KER = $(INCL_P2)/exceptions.h $(INCL_P2)/initial.h $(INCL_P2)/interrupts.h $(INCL_P2)/scheduler.h $(INCL_P2)/syscall.h $(INCL_P1)/types.h
-#header file uarm
+# uARM header file path
 HEAD_UARM = $(INCL_UARM)/uARMconst.h $(INCL_UARM)/uARMtypes.h $(INCL_UARM)/libuarm.h
 
 all: jaeOS

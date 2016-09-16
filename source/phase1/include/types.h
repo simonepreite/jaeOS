@@ -3,8 +3,8 @@
  *	Shared Types Header File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #ifndef TYPES_H
@@ -27,14 +27,14 @@ struct semd_t;
 
 /* process control block type */
 typedef struct pcb_t {
-	struct pcb_t *p_parent; /* pointer to parent */
-	struct semd_t *p_cursem; /* pointer to the semd_t on which process blocked */
-	pid_t pid; /*process id*/
-	state_t p_s; /* processor state */
+	struct pcb_t *p_parent; 				/* pointer to parent */
+	struct semd_t *p_cursem; 				/* pointer to the semd_t on which process blocked */
+	pid_t pid; 								/* process id */
+	state_t p_s; 							/* processor state */
 	state_t excp_state_vector[EXCP_COUNT];
-	struct clist p_list; /* process list */
-	struct clist p_children; /* children list entry point*/
-	struct clist p_siblings; /* children list: links to the siblings */
+	struct clist p_list; 					/* process list */
+	struct clist p_children; 				/* children list entry point*/
+	struct clist p_siblings; 				/* children list: links to the siblings */
 	cputime_t kernel_mode;
 	cputime_t global_time;
 	cputime_t remaining;
@@ -49,6 +49,7 @@ typedef enum ack_type {
 	ACK_TERM_RECEIVE
 } ack_type;
 
+/* custom type to specify handler type */
 typedef enum hdl_type {
 	SYS_HDL,
 	TLB_HDL,

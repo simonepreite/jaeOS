@@ -2,8 +2,8 @@
  *	CONST.H
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 /********************************

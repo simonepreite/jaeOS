@@ -3,8 +3,8 @@
  *	Scheduling Policy and Deadlock Detection Header File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #ifndef SCHEDULER_H

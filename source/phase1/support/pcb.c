@@ -3,8 +3,8 @@
  *	Process Control Block Implementation File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #include "const.h"
@@ -12,8 +12,6 @@
 #include "pcb.h"
 
 void initPcbType(pcb_t *pcb);
-
-/* Lista dei pcb inutilizzati */
 
 HIDDEN struct clist pcbFree;
 
@@ -154,7 +152,7 @@ void initPcbType(pcb_t *pcb) {
 	pcb->p_list = (struct clist)CLIST_INIT;
 	pcb->p_children = (struct clist)CLIST_INIT;
 	pcb->p_siblings = (struct clist)CLIST_INIT;
-	pcb->p_parent = NULL;  // inizializzo la struttura per evitare resuidi di un vecchio utilizzo
+	pcb->p_parent = NULL;
 	pcb->p_cursem = NULL;
 
 	init_state_t(pcb->p_s);

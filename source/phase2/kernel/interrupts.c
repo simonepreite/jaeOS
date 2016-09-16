@@ -3,23 +3,22 @@
  *	Device Interrupt Exception Handlers Implementation File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #include <interrupts.h>
 
 void intHandler() {
-	//executed = curProc->global_time - processStart;
-
 	state_t *oldState = (state_t *)INT_OLDAREA;
 	if (curProc) {
-		(*oldState).pc -= WORD_SIZE;
+		(*oldState).pc -= WORD_SIZE;				// Update Program Counter to instruction that caused interrupt invocation
 		saveCurState(oldState, &curProc->p_s);
 	}
 
 	UI cause = getCAUSE();
 
+	// Analyze interrupt line to understand which kind of device caused the interrupt
 	if (CAUSE_IP_GET(cause, IL_TIMER)) timerHandler();
 	else if (CAUSE_IP_GET(cause, IL_DISK)) deviceHandler(IL_DISK);
 	else if (CAUSE_IP_GET(cause, IL_TAPE)) deviceHandler(IL_TAPE);
@@ -34,6 +33,7 @@ UI getDeviceNumberFromLineBitmap(int *lineAddr) {
 	int activeBit = 0x00000001;
 	int i;
 
+	// Analyze the interrupt line to check which specific device has caused the interrupt
 	for (i = 0; i < 8; i++) {
 		if ((*lineAddr & activeBit) == activeBit) break;
 		activeBit = activeBit << 1;
@@ -43,6 +43,7 @@ UI getDeviceNumberFromLineBitmap(int *lineAddr) {
 }
 
 void acknowledge(UI semIndex, devreg_t *devRegister, ack_type type) {
+	// if a process is blocked on a device, it gets the result of operation and acknowledge operation end to the device 
 	if (semDevices[semIndex] < 1) {
 		pcb_t *process = headBlocked(&semDevices[semIndex]);
 		switch (type) {
@@ -67,11 +68,11 @@ void acknowledge(UI semIndex, devreg_t *devRegister, ack_type type) {
 }
 
 void deviceHandler(int type) {
-	UI *bitmapForLine = (UI *)CDEV_BITMAP_ADDR(type);								// ottengo la bitmap delle linee in base al tipo di device
-	UI deviceNumber = getDeviceNumberFromLineBitmap(bitmapForLine);					// ottengo il numero del device in base alla bitmap (vedere funzione ausiliaria)
-	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(type, deviceNumber);		// ottengo il device register per il device da gestire
+	UI *bitmapForLine = (UI *)CDEV_BITMAP_ADDR(type);								// Getting interrupt line bitmat for specific device type
+	UI deviceNumber = getDeviceNumberFromLineBitmap(bitmapForLine);					// Getting device number from interrupt line bitmap
+	devreg_t *deviceRegister = (devreg_t *)DEV_REG_ADDR(type, deviceNumber);		// Getting device register of the device to be managed
 
-	UI index = EXT_IL_INDEX(type) * N_DEV_PER_IL + deviceNumber;					// calcolo l'indice del semaforo associato al dispositivo
+	UI index = EXT_IL_INDEX(type) * N_DEV_PER_IL + deviceNumber;					// Calculating semaphore index associated to device
 	acknowledge(index, deviceRegister, ACK_GEN_DEVICE);
 }
 
@@ -80,34 +81,39 @@ void terminalHandler() {
 	UI terminalNumber = getDeviceNumberFromLineBitmap(bitmapForLine);
 	devreg_t *terminalRegister = (devreg_t *)DEV_REG_ADDR(INT_TERMINAL, terminalNumber);
 	UI index = 0;
-	// Trasmissione Carattere, operazione a proprità più elevata rispetto alla ricezione
-	if ((terminalRegister->term.transm_status & 0x000000FF) == DEV_TTRS_S_CHARTRSM) {
+	
+	// If a characher has been transmitted (higher priority operation then receiving)
+	if ((terminalRegister->term.transm_status & 0x0000000F) == DEV_TTRS_S_CHARTRSM) {
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_TRANSMIT);
 	}
-	// Ricezione Carattere
-	else if ((terminalRegister->term.recv_status & 0x000000FF) == DEV_TRCV_S_CHARRECV) {
+	// If a character has been been received
+	else if ((terminalRegister->term.recv_status & 0x0000000F) == DEV_TRCV_S_CHARRECV) {
 		index = EXT_IL_INDEX(INT_TERMINAL) * N_DEV_PER_IL + N_DEV_PER_IL + terminalNumber;
 		acknowledge(index, terminalRegister, ACK_TERM_RECEIVE);
 	}
 }
 
 void timerHandler() {
-	clock += getTODLO() - clockTick;
+	clock += getTODLO() - clockTick;		// Update psudo clock time and initialize new interval (clockTick)
 	clockTick = getTODLO();
 
+	// 100ms have expired
 	if (clock >= SCHED_PSEUDO_CLOCK) {
+		// Unblock processes waiting for timer
 		while (semDevices[MAX_DEVICES-1] < 0) {
 			semaphoreOperation(&semDevices[MAX_DEVICES-1], 1);
 		}
 
+		// Initialize clock with a new value considering occurred delays
 		clock = -(SCHED_PSEUDO_CLOCK - clock);
 		clockTick = getTODLO();
 	}
+	// Current process has ran out his time slice
 	if (curProc) {
-		curProc->global_time += getTODLO() - processStart;
-		insertProcQ(&readyQueue, curProc);
-		curProc->remaining = 5000;
+		curProc->global_time += getTODLO() - processStart;		// updating process global time
+		insertProcQ(&readyQueue, curProc);						// process in ready queue
+		curProc->remaining = SCHED_TIME_SLICE;					// resetting time slice
 		curProc = NULL;
 
 		clock += getTODLO() - clockTick;

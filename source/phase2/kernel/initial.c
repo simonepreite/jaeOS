@@ -3,8 +3,8 @@
  *	Kernel Entry Point Implementation File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #include <initial.h>
@@ -49,19 +49,21 @@ int main() {
 	// Try to alloc first process
 	if ((firstProcess = allocPcb()) == NULL) PANIC();
 
-	firstProcess->pid = genPid(firstProcess->pid);   // Generate Process ID
+	firstProcess->pid = genPid(firstProcess->pid);   									// Generate Process ID
 	firstProcess->p_s.cpsr &= STATUS_CLEAR_MODE;
-	(firstProcess->p_s).cpsr = STATUS_ALL_INT_ENABLE((firstProcess->p_s).cpsr);
-	firstProcess->p_s.cpsr = firstProcess->p_s.cpsr | STATUS_SYS_MODE;  // Process executed in kernel mode
+	(firstProcess->p_s).cpsr = STATUS_ALL_INT_ENABLE((firstProcess->p_s).cpsr);			// Enabling interrupts
+	firstProcess->p_s.cpsr = firstProcess->p_s.cpsr | STATUS_SYS_MODE;  				// Process executed in kernel mode
 	firstProcess->p_s.CP15_Control = CP15_DISABLE_VM(firstProcess->p_s.CP15_Control);   // Virtual memory disabled
-	firstProcess->p_s.sp = RAM_TOP - FRAME_SIZE; // Setting stack pointer
-	firstProcess->p_s.pc = (memaddr)test;   // Setting program counter
+	firstProcess->p_s.sp = RAM_TOP - FRAME_SIZE; 										// Setting stack pointer
+	firstProcess->p_s.pc = (memaddr)test;   											// Setting program counter
 	// Process put in ready queue
 	insertProcQ(&readyQueue, firstProcess);
 	processCounter++;
 	clockTick = getTODLO();
 
 	scheduler();
+
+	PANIC();
 
 	return 0;
 }

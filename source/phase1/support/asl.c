@@ -3,8 +3,8 @@
  *	Active Semaphore List Implementation File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #include "const.h"
@@ -12,7 +12,7 @@
 #include "pcb.h"
 #include "asl.h"
 
-/* struttura semafori */
+/* semd_t Sempahore Structure */
 
 typedef struct semd_t {
 	int *s_semAdd;
@@ -25,8 +25,6 @@ HIDDEN struct clist aslh, semdFree;
 /***************************************************************
 *                    ACTIVE SEMAPHORE LIST                     *
 ***************************************************************/
-
-//Inizializza la lista semdFree, verrà chiamato solo una volta
 
 void initASL() {
 	// Initialization

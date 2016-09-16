@@ -3,8 +3,8 @@
  *	Device Interrupt Exception Handlers Header File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #ifndef INTERRUPTS_H
@@ -12,11 +12,10 @@
 
 #include <initial.h>
 
-// interrupts handler
 
-void intHandler();
-void deviceHandler(int type);
-void terminalHandler();
-void timerHandler();
+void intHandler();					// Entry point function of interrupt management
+void deviceHandler(int type);		// Device handler function; type indicates device type that caused interrupt (see uARMconst.h for details)
+void terminalHandler();				// Terminal (tx/rx) handler function
+void timerHandler();				// Timer handler function resposible of pseudo clock and time slice management
 
 #endif

@@ -3,8 +3,8 @@
  *	Circular List with Tail Pointer Implementation File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #ifndef CLIST_H

@@ -3,8 +3,8 @@
  *	TLB, PgmTrap and SYS/Bp Exception Handlers Header File
  *
  *	Gruppo 28:
- *	Del Vecchio Matteo
- *	Preite Simone
+ *	Matteo Del Vecchio
+ *	Simone Preite
  */
 
 #ifndef EXCEPITION_H
@@ -18,15 +18,16 @@ EXTERN cputime_t kernelStart;
 // auxiliary prototype
 
 EXTERN void saveCurState(state_t *state, state_t *newState);
+
+// Function to handle common operations between different types of exception handlers
 void handlerSYSTLBPGM(hdl_type old, UI new, state_t* state);
 
-// handler prototype
+void tlbHandler();		// TLB Handler function
+void sysHandler();		// SYSCALL/BP Handler function
+void pgmHandler();		// Program Trap Handler function
 
-void tlbHandler();
-void sysHandler();
-void pgmHandler();
 
-// SYSTEM CALL (extern module)
+/* Syscall prototypes (see syscall.h for details) */
 
 EXTERN int createProcess(state_t *stato);
 EXTERN void terminateProcess(pid_t p);
