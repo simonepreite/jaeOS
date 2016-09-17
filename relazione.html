@@ -34,6 +34,9 @@ span.list_entry{
 ul.sched_case{
   list-style-type: square;
 }
+p::first-letter{
+  text-transform: uppercase;
+}
 </style>
 </head>
 <body>
@@ -59,8 +62,8 @@ ul.sched_case{
     <p>Per la struttura organizzativa si è deciso di dividere I file in base alle fasi si cui è
       composto ed il makefile è in grado di compilare tutto il progetto o singolarmente le varie fasi (vedi README.md).
       L’albero dei sorgenti parte dalla directory <span class="bold">“source”</span> che contiene le directory <span class="bold">“phase0, phase1 e phase2”</span>,
-      che contengono rispettivamente una directory per gli header e una per I sorgenti.
-      Per la prima fase l’impostazione era dettata per lo più dalle specifiche mentre la seconda fase si compone di cinque file:
+      che contengono rispettivamente una directory per gli header e una per I sorgenti.</p>
+      <p>Per la prima fase l’impostazione era dettata per lo più dalle specifiche mentre la seconda fase si compone di cinque file:
     </p>
     <ul>
       <li><span class="list_entry">initial.c</span>
@@ -68,18 +71,18 @@ ul.sched_case{
           gestire le operazioni iniziali, popolare le aree di memoria, fornire i
           punti di accesso agli handler per le eccezioni e gli interrupt, qui vengono
           disabilitati gli interrupts per queste funzioni in modo tale che quando vi si
-          accede le operazioni non vengano interrotte appunto da interrupt.<br>
-          Viene allocato il primo processo e inizializzato, quindi messo in <span class="italic">readyQueue</span>
+          accede le operazioni non vengano interrotte appunto da interrupt.</p>
+          <p>Viene allocato il primo processo e inizializzato, quindi messo in <span class="italic">readyQueue</span>
           per poi richiamare lo scheduler. Il controllo non tornerà mai più nel main.</p>
         </li>
       <li><span class="list_entry">scheduler.c</span>
         <p>contiene, come si evince dal nome, lo scheduler, che regola l’avvicendarsi dei prcessi.
-          È diviso in due casi.<br>
-          Quando esiste un processo corrente, significa che è avvenuto un interrupt o una system call
+          È diviso in due casi.</p>
+          <p>Quando esiste un processo corrente, significa che è avvenuto un interrupt o una system call
           che non ha bloccato il processo su di un semaforo e quindi deve essere ricaricato,
           e quando il processo corrente è a null, questo è il caso in cui il vecchio processo corrente
-          si è bloccato su un semaforo.<br>
-          Ora bisogna valutare due alternative:
+          si è bloccato su un semaforo.</p>
+          <p>Ora bisogna valutare due alternative:</p>
           <ul class="sched_case">
             <li>c’è un processo in <span class="italic">readyQueue</span> quindi semplicemente viene prelevato e caricato.
             </li>
@@ -102,8 +105,8 @@ ul.sched_case{
       <li><span class="list_entry">interrupts.c</span>
         <p>questo file contiene i gestori degli interrupt per il terminale, il timer e gli altri device.
           Un handler centrale viene invocato quando avviene un interrupt, dopodichè la <span class="list_entry">getDeviceNumberFromLineBitmap</span>
-          si occupa di capire quale device lo ha provocato in modo da richiamare l’handler del device corretto.
-          La funzione <span class="list_entry">acknowledge</span> viene richiamata da tutti I gestori di device e si occupa di gestire le operazioni comuni
+          si occupa di capire quale device lo ha provocato in modo da richiamare l’handler del device corretto.</p>
+          <p>La funzione <span class="list_entry">acknowledge</span> viene richiamata da tutti I gestori di device e si occupa di gestire le operazioni comuni
           (opportunamente parametrizzate) a tutti i device.</p>
       </li>
       <li><span class="list_entry">syscall.c</span>
@@ -130,8 +133,8 @@ ul.sched_case{
            <span class="list_entry">genPid</span> funziona da pseudo random, il concetto base è quello di prendere
            i due byte inferiori ed utilizzarli per modificare i primi due byte dell’indirizzo del processo ed assegnare
            il risultato al pid. Si noti infatti che essendo i processi inizializzati in un array I loro indirizzi fisici
-           sono contingui quindi la parte più significativa dell’indirizzo è quella meno variabile.<br>
-           Inoltre questo metodo evita di arrivare a situazioni di  <span class="bold">overflow</span> a causa di variabili incrementali.</p>
+           sono contingui quindi la parte più significativa dell’indirizzo è quella meno variabile.</p>
+           <p>Inoltre questo metodo evita di arrivare a situazioni di  <span class="bold">overflow</span> a causa di variabili incrementali.</p>
         </li>
       <li><span class="list_entry">verifica chiamate system call 4, 5, 6:</span>
         <p>all’interno della struttura del processo è stato aggiunto il campo tags dichiarato come unsigned int,
@@ -139,8 +142,8 @@ ul.sched_case{
           Viene inizializzato a 0 e man mano che le system call vengono chiamate per specificare l’handler viene fatto
           uno xor con la maschera accende il bit corrispondente (<span class="bold">sys:</span> 0b001 (1), <span class="bold">tlb:</span> 0b010 (2),
           <span class="bold">pgmtrap:</span> 0b100 (4)) , se la variabile ha già il bit corrispondente accesso significa che la system call era
-          stata chiamata in precedenza e il processo viene terminato.<br>
-          Lo stesso meccanismo è utilizzato per verificare se l’handler è stato specificato quando lo si controlla nelle eccezioni.</p>
+          stata chiamata in precedenza e il processo viene terminato.</p>
+          <p>Lo stesso meccanismo è utilizzato per verificare se l’handler è stato specificato quando lo si controlla nelle eccezioni.</p>
       </li>
       <li><span class="list_entry">Utilizzo di funzioni per evitare ripetizioni di codice:</span>
         <p>durante la stesura non si è potuto non notare che molte parti del codice erano comuni a più elementi
@@ -154,11 +157,27 @@ ul.sched_case{
       <li><span class="list_entry">set del timer dopo il risveglio da un semaforo:</span>
         <p>può succedere che durante l’esecuzione un processo resti bloccato su un semaforo ed al suo ritorno in
           esecuzione è giusto che il timer non venga reinizializzato a <span class="italic">5 ms</span> ma che utilizzi il tempo restante
-          che gli era stato concesso.<br>
-          La tecnica utilizzata è quella di tenere traccia del time slice rimanente in una variabile all’interno
+          che gli era stato concesso.</p>
+          <p>La tecnica utilizzata è quella di tenere traccia del time slice rimanente in una variabile all’interno
           della struttura del processo, <span class="italic">remainig</span>, che viene decrementata del tempo che ha già eseguito ogni volta che
-          si ferma su un semaforo.
-          Questa variabile viene inizializzata a 5000 (micro-secondi) nel momento in cui il processo viene allocato e ogni volta che scade il suo time slice.</p>
+          si ferma su un semaforo.</p>
+          <p>Questa variabile viene inizializzata a 5000 (micro-secondi) nel momento in cui il processo viene allocato e ogni volta che scade il
+            suo time slice.</p>
+      </li>
+      <li><span class="list_entry">gestione e registrazione della vita di un processo:</span>
+        <p>Quello che si cerca di fare è di fornire in maniera dettaglaita e coerente il tempo che un processo ha trascorso in esecuzione,
+          ovvero la sua vita, estrapolando da questo il tempo trascorso in kernel mode. In questo modo si possono
+          tenere in considerazione tre variabili: <span class="italic">kernel-time, user-time e global-time</span>.</p><p>Il tempo viene registrato
+          ad ogni contexct switch, quindi nei momenti in cui avviene un interrupt del timer o il processo viene bloccato su un semaforo, inoltre
+          per fornire un dettaglio temporale maggiore i tempi vengono aggiornati anche nella chiamata alla system call <span class="bold">GETCPUTIME</span>.
+          <br>Per tenere traccia dell'esecuzione si fa ausilio di una variabile <span class="italic"> processStart</span> che viene inizializzata ogni volta
+          che il processo viene ricaricato e di questo si occupa lo scheduler.</p><p>Mentre per quanto riguarda il tempo trascorso in Kernel mode viene
+          utilizzata un'altra variabile <span class="italic">kernelStart</span> che viene inizializzata non appena si entra in un handler
+          (a parte quello degli interrupt come detto precedentemente), il ricalcolo del kernel time del processo viene effettuato quando l'esecuzione
+          della system call torna il controllo all'handler, prima di richiamare lo scheduler.</p>
+      </li>
+      <li><span class="list_entry">pseudo clock 100ms:</span>
+        <p></p>
       </li>
     </ul>
   </div>
