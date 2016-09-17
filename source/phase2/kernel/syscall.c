@@ -41,7 +41,7 @@ void saveCurState(state_t *state, state_t *newState) {
 pid_t genPid(UI a) {
 	UI count = getTODLO();  // pseudo random generator
 	count &= 0x0000FFFF;
-	count <<= 4;
+	count <<= 16;
 	return a + count;
 }
 
